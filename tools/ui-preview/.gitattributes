@@ -1,0 +1,2 @@
+# Snapshot manifests hash exact bytes; disable Git's line-ending conversion here.
+out/history/trees/** -text

@@ -1,0 +1,123 @@
+[
+  {
+    "id": 4001,
+    "slug": "editor.abcd",
+    "title": "ABCD question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4002,
+    "slug": "editor.range",
+    "title": "RANGE question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4003,
+    "slug": "editor.voting",
+    "title": "VOTING question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4004,
+    "slug": "editor.text",
+    "title": "TEXT question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4005,
+    "slug": "editor.order",
+    "title": "ORDER question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4006,
+    "slug": "editor.check",
+    "title": "CHECK question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4007,
+    "slug": "editor.slide",
+    "title": "SLIDE question editor",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4010,
+    "slug": "editor.add-question-popup",
+    "title": "Add a question",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4011,
+    "slug": "editor.settings",
+    "title": "Quiz settings",
+    "group": "Quiz editor",
+    "route": "/edit",
+    "sources": [
+      "routes/edit/+page.svelte"
+    ],
+    "limitations": "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+  },
+  {
+    "id": 4020,
+    "slug": "editor.files",
+    "title": "File library",
+    "group": "Quiz editor",
+    "route": "/edit/files",
+    "sources": [
+      "routes/edit/files/+page.svelte"
+    ],
+    "limitations": "File browsing and metadata are interactive; uploading bytes to a real server is unavailable."
+  },
+  {
+    "id": 4030,
+    "slug": "editor.videos",
+    "title": "Video editor",
+    "group": "Quiz editor",
+    "route": "/edit/videos",
+    "sources": [
+      "routes/edit/videos/+page.svelte"
+    ],
+    "limitations": "Video editing requires an input file. FFmpeg encoding and remote downloads are unavailable in the preview."
+  }
+]

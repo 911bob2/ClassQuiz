@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     s3_secret_key: str | None = None
     s3_bucket_name: str = "classquiz"
     s3_base_url: str | None = None
+    s3_public_url: str | None = None
 
 
 async def initialize_arq():
@@ -100,6 +101,7 @@ storage: Storage = Storage(
     secret_key=settings().s3_secret_key,
     bucket_name=settings().s3_bucket_name,
     base_url=settings().s3_base_url,
+    public_url=settings().s3_public_url,
 )
 
 meilisearch = MeiliSearch.Client(settings().meilisearch_url)

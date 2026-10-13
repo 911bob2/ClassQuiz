@@ -19,6 +19,7 @@ class Storage:
         secret_key: str | None = None,
         bucket_name: str | None = None,
         base_url: str | None = None,
+        public_url: str | None = None,
     ):
         self.backend = backend
         self.access_key = access_key
@@ -37,7 +38,8 @@ class Storage:
             if access_key is None or secret_key is None or bucket_name is None or base_url is None:
                 raise ValueError("Not all parameters given")
             self.instance = S3Storage(
-                base_url=base_url, access_key=access_key, secret_key=secret_key, bucket_name=bucket_name
+                base_url=base_url, access_key=access_key, secret_key=secret_key,
+                bucket_name=bucket_name, public_url=public_url
             )
 
         else:

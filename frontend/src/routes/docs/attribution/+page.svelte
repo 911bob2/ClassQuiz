@@ -27,11 +27,7 @@ SPDX-License-Identifier: MPL-2.0
 		</li>
 	</ul>
 	<h2>Translators</h2>
-	<p>
-		People who translated ClassQuiz on <a href="https://translate.mawoka.eu/engage/classquiz/"
-			>Weblate</a
-		> or directly.
-	</p>
+	<p>People who translated ClassQuiz.</p>
 	<ul>
 		<li>
 			<a href="https://github.com/liimee">liimee</a> (Indonesian)

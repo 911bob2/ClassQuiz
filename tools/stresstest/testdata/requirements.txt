@@ -1,0 +1,6 @@
+# Exact Socket.IO, Engine.IO and ASGI versions inspected on my-vm.
+python-socketio==5.14.2
+python-engineio==4.12.3
+uvicorn[standard]==0.38.0
+# Keep the fixture compatible with Uvicorn's legacy WebSocket adapter.
+websockets==15.0.1

@@ -50,7 +50,7 @@ SPDX-License-Identifier: MPL-2.0
 		<i>I hope you understand what I mean.</i> 😇
 	</p>
 	<h2>How to report illegal content</h2>
-	<p>You have to report illegal content by writing an email to report@mawoka.eu</p>
+	<p>Contact the administrator of this ClassQuiz installation.</p>
 	<h2>The rights of the admin</h2>
 	<p>
 		The admin is allowed to publish <b>ANY</b> data provided by the user, although the admin
@@ -61,10 +61,9 @@ SPDX-License-Identifier: MPL-2.0
 	</p>
 	<h2>The rights of the user</h2>
 	<p>
-		You can request the deletion of your data at any time by writing an email to
-		deleteme@mawoka.eu. Please include the email you registered with on ClassQuiz, and, if
-		possible, a prove that you are the owner of the account, by, eg., writing the email with the
-		email-address which is associated with your ClassQuiz-account.
+		You can request the deletion of your data at any time by contacting the administrator of
+		this ClassQuiz installation. Include the email address registered with your account and
+		proof that you own the account.
 	</p>
 
 	<h2>Final Words</h2>
@@ -73,8 +72,6 @@ SPDX-License-Identifier: MPL-2.0
 		happens if data should be stolen and published? i don't run this platform to get insulted
 		for publishing (personal) data, so I just make sure you're fine with that! Of course, I'll
 		try to not publish any data, delete any content without a reason, etc, but I could. If you
-		still got any questions, please contact me at <a href="https://mawoka.eu/contact"
-			>mawoka.eu/contact</a
-		>
+		still have questions, contact the administrator of this ClassQuiz installation.
 	</p>
 </article>

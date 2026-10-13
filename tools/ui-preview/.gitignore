@@ -1,0 +1,8 @@
+# Runtime process state and temporary test repositories; saved preview history is tracked.
+/out/tests/
+/out/*.log
+/out/*.pid
+/out/*.lock
+/out/history/write.lock
+/out/history/refs-*.tmp
+/out/history/trees/.pending-*/

@@ -1,0 +1,1649 @@
+▲ [WARNING] Cannot find base config file "./.svelte-kit/tsconfig.json" [tsconfig.json]
+
+    tsconfig.json:36:12:
+      36 │   "extends": "./.svelte-kit/tsconfig.json",
+         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+vite v7.1.12 building SSR bundle for production...
+transforming...
+7:49:32 PM [vite-plugin-svelte] src/routes/+page.svelte:22:4 `SelectedCreateThing` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+20: navbarVisible.visible = true;
+21: // eslint-disable-next-line no-unused-vars
+22: var SelectedCreateThing;
+                           ^
+23: (function (SelectedCreateThing) {
+24:     // eslint-disable-next-line no-unused-vars
+7:49:32 PM [vite-plugin-svelte] src/routes/+page.svelte:32:4 `SelectedPlayThing` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+30: })(SelectedCreateThing || (SelectedCreateThing = {}));
+31: // eslint-disable-next-line no-unused-vars
+32: var SelectedPlayThing;
+                         ^
+33: (function (SelectedPlayThing) {
+34:     // eslint-disable-next-line no-unused-vars
+7:49:32 PM [vite-plugin-svelte] src/routes/account/register/+page.svelte:187:7 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+185:               <!--						<div class='flex items-center justify-between mt-4 w-full'>-->
+186:               <input type="checkbox" name="privacy_accept" class="ml-3" />
+187:               <label class="text-sm text-gray-600 dark:text-gray-200">
+                           ^
+188:                 I've read the <a href="/docs/privacy-policy" class="underline"
+189:                   >Privacy policy</a
+7:49:32 PM [vite-plugin-svelte] src/routes/account/register/+page.svelte:201:7 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+199:               <!--						<div class='flex items-center justify-between mt-4 w-full'>-->
+200:               <input type="checkbox" name="tos_accept" class="ml-3" />
+201:               <label class="text-sm text-gray-600 dark:text-gray-200">
+                           ^
+202:                 I agree to the <a href="/docs/tos" class="underline"
+203:                   >Terms of Service</a
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:78:3 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+76:   <div class="grid grid-cols-6 overflow-hidden h-full">
+77:     <div class="border-r-4 border-black h-full">
+78:       <img src={image_url} />
+                                 ^
+79:     </div>
+80:     <div class="col-start-2 col-end-7 overflow-scroll">
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:101:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+ 99:       <div class="grid grid-cols-4">
+100:         {#each Array.from(Array(item_count[data_keys[index]]).keys()) as key}
+101:           <button
+                       ^
+102:             class="hover:opacity-80 transition-all"
+103:             onclick={() => {
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:113:6 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+111:             }}
+112:           >
+113:             <img
+                   ^
+114:               src={get_image_url({ ...data, [data_keys[index]]: key })}
+115:               in:fade|global={{ duration: 100 }}
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:132:2 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+130:       {$t('avatar_settings.thats_you')}
+131:     </h1>
+132:     <img
+           ^
+133:       class="m-auto w-1/2 h-1/2 z-20"
+134:       src={get_image_url(data)}
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/security/+page.svelte:177:8 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+175:             {#if user_data.require_password}
+176:               <div class="flex items-center space-x-2">
+177:                 <button
+                             ^
+178:                   disabled={!totp_activated}
+179:                   onclick={() => {
+7:49:32 PM [vite-plugin-svelte] src/routes/account/settings/security/+page.svelte:199:8 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+197:             {:else}
+198:               <div class="flex items-center space-x-2">
+199:                 <button
+                             ^
+200:                   disabled={!totp_activated}
+201:                   type="button"
+7:49:32 PM [vite-plugin-svelte] src/routes/admin/+page.svelte:264:1 '#' is not a valid href attribute
+https://svelte.dev/e/a11y_invalid_attribute
+262: <a
+263:   onclick={request_answer_export}
+264:   href="#"
+               ^
+265:   target="_blank"
+266:   bind:this={dataexport_download_a}
+7:49:32 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:152:7 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+150:                 placeholder={$t('dashboard.search_for_own_quizzes')}
+151:               />
+152:               <button
+                           ^
+153:                 onclick={() => {
+154:                   search_term = '';
+7:49:32 PM [vite-plugin-svelte] src/routes/edit/files/+page.svelte:116:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+114: 
+115: {#if edit_popup}
+116:   <div
+            ^
+117:     transition:fade={{ duration: 100 }}
+118:     class="fixed top-0 left-0 h-screen w-screen z-40 flex bg-black/50"
+7:49:32 PM [vite-plugin-svelte] src/routes/edit/files/+page.svelte:116:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+114: 
+115: {#if edit_popup}
+116:   <div
+            ^
+117:     transition:fade={{ duration: 100 }}
+118:     class="fixed top-0 left-0 h-screen w-screen z-40 flex bg-black/50"
+7:49:32 PM [vite-plugin-svelte] src/routes/edit/videos/+page.svelte:28:4 `Status` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+26: let last_time_elapsed = 0;
+27: // eslint-disable-next-line no-unused-vars
+28: var Status;
+              ^
+29: (function (Status) {
+30:     // eslint-disable-next-line no-unused-vars
+7:49:33 PM [vite-plugin-svelte] src/routes/practice/+page.svelte:39:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+37: 
+38:     <div class="grid grid-cols-2 h-fit px-20 mt-6 absolute bottom-0 w-full">
+39:       <button
+                  ^
+40:         class="flex justify-start transition-all disabled:opacity-60"
+41:         disabled={selected_question <= -1}
+7:49:33 PM [vite-plugin-svelte] src/routes/practice/+page.svelte:61:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+59:         </svg>
+60:       </button>
+61:       <button
+                  ^
+62:         class="flex justify-end transition-all disabled:opacity-60"
+63:         disabled={selected_question >= quiz.questions.length - 1}
+7:49:33 PM [vite-plugin-svelte] src/routes/remote/+page.svelte:300:1 '#' is not a valid href attribute
+https://svelte.dev/e/a11y_invalid_attribute
+298: <a
+299:   onclick={request_answer_export}
+300:   href="#"
+               ^
+301:   bind:this={dataexport_download_a}
+302:   class="absolute -top-3/4 -left-3/4 opacity-0 hidden">Download</a
+7:49:33 PM [vite-plugin-svelte] src/routes/results/[result_id]/+page.svelte:15:4 `SelectedTab` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+13: let { data } = $props();
+14: // eslint-disable-next-line no-unused-vars
+15: var SelectedTab;
+                   ^
+16: (function (SelectedTab) {
+17:     // eslint-disable-next-line no-unused-vars
+7:49:33 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:25:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+23:       <ul class="flex flex-col gap-4">
+24:         {#if available_methods.includes('PASSKEY')}
+25:           <div
+                   ^
+26:             class="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+27:             onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:56:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+54:         {/if}
+55:         {#if available_methods.includes('PASSWORD')}
+56:           <div
+                   ^
+57:             class="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+58:             onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:102:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+100:         {/if}
+101:         {#if available_methods.includes('TOTP')}
+102:           <div
+                    ^
+103:             class="flex flex-row bg-gray-100 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+104:             onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/routes/account/settings/security/backup_codes.svelte:39:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+37:     >
+38:       <h2 class="text-3xl m-auto">{$t('security_settings.backup_codes.your_backup_code')}</h2>
+39:       <p
+             ^
+40:         class="select-all font-mono text-xl m-auto"
+41:         onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/routes/account/settings/security/backup_codes.svelte:39:3 Non-interactive element `<p>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+37:     >
+38:       <h2 class="text-3xl m-auto">{$t('security_settings.backup_codes.your_backup_code')}</h2>
+39:       <p
+             ^
+40:         class="select-all font-mono text-xl m-auto"
+41:         onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:37:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+35:       </p>
+36:     </div>
+37:     <img
+          ^
+38:       onclick={() => (fullscreen_open = true)}
+39:       alt="QR code to join the game"
+7:49:33 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:37:2 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+35:       </p>
+36:     </div>
+37:     <img
+          ^
+38:       onclick={() => (fullscreen_open = true)}
+39:       alt="QR code to join the game"
+7:49:33 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:97:5 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+ 95:       {#each game_state.players as player}
+ 96:         <div class="p-2 m-2 border-2 border-[#B07156] rounded-sm hover:cursor-pointer">
+ 97:           <span
+                ^
+ 98:             class="hover:line-through text-lg"
+ 99:             onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:97:5 `<span>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+ 95:       {#each game_state.players as player}
+ 96:         <div class="p-2 m-2 border-2 border-[#B07156] rounded-sm hover:cursor-pointer">
+ 97:           <span
+                ^
+ 98:             class="hover:line-through text-lg"
+ 99:             onclick={() => {
+7:49:33 PM [vite-plugin-svelte] src/routes/dashboard/Analytics.svelte:29:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+27: 
+28: {#if quiz}
+29:   <div
+           ^
+30:     class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+31:     onclick={on_parent_click}
+7:49:33 PM [vite-plugin-svelte] src/routes/dashboard/Analytics.svelte:29:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+27: 
+28: {#if quiz}
+29:   <div
+           ^
+30:     class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+31:     onclick={on_parent_click}
+7:49:33 PM [vite-plugin-svelte] src/lib/components/DownloadQuiz.svelte:25:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+23: 
+24: {#if quiz_id}
+25:   <div
+           ^
+26:     class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
+27:     onclick={handle_on_click}
+7:49:33 PM [vite-plugin-svelte] src/lib/components/DownloadQuiz.svelte:25:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+23: 
+24: {#if quiz_id}
+25:   <div
+           ^
+26:     class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
+27:     onclick={handle_on_click}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:84:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+82: </script>
+83: 
+84: <div
+         ^
+85:   class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
+86:   transition:fade|global={{ duration: 100 }}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:84:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+82: </script>
+83: 
+84: <div
+         ^
+85:   class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
+86:   transition:fade|global={{ duration: 100 }}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:135:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+133: 
+134:     <div class="grid grid-cols-2 gap-8 my-auto">
+135:       <div
+                ^
+136:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+137:         class:opacity-50={selected_game_mode !== 'kahoot'}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:135:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+133: 
+134:     <div class="grid grid-cols-2 gap-8 my-auto">
+135:       <div
+                ^
+136:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+137:         class:opacity-50={selected_game_mode !== 'kahoot'}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:147:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+145:         </p>
+146:       </div>
+147:       <div
+                ^
+148:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+149:         class:opacity-50={selected_game_mode !== 'normal'}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:147:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+145:         </p>
+146:       </div>
+147:       <div
+                ^
+148:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+149:         class:opacity-50={selected_game_mode !== 'normal'}
+7:49:33 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:161:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+159:     </div>
+160:     <div class="flex justify-center items-center my-auto">
+161:       <label class="mr-4">{$t('result_page.custom_field')}</label>
+                                                                       ^
+162:       <input
+163:         bind:value={custom_field}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:49:1 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+47: 
+48: {#await media}
+49:   <img src={thumbhash_data} class={`${css_classes} ${added_thumbhash_classes}`} />
+                                                                                      ^
+50: {:then data}
+51:   {#if type === 'img'}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:52:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+50: {:then data}
+51:   {#if type === 'img'}
+52:     <img
+          ^
+53:       in:fade|global={{ duration: 300 }}
+54:       src={img_data.data}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:52:2 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+50: {:then data}
+51:   {#if type === 'img'}
+52:     <img
+          ^
+53:       in:fade|global={{ duration: 300 }}
+54:       src={img_data.data}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:78:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+76: 
+77: {#if fullscreen_open}
+78:   <div
+           ^
+79:     class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 fle p-2"
+80:     transition:fade|global={{ duration: 80 }}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:78:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+76: 
+77: {#if fullscreen_open}
+78:   <div
+           ^
+79:     class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 fle p-2"
+80:     transition:fade|global={{ duration: 80 }}
+7:49:33 PM [vite-plugin-svelte] src/lib/play/question.svelte:72:4 This reference only captures the initial value of `slider_value`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+70: let slider_value = $state([0]);
+71: if (question.type === QuizQuestionType.RANGE) {
+72:     slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+                    ^
+73: }
+74: const set_answer_if_not_set_range = (time) => {
+7:49:33 PM [vite-plugin-svelte] src/lib/practice/question.svelte:35:4 This reference only captures the initial value of `slider_value`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+33: let slider_value = $state([0]);
+34: if (question.type === QuizQuestionType.RANGE) {
+35:     slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+                    ^
+36: }
+37: let slider_values = $state([
+7:49:33 PM [vite-plugin-svelte] src/lib/practice/question.svelte:241:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+239:           style="background-color: {answer.color ?? '#b07156'}"
+240:         >
+241:           <button
+                       ^
+242:             onclick={() => {
+243:               question.answers = swapArrayElements(question.answers, i, i - 1);
+7:49:33 PM [vite-plugin-svelte] src/lib/practice/question.svelte:268:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+266:           <p class="w-full text-center p-2 text-2xl">{answer.answer}</p>
+267: 
+268:           <button
+                       ^
+269:             onclick={() => {
+270:               question.answers = swapArrayElements(question.answers, i, i + 1);
+7:49:33 PM [vite-plugin-svelte] src/lib/quiztivity/shares_popover.svelte:115:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+113: 
+114: <SmallPopover bind:open={popover_open} type={PopoverTypes.Copy} />
+115: <div
+          ^
+116:   class="fixed w-full h-full top-0 flex bg-black/50 z-50"
+117:   onclick={on_parent_click}
+7:49:33 PM [vite-plugin-svelte] src/lib/quiztivity/shares_popover.svelte:115:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+113: 
+114: <SmallPopover bind:open={popover_open} type={PopoverTypes.Copy} />
+115: <div
+          ^
+116:   class="fixed w-full h-full top-0 flex bg-black/50 z-50"
+117:   onclick={on_parent_click}
+7:49:33 PM [vite-plugin-svelte] src/lib/play/admin/slide.svelte:34:2 Screenreaders already announce `<img>` elements as an image
+https://svelte.dev/e/a11y_img_redundant_alt
+32:   </div>
+33:   <div class="w-full h-full flex justify-center">
+34:     <img src={img_src} alt="Slide image" />
+                                               ^
+35:   </div>
+36: </div>
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:74:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+72:   </div>
+73:   <div class="border-r-2 pt-6 px-6 overflow-scroll h-full">
+74:     <div
+             ^
+75:       bind:this={propertyCard}
+76:       class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:74:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+72:   </div>
+73:   <div class="border-r-2 pt-6 px-6 overflow-scroll h-full">
+74:     <div
+             ^
+75:       bind:this={propertyCard}
+76:       class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:163:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+161:     </div>
+162:     {#each data.questions as question, index}
+163:       <div
+                ^
+164:         class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition relative"
+165:         class:bg-green-300={index === selected_question}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:163:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+161:     </div>
+162:     {#each data.questions as question, index}
+163:       <div
+                ^
+164:         class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition relative"
+165:         class:bg-green-300={index === selected_question}
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:178:6 Elements with the 'button' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus
+176:           >
+177:             <!-- Div is used, since it just put me on the dashboard when using button elements... Idk why and I hate it-->
+178:             <div
+                      ^
+179:               class="h-full"
+180:               role="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:178:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+176:           >
+177:             <!-- Div is used, since it just put me on the dashboard when using button elements... Idk why and I hate it-->
+178:             <div
+                      ^
+179:               class="h-full"
+180:               role="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:207:6 Elements with the 'button' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus
+205:               </svg>
+206:             </div>
+207:             <div
+                      ^
+208:               class="h-full"
+209:               role="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:207:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+205:               </svg>
+206:             </div>
+207:             <div
+                      ^
+208:               class="h-full"
+209:               role="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:239:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+237:           </div>
+238:         {/if}
+239:         <button
+                     ^
+240:           class="rounded-full absolute -top-3 -right-3 opacity-70 hover:opacity-100 transition"
+241:           type="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/card.svelte:90:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+88:           class="inline-block bg-gray-600 w-4 h-4 rounded-full hover:bg-green-400 transition"
+89:         ></span>
+90:         <button
+                    ^
+91:           class="ml-auto"
+92:           type="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/card.svelte:148:7 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+146:           <div class="flex justify-center pt-10 w-full h-72">
+147:             <div class="h-72 relative">
+148:               <button
+                           ^
+149:                 class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+150:                 type="button"
+7:49:33 PM [vite-plugin-svelte] src/lib/editor/uploader.svelte:30:4 `AvailableUploadTypes` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+28: let selected_type = $state(null);
+29: // eslint-disable-next-line no-unused-vars
+30: var AvailableUploadTypes;
+                            ^
+31: (function (AvailableUploadTypes) {
+32:     // eslint-disable-next-line no-unused-vars
+7:49:34 PM [vite-plugin-svelte] src/lib/view_quiz/Hoverable.svelte:16:0 `<div>` with a mouseenter or mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+14: </script>
+15: 
+16: <div onmouseenter={enter} onmouseleave={leave}>
+          ^
+17:   {@render children?.({ hovering, })}
+18: </div>
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/AddNewQuestionPopup.svelte:83:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+81: </script>
+82: 
+83: <div
+         ^
+84:   class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
+85:   onclick={on_parent_click}
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/AddNewQuestionPopup.svelte:83:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+81: </script>
+82: 
+83: <div
+         ^
+84:   class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
+85:   onclick={on_parent_click}
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/slide.svelte:167:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+165:   <div class="absolute top-0 left-0 grid grid-cols-6 w-full">
+166:     <div class="flex flex-col pl-2 rounded-t-lg z-40 pt-2">
+167:       <button
+                   ^
+168:         class="mr-auto"
+169:         onclick={() => {
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/slide.svelte:207:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+205: 
+206:     <div class="flex flex-col pr-2 rounded-t-lg z-40 pt-2">
+207:       <button
+                   ^
+208:         class="ml-auto"
+209:         onclick={() => {
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/ABCDEditorPart.svelte:65:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+63:         )}
+64:       >
+65:         <button
+                    ^
+66:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+67:           type="button"
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/VotingEditorPart.svelte:59:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+57:         class:bg-gray-300={answer.answer}
+58:       >
+59:         <button
+                    ^
+60:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+61:           type="button"
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/TextEditorPart.svelte:47:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+45:         )}
+46:       >
+47:         <button
+                    ^
+48:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+49:           type="button"
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:63:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+61:         class="p-4 rounded-lg flex justify-center w-full transition relative border border-gray-600 flex-row gap-4 m-2"
+62:       >
+63:         <button
+                    ^
+64:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+65:           type="button"
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:88:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+86:         </button>
+87:         <div>
+88:           <button
+                      ^
+89:             onclick={() => {
+90:               move_item(true, i);
+7:49:34 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:113:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+111:             </svg>
+112:           </button>
+113:           <button
+                       ^
+114:             onclick={() => {
+115:               move_item(false, i);
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+(node:10720) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+7:49:43 PM [vite-plugin-svelte] src/lib/editor/slides/element_selection.svelte:73:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+71:   <ul>
+72:     {#each element_list as el}
+73:       <li
+              ^
+74:         class="flex flex-row mt-4 w-full bg-gray-200 shadow-xl rounded-lg p-2 hover:bg-gray-300 hover:shadow-2xl hover:cursor-pointer transition dark:bg-gray-800"
+75:         onclick={() => {
+7:49:43 PM [vite-plugin-svelte] src/lib/editor/slides/element_selection.svelte:73:3 Non-interactive element `<li>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+71:   <ul>
+72:     {#each element_list as el}
+73:       <li
+              ^
+74:         class="flex flex-row mt-4 w-full bg-gray-200 shadow-xl rounded-lg p-2 hover:bg-gray-300 hover:shadow-2xl hover:cursor-pointer transition dark:bg-gray-800"
+75:         onclick={() => {
+7:49:43 PM [vite-plugin-svelte] src/lib/components/commandpalette.svelte:227:5 Avoid using autofocus
+https://svelte.dev/e/a11y_autofocus
+225:           bind:value={input}
+226:           oninput={() => search(input)}
+227:           autofocus
+                        ^
+228:         />
+229:       </div>
+7:49:43 PM [vite-plugin-svelte] src/routes/results/[result_id]/general_overview.svelte:33:7 Unused CSS selector "underline"
+https://svelte.dev/e/css_unused_selector
+31: </div>
+32: 
+33: <style>underline{text-decoration:underline}</style>
+                    ^
+34: 
+7:49:43 PM [vite-plugin-svelte] src/lib/inline-editor.svelte:21:4 Avoid declaring classes below the top level scope
+https://svelte.dev/e/perf_avoid_nested_class
+19: let editor;
+20: onMount(() => {
+21:     class Editor extends BalloonEditor {
+         ^
+22:         static builtinPlugins = [
+23:             Essentials,
+✓ 540 modules transformed.
+rendering chunks...
+vite v7.1.12 building for production...
+transforming...
+7:49:46 PM [vite-plugin-svelte] src/routes/+page.svelte:22:4 `SelectedCreateThing` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+20: navbarVisible.visible = true;
+21: // eslint-disable-next-line no-unused-vars
+22: var SelectedCreateThing;
+                           ^
+23: (function (SelectedCreateThing) {
+24:     // eslint-disable-next-line no-unused-vars
+7:49:46 PM [vite-plugin-svelte] src/routes/+page.svelte:32:4 `SelectedPlayThing` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+30: })(SelectedCreateThing || (SelectedCreateThing = {}));
+31: // eslint-disable-next-line no-unused-vars
+32: var SelectedPlayThing;
+                         ^
+33: (function (SelectedPlayThing) {
+34:     // eslint-disable-next-line no-unused-vars
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:78:3 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+76:   <div class="grid grid-cols-6 overflow-hidden h-full">
+77:     <div class="border-r-4 border-black h-full">
+78:       <img src={image_url} />
+                                 ^
+79:     </div>
+80:     <div class="col-start-2 col-end-7 overflow-scroll">
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:101:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+ 99:       <div class="grid grid-cols-4">
+100:         {#each Array.from(Array(item_count[data_keys[index]]).keys()) as key}
+101:           <button
+                       ^
+102:             class="hover:opacity-80 transition-all"
+103:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:113:6 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+111:             }}
+112:           >
+113:             <img
+                   ^
+114:               src={get_image_url({ ...data, [data_keys[index]]: key })}
+115:               in:fade|global={{ duration: 100 }}
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/avatar/+page.svelte:132:2 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+130:       {$t('avatar_settings.thats_you')}
+131:     </h1>
+132:     <img
+           ^
+133:       class="m-auto w-1/2 h-1/2 z-20"
+134:       src={get_image_url(data)}
+7:49:46 PM [vite-plugin-svelte] src/routes/account/register/+page.svelte:187:7 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+185:               <!--						<div class='flex items-center justify-between mt-4 w-full'>-->
+186:               <input type="checkbox" name="privacy_accept" class="ml-3" />
+187:               <label class="text-sm text-gray-600 dark:text-gray-200">
+                           ^
+188:                 I've read the <a href="/docs/privacy-policy" class="underline"
+189:                   >Privacy policy</a
+7:49:46 PM [vite-plugin-svelte] src/routes/account/register/+page.svelte:201:7 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+199:               <!--						<div class='flex items-center justify-between mt-4 w-full'>-->
+200:               <input type="checkbox" name="tos_accept" class="ml-3" />
+201:               <label class="text-sm text-gray-600 dark:text-gray-200">
+                           ^
+202:                 I agree to the <a href="/docs/tos" class="underline"
+203:                   >Terms of Service</a
+7:49:46 PM [vite-plugin-svelte] src/routes/admin/+page.svelte:264:1 '#' is not a valid href attribute
+https://svelte.dev/e/a11y_invalid_attribute
+262: <a
+263:   onclick={request_answer_export}
+264:   href="#"
+               ^
+265:   target="_blank"
+266:   bind:this={dataexport_download_a}
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/security/+page.svelte:177:8 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+175:             {#if user_data.require_password}
+176:               <div class="flex items-center space-x-2">
+177:                 <button
+                             ^
+178:                   disabled={!totp_activated}
+179:                   onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/security/+page.svelte:199:8 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+197:             {:else}
+198:               <div class="flex items-center space-x-2">
+199:                 <button
+                             ^
+200:                   disabled={!totp_activated}
+201:                   type="button"
+7:49:46 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:152:7 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+150:                 placeholder={$t('dashboard.search_for_own_quizzes')}
+151:               />
+152:               <button
+                           ^
+153:                 onclick={() => {
+154:                   search_term = '';
+7:49:46 PM [vite-plugin-svelte] src/routes/edit/files/+page.svelte:116:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+114: 
+115: {#if edit_popup}
+116:   <div
+            ^
+117:     transition:fade={{ duration: 100 }}
+118:     class="fixed top-0 left-0 h-screen w-screen z-40 flex bg-black/50"
+7:49:46 PM [vite-plugin-svelte] src/routes/edit/files/+page.svelte:116:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+114: 
+115: {#if edit_popup}
+116:   <div
+            ^
+117:     transition:fade={{ duration: 100 }}
+118:     class="fixed top-0 left-0 h-screen w-screen z-40 flex bg-black/50"
+7:49:46 PM [vite-plugin-svelte] src/routes/edit/videos/+page.svelte:28:4 `Status` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+26: let last_time_elapsed = 0;
+27: // eslint-disable-next-line no-unused-vars
+28: var Status;
+              ^
+29: (function (Status) {
+30:     // eslint-disable-next-line no-unused-vars
+7:49:46 PM [vite-plugin-svelte] src/routes/practice/+page.svelte:39:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+37: 
+38:     <div class="grid grid-cols-2 h-fit px-20 mt-6 absolute bottom-0 w-full">
+39:       <button
+                  ^
+40:         class="flex justify-start transition-all disabled:opacity-60"
+41:         disabled={selected_question <= -1}
+7:49:46 PM [vite-plugin-svelte] src/routes/practice/+page.svelte:61:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+59:         </svg>
+60:       </button>
+61:       <button
+                  ^
+62:         class="flex justify-end transition-all disabled:opacity-60"
+63:         disabled={selected_question >= quiz.questions.length - 1}
+7:49:46 PM [vite-plugin-svelte] src/routes/remote/+page.svelte:300:1 '#' is not a valid href attribute
+https://svelte.dev/e/a11y_invalid_attribute
+298: <a
+299:   onclick={request_answer_export}
+300:   href="#"
+               ^
+301:   bind:this={dataexport_download_a}
+302:   class="absolute -top-3/4 -left-3/4 opacity-0 hidden">Download</a
+7:49:46 PM [vite-plugin-svelte] src/routes/results/[result_id]/+page.svelte:15:4 `SelectedTab` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+13: let { data } = $props();
+14: // eslint-disable-next-line no-unused-vars
+15: var SelectedTab;
+                   ^
+16: (function (SelectedTab) {
+17:     // eslint-disable-next-line no-unused-vars
+7:49:46 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:25:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+23:       <ul class="flex flex-col gap-4">
+24:         {#if available_methods.includes('PASSKEY')}
+25:           <div
+                   ^
+26:             class="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+27:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:56:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+54:         {/if}
+55:         {#if available_methods.includes('PASSWORD')}
+56:           <div
+                   ^
+57:             class="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+58:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/login/select_method.svelte:102:5 `<div>` with a click or keyup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+100:         {/if}
+101:         {#if available_methods.includes('TOTP')}
+102:           <div
+                    ^
+103:             class="flex flex-row bg-gray-100 rounded-lg p-2 hover:cursor-pointer hover:bg-gray-200 transition"
+104:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:37:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+35:       </p>
+36:     </div>
+37:     <img
+          ^
+38:       onclick={() => (fullscreen_open = true)}
+39:       alt="QR code to join the game"
+7:49:46 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:37:2 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+35:       </p>
+36:     </div>
+37:     <img
+          ^
+38:       onclick={() => (fullscreen_open = true)}
+39:       alt="QR code to join the game"
+7:49:46 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:97:5 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+ 95:       {#each game_state.players as player}
+ 96:         <div class="p-2 m-2 border-2 border-[#B07156] rounded-sm hover:cursor-pointer">
+ 97:           <span
+                ^
+ 98:             class="hover:line-through text-lg"
+ 99:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/lib/play/admin/game_not_started.svelte:97:5 `<span>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+ 95:       {#each game_state.players as player}
+ 96:         <div class="p-2 m-2 border-2 border-[#B07156] rounded-sm hover:cursor-pointer">
+ 97:           <span
+                ^
+ 98:             class="hover:line-through text-lg"
+ 99:             onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/security/backup_codes.svelte:39:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+37:     >
+38:       <h2 class="text-3xl m-auto">{$t('security_settings.backup_codes.your_backup_code')}</h2>
+39:       <p
+             ^
+40:         class="select-all font-mono text-xl m-auto"
+41:         onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/account/settings/security/backup_codes.svelte:39:3 Non-interactive element `<p>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+37:     >
+38:       <h2 class="text-3xl m-auto">{$t('security_settings.backup_codes.your_backup_code')}</h2>
+39:       <p
+             ^
+40:         class="select-all font-mono text-xl m-auto"
+41:         onclick={() => {
+7:49:46 PM [vite-plugin-svelte] src/routes/dashboard/Analytics.svelte:29:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+27: 
+28: {#if quiz}
+29:   <div
+           ^
+30:     class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+31:     onclick={on_parent_click}
+7:49:46 PM [vite-plugin-svelte] src/routes/dashboard/Analytics.svelte:29:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+27: 
+28: {#if quiz}
+29:   <div
+           ^
+30:     class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+31:     onclick={on_parent_click}
+7:49:46 PM [vite-plugin-svelte] src/lib/components/DownloadQuiz.svelte:25:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+23: 
+24: {#if quiz_id}
+25:   <div
+           ^
+26:     class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
+27:     onclick={handle_on_click}
+7:49:46 PM [vite-plugin-svelte] src/lib/components/DownloadQuiz.svelte:25:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+23: 
+24: {#if quiz_id}
+25:   <div
+           ^
+26:     class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
+27:     onclick={handle_on_click}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:84:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+82: </script>
+83: 
+84: <div
+         ^
+85:   class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
+86:   transition:fade|global={{ duration: 100 }}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:84:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+82: </script>
+83: 
+84: <div
+         ^
+85:   class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
+86:   transition:fade|global={{ duration: 100 }}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:135:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+133: 
+134:     <div class="grid grid-cols-2 gap-8 my-auto">
+135:       <div
+                ^
+136:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+137:         class:opacity-50={selected_game_mode !== 'kahoot'}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:135:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+133: 
+134:     <div class="grid grid-cols-2 gap-8 my-auto">
+135:       <div
+                ^
+136:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+137:         class:opacity-50={selected_game_mode !== 'kahoot'}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:147:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+145:         </p>
+146:       </div>
+147:       <div
+                ^
+148:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+149:         class:opacity-50={selected_game_mode !== 'normal'}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:147:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+145:         </p>
+146:       </div>
+147:       <div
+                ^
+148:         class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
+149:         class:opacity-50={selected_game_mode !== 'normal'}
+7:49:46 PM [vite-plugin-svelte] src/lib/dashboard/start_game.svelte:161:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+159:     </div>
+160:     <div class="flex justify-center items-center my-auto">
+161:       <label class="mr-4">{$t('result_page.custom_field')}</label>
+                                                                       ^
+162:       <input
+163:         bind:value={custom_field}
+7:49:46 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:49:1 `<img>` element should have an alt attribute
+https://svelte.dev/e/a11y_missing_attribute
+47: 
+48: {#await media}
+49:   <img src={thumbhash_data} class={`${css_classes} ${added_thumbhash_classes}`} />
+                                                                                      ^
+50: {:then data}
+51:   {#if type === 'img'}
+7:49:46 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:52:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+50: {:then data}
+51:   {#if type === 'img'}
+52:     <img
+          ^
+53:       in:fade|global={{ duration: 300 }}
+54:       src={img_data.data}
+7:49:46 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:52:2 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+50: {:then data}
+51:   {#if type === 'img'}
+52:     <img
+          ^
+53:       in:fade|global={{ duration: 300 }}
+54:       src={img_data.data}
+7:49:46 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:78:1 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+76: 
+77: {#if fullscreen_open}
+78:   <div
+           ^
+79:     class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 fle p-2"
+80:     transition:fade|global={{ duration: 80 }}
+7:49:46 PM [vite-plugin-svelte] src/lib/editor/MediaComponent.svelte:78:1 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+76: 
+77: {#if fullscreen_open}
+78:   <div
+           ^
+79:     class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 fle p-2"
+80:     transition:fade|global={{ duration: 80 }}
+7:49:46 PM [vite-plugin-svelte] src/lib/play/question.svelte:72:4 This reference only captures the initial value of `slider_value`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+70: let slider_value = $state([0]);
+71: if (question.type === QuizQuestionType.RANGE) {
+72:     slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+                    ^
+73: }
+74: const set_answer_if_not_set_range = (time) => {
+7:49:46 PM [vite-plugin-svelte] src/lib/practice/question.svelte:35:4 This reference only captures the initial value of `slider_value`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+33: let slider_value = $state([0]);
+34: if (question.type === QuizQuestionType.RANGE) {
+35:     slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+                    ^
+36: }
+37: let slider_values = $state([
+7:49:46 PM [vite-plugin-svelte] src/lib/practice/question.svelte:241:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+239:           style="background-color: {answer.color ?? '#b07156'}"
+240:         >
+241:           <button
+                       ^
+242:             onclick={() => {
+243:               question.answers = swapArrayElements(question.answers, i, i - 1);
+7:49:46 PM [vite-plugin-svelte] src/lib/practice/question.svelte:268:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+266:           <p class="w-full text-center p-2 text-2xl">{answer.answer}</p>
+267: 
+268:           <button
+                       ^
+269:             onclick={() => {
+270:               question.answers = swapArrayElements(question.answers, i, i + 1);
+7:49:46 PM [vite-plugin-svelte] src/lib/quiztivity/shares_popover.svelte:115:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+113: 
+114: <SmallPopover bind:open={popover_open} type={PopoverTypes.Copy} />
+115: <div
+          ^
+116:   class="fixed w-full h-full top-0 flex bg-black/50 z-50"
+117:   onclick={on_parent_click}
+7:49:46 PM [vite-plugin-svelte] src/lib/quiztivity/shares_popover.svelte:115:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+113: 
+114: <SmallPopover bind:open={popover_open} type={PopoverTypes.Copy} />
+115: <div
+          ^
+116:   class="fixed w-full h-full top-0 flex bg-black/50 z-50"
+117:   onclick={on_parent_click}
+7:49:46 PM [vite-plugin-svelte] src/lib/play/admin/slide.svelte:34:2 Screenreaders already announce `<img>` elements as an image
+https://svelte.dev/e/a11y_img_redundant_alt
+32:   </div>
+33:   <div class="w-full h-full flex justify-center">
+34:     <img src={img_src} alt="Slide image" />
+                                               ^
+35:   </div>
+36: </div>
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:74:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+72:   </div>
+73:   <div class="border-r-2 pt-6 px-6 overflow-scroll h-full">
+74:     <div
+             ^
+75:       bind:this={propertyCard}
+76:       class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:74:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+72:   </div>
+73:   <div class="border-r-2 pt-6 px-6 overflow-scroll h-full">
+74:     <div
+             ^
+75:       bind:this={propertyCard}
+76:       class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:163:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+161:     </div>
+162:     {#each data.questions as question, index}
+163:       <div
+                ^
+164:         class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition relative"
+165:         class:bg-green-300={index === selected_question}
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:163:3 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+161:     </div>
+162:     {#each data.questions as question, index}
+163:       <div
+                ^
+164:         class="bg-white shadow-smrounded-lg h-40 p-2 mb-6 hover:cursor-pointer drop-shadow-2xl border border-gray-500 dark:bg-gray-600 transition relative"
+165:         class:bg-green-300={index === selected_question}
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:178:6 Elements with the 'button' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus
+176:           >
+177:             <!-- Div is used, since it just put me on the dashboard when using button elements... Idk why and I hate it-->
+178:             <div
+                      ^
+179:               class="h-full"
+180:               role="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:178:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+176:           >
+177:             <!-- Div is used, since it just put me on the dashboard when using button elements... Idk why and I hate it-->
+178:             <div
+                      ^
+179:               class="h-full"
+180:               role="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:207:6 Elements with the 'button' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus
+205:               </svg>
+206:             </div>
+207:             <div
+                      ^
+208:               class="h-full"
+209:               role="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:207:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+205:               </svg>
+206:             </div>
+207:             <div
+                      ^
+208:               class="h-full"
+209:               role="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/sidebar.svelte:239:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+237:           </div>
+238:         {/if}
+239:         <button
+                     ^
+240:           class="rounded-full absolute -top-3 -right-3 opacity-70 hover:opacity-100 transition"
+241:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/card.svelte:90:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+88:           class="inline-block bg-gray-600 w-4 h-4 rounded-full hover:bg-green-400 transition"
+89:         ></span>
+90:         <button
+                    ^
+91:           class="ml-auto"
+92:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/card.svelte:148:7 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+146:           <div class="flex justify-center pt-10 w-full h-72">
+147:             <div class="h-72 relative">
+148:               <button
+                           ^
+149:                 class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+150:                 type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/uploader.svelte:30:4 `AvailableUploadTypes` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+28: let selected_type = $state(null);
+29: // eslint-disable-next-line no-unused-vars
+30: var AvailableUploadTypes;
+                            ^
+31: (function (AvailableUploadTypes) {
+32:     // eslint-disable-next-line no-unused-vars
+7:49:47 PM [vite-plugin-svelte] src/lib/view_quiz/Hoverable.svelte:16:0 `<div>` with a mouseenter or mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+14: </script>
+15: 
+16: <div onmouseenter={enter} onmouseleave={leave}>
+          ^
+17:   {@render children?.({ hovering, })}
+18: </div>
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/ABCDEditorPart.svelte:65:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+63:         )}
+64:       >
+65:         <button
+                    ^
+66:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+67:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/slide.svelte:167:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+165:   <div class="absolute top-0 left-0 grid grid-cols-6 w-full">
+166:     <div class="flex flex-col pl-2 rounded-t-lg z-40 pt-2">
+167:       <button
+                   ^
+168:         class="mr-auto"
+169:         onclick={() => {
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/slide.svelte:207:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+205: 
+206:     <div class="flex flex-col pr-2 rounded-t-lg z-40 pt-2">
+207:       <button
+                   ^
+208:         class="ml-auto"
+209:         onclick={() => {
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/AddNewQuestionPopup.svelte:83:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+81: </script>
+82: 
+83: <div
+         ^
+84:   class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
+85:   onclick={on_parent_click}
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/AddNewQuestionPopup.svelte:83:0 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+81: </script>
+82: 
+83: <div
+         ^
+84:   class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
+85:   onclick={on_parent_click}
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/VotingEditorPart.svelte:59:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+57:         class:bg-gray-300={answer.answer}
+58:       >
+59:         <button
+                    ^
+60:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+61:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/TextEditorPart.svelte:47:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+45:         )}
+46:       >
+47:         <button
+                    ^
+48:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+49:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:63:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+61:         class="p-4 rounded-lg flex justify-center w-full transition relative border border-gray-600 flex-row gap-4 m-2"
+62:       >
+63:         <button
+                    ^
+64:           class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
+65:           type="button"
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:88:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+86:         </button>
+87:         <div>
+88:           <button
+                      ^
+89:             onclick={() => {
+90:               move_item(true, i);
+7:49:47 PM [vite-plugin-svelte] src/lib/editor/OrderEditorPart.svelte:113:5 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+111:             </svg>
+112:           </button>
+113:           <button
+                       ^
+114:             onclick={() => {
+115:               move_item(false, i);
+7:49:48 PM [vite-plugin-svelte] src/lib/editor/slides/element_selection.svelte:73:3 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+71:   <ul>
+72:     {#each element_list as el}
+73:       <li
+              ^
+74:         class="flex flex-row mt-4 w-full bg-gray-200 shadow-xl rounded-lg p-2 hover:bg-gray-300 hover:shadow-2xl hover:cursor-pointer transition dark:bg-gray-800"
+75:         onclick={() => {
+7:49:48 PM [vite-plugin-svelte] src/lib/editor/slides/element_selection.svelte:73:3 Non-interactive element `<li>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+71:   <ul>
+72:     {#each element_list as el}
+73:       <li
+              ^
+74:         class="flex flex-row mt-4 w-full bg-gray-200 shadow-xl rounded-lg p-2 hover:bg-gray-300 hover:shadow-2xl hover:cursor-pointer transition dark:bg-gray-800"
+75:         onclick={() => {
+7:49:48 PM [vite-plugin-svelte] src/lib/components/commandpalette.svelte:227:5 Avoid using autofocus
+https://svelte.dev/e/a11y_autofocus
+225:           bind:value={input}
+226:           oninput={() => search(input)}
+227:           autofocus
+                        ^
+228:         />
+229:       </div>
+7:49:49 PM [vite-plugin-svelte] src/routes/results/[result_id]/general_overview.svelte:33:7 Unused CSS selector "underline"
+https://svelte.dev/e/css_unused_selector
+31: </div>
+32: 
+33: <style>underline{text-decoration:underline}</style>
+                    ^
+34: 
+7:49:49 PM [vite-plugin-svelte] src/lib/inline-editor.svelte:21:4 Avoid declaring classes below the top level scope
+https://svelte.dev/e/perf_avoid_nested_class
+19: let editor;
+20: onMount(() => {
+21:     class Editor extends BalloonEditor {
+         ^
+22:         static builtinPlugins = [
+23:             Essentials,
+✓ 2044 modules transformed.
+rendering chunks...
+computing gzip size...
+.svelte-kit/output/client/_app/version.json                                                         0.03 kB │ gzip:   0.05 kB
+.svelte-kit/output/client/_app/immutable/workers/worker-BAOIWoxA.js                                 2.57 kB
+.svelte-kit/output/client/_app/immutable/assets/import.Bi72Th-G.webp                                4.20 kB
+.svelte-kit/output/client/_app/immutable/assets/2.Ykv40iDs.svg                                      4.64 kB │ gzip:   2.20 kB
+.svelte-kit/output/client/_app/immutable/assets/find.DGDu24zD.webp                                  4.73 kB
+.svelte-kit/output/client/_app/immutable/assets/select.DZfDjVjP.webp                                5.92 kB
+.svelte-kit/output/client/_app/immutable/assets/result.Bo_iSsA7.webp                                7.66 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-latin-ext-400-normal.CEQHAJDc.woff2    8.74 kB
+.svelte-kit/output/client/_app/immutable/assets/edit.C6O7F-of.webp                                  9.13 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-cyrillic-400-normal.BIatlnl2.woff2    10.53 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-latin-ext-400-normal.BipQGsdP.woff    11.38 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-cyrillic-400-normal.C4wWsGQ-.woff     13.00 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-latin-400-normal.hvIDGCO4.woff2       13.35 kB
+.svelte-kit/output/client/_app/immutable/assets/marck-script-latin-400-normal.DonRfbfk.woff        17.22 kB
+.svelte-kit/output/client/_app/immutable/assets/start_game_background.CxipYXmF.svg                 32.43 kB │ gzip:  12.31 kB
+.svelte-kit/output/client/_app/immutable/assets/opengraph-home.BDw-jIGR.webp                       38.08 kB
+.svelte-kit/output/client/_app/immutable/assets/opengraph-home.B6UmBWfG.jpg                        45.64 kB
+.svelte-kit/output/client/.vite/manifest.json                                                      64.49 kB │ gzip:   6.22 kB
+.svelte-kit/output/client/_app/immutable/assets/59.tn0RQdqM.css                                     0.00 kB │ gzip:   0.02 kB
+.svelte-kit/output/client/_app/immutable/assets/circular_progress.CgDre03T.css                      0.21 kB │ gzip:   0.18 kB
+.svelte-kit/output/client/_app/immutable/assets/62.D4niTXTZ.css                                     0.29 kB │ gzip:   0.18 kB
+.svelte-kit/output/client/_app/immutable/assets/hljs.BP82T1U6.css                                   1.16 kB │ gzip:   0.54 kB
+.svelte-kit/output/client/_app/immutable/assets/index.DFUdU87r.css                                 10.57 kB │ gzip:   2.09 kB
+.svelte-kit/output/client/_app/immutable/assets/uploader.BdkbUj-R.css                              74.28 kB │ gzip:  12.22 kB
+.svelte-kit/output/client/_app/immutable/assets/0.HAr_8nYp.css                                    107.01 kB │ gzip:  16.81 kB
+.svelte-kit/output/client/_app/immutable/assets/inline-editor.DdKdl8SV.css                        242.23 kB │ gzip:  34.55 kB
+.svelte-kit/output/client/_app/immutable/chunks/BCi0tQyS.js                                         0.08 kB │ gzip:   0.10 kB │ map:     0.40 kB
+.svelte-kit/output/client/_app/immutable/chunks/CuJSmGYr.js                                         0.08 kB │ gzip:   0.10 kB │ map:     1.01 kB
+.svelte-kit/output/client/_app/immutable/chunks/DsnmJJEf.js                                         0.10 kB │ gzip:   0.12 kB │ map:     0.53 kB
+.svelte-kit/output/client/_app/immutable/chunks/CCwgUO2V.js                                         0.11 kB │ gzip:   0.13 kB │ map:     0.35 kB
+.svelte-kit/output/client/_app/immutable/chunks/9l8Gxslx.js                                         0.12 kB │ gzip:   0.13 kB │ map:    11.55 kB
+.svelte-kit/output/client/_app/immutable/entry/start.ReefFZZn.js                                    0.13 kB │ gzip:   0.13 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/D4Caz1gY.js                                         0.14 kB │ gzip:   0.15 kB │ map:     3.85 kB
+.svelte-kit/output/client/_app/immutable/chunks/bKqohd_7.js                                         0.16 kB │ gzip:   0.16 kB │ map:     0.60 kB
+.svelte-kit/output/client/_app/immutable/chunks/g3AKl6eR.js                                         0.16 kB │ gzip:   0.15 kB │ map:     1.48 kB
+.svelte-kit/output/client/_app/immutable/chunks/C-e0qJHJ.js                                         0.18 kB │ gzip:   0.17 kB │ map:     5.25 kB
+.svelte-kit/output/client/_app/immutable/chunks/47rSToPD.js                                         0.20 kB │ gzip:   0.18 kB │ map:     1.90 kB
+.svelte-kit/output/client/_app/immutable/chunks/BM3yp-ss.js                                         0.24 kB │ gzip:   0.21 kB │ map:     1.48 kB
+.svelte-kit/output/client/_app/immutable/chunks/CI0jPTqG.js                                         0.26 kB │ gzip:   0.23 kB │ map:     1.50 kB
+.svelte-kit/output/client/_app/immutable/chunks/Cpj98o6Y.js                                         0.27 kB │ gzip:   0.21 kB │ map:     0.09 kB
+.svelte-kit/output/client/_app/immutable/chunks/uAy1XE8L.js                                         0.28 kB │ gzip:   0.23 kB │ map:     6.11 kB
+.svelte-kit/output/client/_app/immutable/chunks/DXci8OlY.js                                         0.29 kB │ gzip:   0.24 kB │ map:     2.32 kB
+.svelte-kit/output/client/_app/immutable/chunks/DTtZ75V8.js                                         0.30 kB │ gzip:   0.23 kB │ map:     3.19 kB
+.svelte-kit/output/client/_app/immutable/nodes/2.j1AzjPMi.js                                        0.34 kB │ gzip:   0.25 kB │ map:     0.55 kB
+.svelte-kit/output/client/_app/immutable/chunks/BKNngCol.js                                         0.35 kB │ gzip:   0.26 kB │ map:     3.15 kB
+.svelte-kit/output/client/_app/immutable/nodes/27.CZkRazZQ.js                                       0.39 kB │ gzip:   0.28 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/BQwWrtaT.js                                         0.42 kB │ gzip:   0.31 kB │ map:     3.09 kB
+.svelte-kit/output/client/_app/immutable/chunks/DaEnbx3H.js                                         0.43 kB │ gzip:   0.32 kB │ map:     3.29 kB
+.svelte-kit/output/client/_app/immutable/chunks/YKQ4gWok.js                                         0.43 kB │ gzip:   0.32 kB │ map:     3.35 kB
+.svelte-kit/output/client/_app/immutable/chunks/BPRkvo5C.js                                         0.45 kB │ gzip:   0.33 kB │ map:     4.46 kB
+.svelte-kit/output/client/_app/immutable/nodes/21.Da82DeAc.js                                       0.47 kB │ gzip:   0.33 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/32.DX5mEzLD.js                                       0.48 kB │ gzip:   0.35 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/35.CCDfmF6D.js                                       0.48 kB │ gzip:   0.33 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/36.CtYBU6x0.js                                       0.52 kB │ gzip:   0.37 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/34.Djp7-J7_.js                                       0.53 kB │ gzip:   0.36 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/3.DMF0lfNt.js                                        0.54 kB │ gzip:   0.35 kB │ map:     0.71 kB
+.svelte-kit/output/client/_app/immutable/chunks/D0iwhpLH.js                                         0.54 kB │ gzip:   0.34 kB │ map:     4.36 kB
+.svelte-kit/output/client/_app/immutable/chunks/Dlwj5QBI.js                                         0.56 kB │ gzip:   0.37 kB │ map:     3.63 kB
+.svelte-kit/output/client/_app/immutable/nodes/33.BfmvmMFL.js                                       0.57 kB │ gzip:   0.39 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/29.DNxve1zV.js                                       0.58 kB │ gzip:   0.41 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/31.Dfgj_5xx.js                                       0.62 kB │ gzip:   0.40 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/B4bxGVIS.js                                         0.66 kB │ gzip:   0.44 kB │ map:     5.42 kB
+.svelte-kit/output/client/_app/immutable/nodes/30.BVrXX7HI.js                                       0.66 kB │ gzip:   0.33 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/24.DRhtTY32.js                                       0.69 kB │ gzip:   0.46 kB │ map:     1.70 kB
+.svelte-kit/output/client/_app/immutable/chunks/BLWVpNdD.js                                         0.73 kB │ gzip:   0.48 kB │ map:     1.04 kB
+.svelte-kit/output/client/_app/immutable/chunks/ur-Ycm_b.js                                         0.76 kB │ gzip:   0.49 kB │ map:     6.22 kB
+.svelte-kit/output/client/_app/immutable/chunks/BzvPe2U0.js                                         0.76 kB │ gzip:   0.45 kB │ map:     7.70 kB
+.svelte-kit/output/client/_app/immutable/nodes/4.BSYud75r.js                                        0.85 kB │ gzip:   0.51 kB │ map:     0.84 kB
+.svelte-kit/output/client/_app/immutable/chunks/B9k9Qol4.js                                         0.86 kB │ gzip:   0.54 kB │ map:     4.18 kB
+.svelte-kit/output/client/_app/immutable/chunks/C9MYbW0J.js                                         0.88 kB │ gzip:   0.55 kB │ map:     1.31 kB
+.svelte-kit/output/client/_app/immutable/nodes/53.k_HIUigj.js                                       0.89 kB │ gzip:   0.58 kB │ map:     1.33 kB
+.svelte-kit/output/client/_app/immutable/nodes/48.BiPEJ-Qi.js                                       0.91 kB │ gzip:   0.61 kB │ map:     1.67 kB
+.svelte-kit/output/client/_app/immutable/chunks/DrKzLnyV.js                                         0.95 kB │ gzip:   0.61 kB │ map:     1.40 kB
+.svelte-kit/output/client/_app/immutable/chunks/DuW2gKuv.js                                         0.97 kB │ gzip:   0.56 kB │ map:     1.25 kB
+.svelte-kit/output/client/_app/immutable/chunks/UElHFLUr.js                                         0.98 kB │ gzip:   0.59 kB │ map:    15.64 kB
+.svelte-kit/output/client/_app/immutable/nodes/25.fVXBvce1.js                                       1.03 kB │ gzip:   0.61 kB │ map:     0.30 kB
+.svelte-kit/output/client/_app/immutable/chunks/BF8ww7-k.js                                         1.10 kB │ gzip:   0.63 kB │ map:    24.21 kB
+.svelte-kit/output/client/_app/immutable/nodes/26.DY3bLszH.js                                       1.12 kB │ gzip:   0.65 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/BfFYOgQS.js                                         1.12 kB │ gzip:   0.68 kB │ map:    10.62 kB
+.svelte-kit/output/client/_app/immutable/chunks/CR_PDQdn.js                                         1.14 kB │ gzip:   0.59 kB │ map:    11.19 kB
+.svelte-kit/output/client/_app/immutable/chunks/C0zebbgj.js                                         1.17 kB │ gzip:   0.69 kB │ map:     9.46 kB
+.svelte-kit/output/client/_app/immutable/nodes/42.G86dhSz_.js                                       1.18 kB │ gzip:   0.62 kB │ map:     0.31 kB
+.svelte-kit/output/client/_app/immutable/nodes/28.BHsy5ngv.js                                       1.18 kB │ gzip:   0.69 kB │ map:     0.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/DmNLNqfB.js                                         1.22 kB │ gzip:   0.67 kB │ map:    10.77 kB
+.svelte-kit/output/client/_app/immutable/nodes/6.Cv-oboiw.js                                        1.26 kB │ gzip:   0.75 kB │ map:     1.29 kB
+.svelte-kit/output/client/_app/immutable/chunks/PPVm8Dsz.js                                         1.27 kB │ gzip:   0.75 kB │ map:     0.09 kB
+.svelte-kit/output/client/_app/immutable/chunks/DwVrQ0ht.js                                         1.30 kB │ gzip:   0.71 kB │ map:    11.62 kB
+.svelte-kit/output/client/_app/immutable/nodes/10.DwKYXPc8.js                                       1.32 kB │ gzip:   0.76 kB │ map:     2.02 kB
+.svelte-kit/output/client/_app/immutable/nodes/54.DZhbsgs6.js                                       1.34 kB │ gzip:   0.81 kB │ map:     2.47 kB
+.svelte-kit/output/client/_app/immutable/nodes/39.B2dxyySE.js                                       1.37 kB │ gzip:   0.80 kB │ map:     0.32 kB
+.svelte-kit/output/client/_app/immutable/nodes/1.cIhmLoZ3.js                                        1.40 kB │ gzip:   0.74 kB │ map:     1.38 kB
+.svelte-kit/output/client/_app/immutable/chunks/Cz0CWeBA.js                                         1.45 kB │ gzip:   0.76 kB │ map:     5.95 kB
+.svelte-kit/output/client/_app/immutable/chunks/OHvUAtmg.js                                         1.48 kB │ gzip:   0.79 kB │ map:    10.70 kB
+.svelte-kit/output/client/_app/immutable/chunks/DuQG3k_j.js                                         1.49 kB │ gzip:   0.68 kB │ map:     7.85 kB
+.svelte-kit/output/client/_app/immutable/chunks/xLz7CY7R.js                                         1.52 kB │ gzip:   0.68 kB │ map:     1.94 kB
+.svelte-kit/output/client/_app/immutable/chunks/BW0LQRS5.js                                         1.53 kB │ gzip:   0.73 kB │ map:     2.10 kB
+.svelte-kit/output/client/_app/immutable/chunks/B-wt-EO5.js                                         1.58 kB │ gzip:   0.88 kB │ map:     2.05 kB
+.svelte-kit/output/client/_app/immutable/nodes/13.Cdl8uiv7.js                                       1.59 kB │ gzip:   0.90 kB │ map:     2.15 kB
+.svelte-kit/output/client/_app/immutable/nodes/5.Czngwjdc.js                                        1.61 kB │ gzip:   0.83 kB │ map:     1.71 kB
+.svelte-kit/output/client/_app/immutable/chunks/BAxCDoik.js                                         1.62 kB │ gzip:   0.81 kB │ map:    10.17 kB
+.svelte-kit/output/client/_app/immutable/chunks/g9QspaTJ.js                                         1.79 kB │ gzip:   0.95 kB │ map:     2.37 kB
+.svelte-kit/output/client/_app/immutable/nodes/40.Dk-tRKkq.js                                       1.83 kB │ gzip:   1.09 kB │ map:     0.32 kB
+.svelte-kit/output/client/_app/immutable/chunks/easFlya-.js                                         1.85 kB │ gzip:   0.95 kB │ map:     3.48 kB
+.svelte-kit/output/client/_app/immutable/chunks/I6xtpd2e.js                                         1.86 kB │ gzip:   1.09 kB │ map:     3.17 kB
+.svelte-kit/output/client/_app/immutable/chunks/CUjROMaj.js                                         1.94 kB │ gzip:   1.13 kB │ map:     3.79 kB
+.svelte-kit/output/client/_app/immutable/nodes/37.CUtkGD8F.js                                       1.96 kB │ gzip:   0.95 kB │ map:     0.32 kB
+.svelte-kit/output/client/_app/immutable/chunks/ChrA4Q_b.js                                         2.17 kB │ gzip:   0.88 kB │ map:     3.08 kB
+.svelte-kit/output/client/_app/immutable/chunks/DVgVcb7u.js                                         2.60 kB │ gzip:   1.44 kB │ map:     3.99 kB
+.svelte-kit/output/client/_app/immutable/nodes/41.D488oRsY.js                                       2.67 kB │ gzip:   1.38 kB │ map:     3.18 kB
+.svelte-kit/output/client/_app/immutable/nodes/58.BURJHi6g.js                                       2.77 kB │ gzip:   1.29 kB │ map:     4.20 kB
+.svelte-kit/output/client/_app/immutable/nodes/50.s11KfKKM.js                                       2.79 kB │ gzip:   1.36 kB │ map:     3.75 kB
+.svelte-kit/output/client/_app/immutable/chunks/6pVmm5tL.js                                         2.85 kB │ gzip:   1.40 kB │ map:     4.85 kB
+.svelte-kit/output/client/_app/immutable/nodes/44._UP_ymMR.js                                       2.91 kB │ gzip:   1.52 kB │ map:     0.32 kB
+.svelte-kit/output/client/_app/immutable/chunks/DQlTTwk3.js                                         3.19 kB │ gzip:   1.67 kB │ map:    11.02 kB
+.svelte-kit/output/client/_app/immutable/nodes/22.BYCUqKNZ.js                                       3.28 kB │ gzip:   1.67 kB │ map:     4.64 kB
+.svelte-kit/output/client/_app/immutable/nodes/8.BlXCPIE4.js                                        3.31 kB │ gzip:   1.33 kB │ map:     5.05 kB
+.svelte-kit/output/client/_app/immutable/chunks/DDfBTWey.js                                         3.66 kB │ gzip:   1.63 kB │ map:     6.37 kB
+.svelte-kit/output/client/_app/immutable/chunks/DX5KHD5m.js                                         3.83 kB │ gzip:   1.94 kB │ map:    28.28 kB
+.svelte-kit/output/client/_app/immutable/nodes/55.C6z913Tf.js                                       3.86 kB │ gzip:   1.74 kB │ map:     5.10 kB
+.svelte-kit/output/client/_app/immutable/nodes/60.CofeaMVc.js                                       3.96 kB │ gzip:   2.11 kB │ map:     5.23 kB
+.svelte-kit/output/client/_app/immutable/chunks/DHDYKbxt.js                                         4.01 kB │ gzip:   1.59 kB │ map:     6.37 kB
+.svelte-kit/output/client/_app/immutable/nodes/9.DUC4oXaN.js                                        4.09 kB │ gzip:   1.67 kB │ map:     7.44 kB
+.svelte-kit/output/client/_app/immutable/nodes/16.BP3ZpDXU.js                                       4.30 kB │ gzip:   2.02 kB │ map:     6.01 kB
+.svelte-kit/output/client/_app/immutable/nodes/45.DVQlWd06.js                                       4.45 kB │ gzip:   2.19 kB │ map:     6.15 kB
+.svelte-kit/output/client/_app/immutable/chunks/ZAD_z0PH.js                                         4.51 kB │ gzip:   2.47 kB │ map:    19.68 kB
+.svelte-kit/output/client/_app/immutable/nodes/38.2ZxwIuWL.js                                       4.76 kB │ gzip:   2.01 kB │ map:     6.05 kB
+.svelte-kit/output/client/_app/immutable/chunks/B4Jz4rxr.js                                         4.79 kB │ gzip:   1.91 kB │ map:     7.81 kB
+.svelte-kit/output/client/_app/immutable/chunks/BzIghSnt.js                                         4.85 kB │ gzip:   1.81 kB │ map:     8.49 kB
+.svelte-kit/output/client/_app/immutable/nodes/14.DDYpNO_d.js                                       5.24 kB │ gzip:   2.13 kB │ map:     7.61 kB
+.svelte-kit/output/client/_app/immutable/nodes/18.D5Yx3yP0.js                                       5.25 kB │ gzip:   2.21 kB │ map:     8.28 kB
+.svelte-kit/output/client/_app/immutable/nodes/11.BfNDhD7_.js                                       5.38 kB │ gzip:   2.49 kB │ map:     9.36 kB
+.svelte-kit/output/client/_app/immutable/chunks/BltanfY_.js                                         5.55 kB │ gzip:   2.56 kB │ map:    37.82 kB
+.svelte-kit/output/client/_app/immutable/nodes/61.BrrDB2k7.js                                       5.78 kB │ gzip:   2.53 kB │ map:    10.30 kB
+.svelte-kit/output/client/_app/immutable/chunks/BxzaIjW4.js                                         6.12 kB │ gzip:   2.79 kB │ map:    60.35 kB
+.svelte-kit/output/client/_app/immutable/nodes/43.Bh52-foP.js                                       6.74 kB │ gzip:   2.97 kB │ map:     7.66 kB
+.svelte-kit/output/client/_app/immutable/nodes/46.D_zqFm20.js                                       6.84 kB │ gzip:   2.87 kB │ map:     9.35 kB
+.svelte-kit/output/client/_app/immutable/chunks/BZ8pTIzg.js                                         7.00 kB │ gzip:   2.70 kB │ map:    11.14 kB
+.svelte-kit/output/client/_app/immutable/nodes/49.SQBVWFsS.js                                       7.90 kB │ gzip:   2.98 kB │ map:    12.51 kB
+.svelte-kit/output/client/_app/immutable/nodes/47.BSwVSecP.js                                       8.67 kB │ gzip:   3.63 kB │ map:    32.29 kB
+.svelte-kit/output/client/_app/immutable/nodes/57.CnxfwYX-.js                                       8.68 kB │ gzip:   3.47 kB │ map:    14.18 kB
+.svelte-kit/output/client/_app/immutable/chunks/gl9uF3T3.js                                        10.44 kB │ gzip:   3.84 kB │ map:    20.84 kB
+.svelte-kit/output/client/_app/immutable/nodes/59.BvbvMTS_.js                                      10.56 kB │ gzip:   3.66 kB │ map:    19.05 kB
+.svelte-kit/output/client/_app/immutable/nodes/7.DlShhjAu.js                                       15.96 kB │ gzip:   6.82 kB │ map:    21.99 kB
+.svelte-kit/output/client/_app/immutable/entry/app.kIN5WPRK.js                                     16.38 kB │ gzip:   4.65 kB │ map:    15.12 kB
+.svelte-kit/output/client/_app/immutable/nodes/52.Bpd0ClUu.js                                      16.49 kB │ gzip:   5.68 kB │ map:    24.91 kB
+.svelte-kit/output/client/_app/immutable/nodes/62.CUJ-O7GG.js                                      17.98 kB │ gzip:   6.17 kB │ map:    27.88 kB
+.svelte-kit/output/client/_app/immutable/chunks/yt4BQfAw.js                                        18.03 kB │ gzip:   6.39 kB │ map:    33.26 kB
+.svelte-kit/output/client/_app/immutable/nodes/51.BcwfDh0-.js                                      19.46 kB │ gzip:   7.21 kB │ map:    33.44 kB
+.svelte-kit/output/client/_app/immutable/chunks/Ci3OJfQQ.js                                        20.38 kB │ gzip:   7.70 kB │ map:    90.05 kB
+.svelte-kit/output/client/_app/immutable/chunks/MHxtHNJP.js                                        22.97 kB │ gzip:   8.89 kB │ map:    56.52 kB
+.svelte-kit/output/client/_app/immutable/chunks/B1SV-PD7.js                                        22.98 kB │ gzip:   9.00 kB │ map:    93.39 kB
+.svelte-kit/output/client/_app/immutable/nodes/20.CnlWaf9G.js                                      24.22 kB │ gzip:   7.74 kB │ map:    38.29 kB
+.svelte-kit/output/client/_app/immutable/nodes/12.BllnkiNx.js                                      24.52 kB │ gzip:   7.02 kB │ map:    50.80 kB
+.svelte-kit/output/client/_app/immutable/chunks/Cn74c4-R.js                                        25.30 kB │ gzip:   9.84 kB │ map:   239.28 kB
+.svelte-kit/output/client/_app/immutable/chunks/C9_SrCz4.js                                        31.74 kB │ gzip:  12.46 kB │ map:   210.02 kB
+.svelte-kit/output/client/_app/immutable/nodes/23.DntSp0Xp.js                                      32.26 kB │ gzip:  11.57 kB │ map:    98.89 kB
+.svelte-kit/output/client/_app/immutable/nodes/0.HZbngEry.js                                       32.29 kB │ gzip:  10.71 kB │ map:   134.54 kB
+.svelte-kit/output/client/_app/immutable/nodes/17.BOrRpF3i.js                                      34.71 kB │ gzip:  14.66 kB │ map:   120.32 kB
+.svelte-kit/output/client/_app/immutable/chunks/gt83CAHX.js                                        36.09 kB │ gzip:  12.87 kB │ map:   222.98 kB
+.svelte-kit/output/client/_app/immutable/chunks/-rNSWRA8.js                                        37.98 kB │ gzip:  11.58 kB │ map:    61.05 kB
+.svelte-kit/output/client/_app/immutable/chunks/BGv_dqOO.js                                        39.42 kB │ gzip:  12.09 kB │ map:    86.04 kB
+.svelte-kit/output/client/_app/immutable/nodes/15.Bb-XEiB8.js                                      40.15 kB │ gzip:  13.53 kB │ map:   160.71 kB
+.svelte-kit/output/client/_app/immutable/nodes/19.CEwHCYBP.js                                      41.50 kB │ gzip:  15.27 kB │ map:   159.35 kB
+.svelte-kit/output/client/_app/immutable/chunks/C-r-dS_c.js                                        41.99 kB │ gzip:  13.32 kB │ map:   189.30 kB
+.svelte-kit/output/client/_app/immutable/chunks/DW9MooKG.js                                        42.06 kB │ gzip:  13.43 kB │ map:   148.58 kB
+.svelte-kit/output/client/_app/immutable/chunks/BDx6lZXm.js                                        71.41 kB │ gzip:  22.25 kB │ map:   380.65 kB
+.svelte-kit/output/client/_app/immutable/chunks/DeuAvGyE.js                                       162.56 kB │ gzip:  54.01 kB │ map:   528.19 kB
+.svelte-kit/output/client/_app/immutable/chunks/IiA-ucTa.js                                       266.08 kB │ gzip:  84.81 kB │ map:   960.72 kB
+.svelte-kit/output/client/_app/immutable/chunks/Dmv0P6uf.js                                       273.80 kB │ gzip:  76.11 kB │ map:   604.58 kB
+.svelte-kit/output/client/_app/immutable/chunks/CUNqKCT8.js                                       465.68 kB │ gzip: 143.96 kB │ map:   173.06 kB
+.svelte-kit/output/client/_app/immutable/chunks/4uuelFS0.js                                       622.27 kB │ gzip: 164.48 kB │ map: 4,958.73 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.75s
+.svelte-kit/output/server/_app/immutable/assets/import.Bi72Th-G.webp                                        4.20 kB
+.svelte-kit/output/server/_app/immutable/assets/2.Ykv40iDs.svg                                              4.64 kB
+.svelte-kit/output/server/_app/immutable/assets/find.DGDu24zD.webp                                          4.73 kB
+.svelte-kit/output/server/_app/immutable/assets/select.DZfDjVjP.webp                                        5.92 kB
+.svelte-kit/output/server/_app/immutable/assets/result.Bo_iSsA7.webp                                        7.66 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-latin-ext-400-normal.CEQHAJDc.woff2            8.74 kB
+.svelte-kit/output/server/_app/immutable/assets/edit.C6O7F-of.webp                                          9.13 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-cyrillic-400-normal.BIatlnl2.woff2            10.53 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-latin-ext-400-normal.BipQGsdP.woff            11.38 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-cyrillic-400-normal.C4wWsGQ-.woff             13.00 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-latin-400-normal.hvIDGCO4.woff2               13.35 kB
+.svelte-kit/output/server/_app/immutable/assets/marck-script-latin-400-normal.DonRfbfk.woff                17.22 kB
+.svelte-kit/output/server/_app/immutable/assets/start_game_background.CxipYXmF.svg                         32.43 kB
+.svelte-kit/output/server/_app/immutable/assets/opengraph-home.BDw-jIGR.webp                               38.08 kB
+.svelte-kit/output/server/_app/immutable/assets/opengraph-home.B6UmBWfG.jpg                                45.64 kB
+.svelte-kit/output/server/.vite/manifest.json                                                              49.51 kB
+.svelte-kit/output/server/_app/immutable/assets/_page.tn0RQdqM.css                                          0.00 kB
+.svelte-kit/output/server/_app/immutable/assets/circular_progress.CgDre03T.css                              0.21 kB
+.svelte-kit/output/server/_app/immutable/assets/_page.D4niTXTZ.css                                          0.29 kB
+.svelte-kit/output/server/_app/immutable/assets/hljs.BP82T1U6.css                                           1.16 kB
+.svelte-kit/output/server/_app/immutable/assets/index.DFUdU87r.css                                         10.57 kB
+.svelte-kit/output/server/_app/immutable/assets/uploader.BdkbUj-R.css                                      74.28 kB
+.svelte-kit/output/server/_app/immutable/assets/_layout.CJ_bC44J.css                                      106.87 kB
+.svelte-kit/output/server/_app/immutable/assets/inline-editor.DdKdl8SV.css                                242.23 kB
+.svelte-kit/output/server/chunks/false.js                                                                   0.08 kB │ map:   0.29 kB
+.svelte-kit/output/server/entries/pages/docs/_page.js                                                       0.08 kB │ map:   0.29 kB
+.svelte-kit/output/server/entries/pages/docs/attribution/_page.js                                           0.08 kB │ map:   0.30 kB
+.svelte-kit/output/server/entries/pages/docs/develop/_page.js                                               0.08 kB │ map:   0.30 kB
+.svelte-kit/output/server/entries/pages/docs/import-from-kahoot/_page.js                                    0.08 kB │ map:   0.31 kB
+.svelte-kit/output/server/entries/pages/docs/pow/_page.js                                                   0.08 kB │ map:   0.29 kB
+.svelte-kit/output/server/entries/pages/docs/privacy-policy/_page.js                                        0.08 kB │ map:   0.30 kB
+.svelte-kit/output/server/entries/pages/docs/roadmap/_page.js                                               0.08 kB │ map:   0.30 kB
+.svelte-kit/output/server/entries/pages/docs/self-host/_page.js                                             0.08 kB │ map:   0.30 kB
+.svelte-kit/output/server/entries/pages/docs/tos/_page.js                                                   0.08 kB │ map:   0.29 kB
+.svelte-kit/output/server/chunks/stores.svelte.js                                                           0.12 kB │ map:   0.32 kB
+.svelte-kit/output/server/entries/pages/account/oauth-error/_page.ts.js                                     0.16 kB │ map:   0.48 kB
+.svelte-kit/output/server/entries/pages/account/password-reset/_page.server.ts.js                           0.16 kB │ map:   0.50 kB
+.svelte-kit/output/server/chunks/config.js                                                                  0.17 kB │ map:   0.96 kB
+.svelte-kit/output/server/chunks/html.js                                                                    0.18 kB │ map:   0.65 kB
+.svelte-kit/output/server/entries/endpoints/overview/_server.ts.js                                          0.19 kB │ map:   0.61 kB
+.svelte-kit/output/server/entries/pages/dashboard/files/_page.ts.js                                         0.19 kB │ map:   0.58 kB
+.svelte-kit/output/server/entries/pages/account/controllers/add/_page.ts.js                                 0.22 kB │ map:   0.67 kB
+.svelte-kit/output/server/entries/pages/edit/videos/_page.server.ts.js                                      0.22 kB │ map:   0.63 kB
+.svelte-kit/output/server/entries/pages/account/controllers/_page.ts.js                                     0.23 kB │ map:   0.75 kB
+.svelte-kit/output/server/entries/pages/quiztivity/share/_share_id_/_page.server.ts.js                      0.24 kB │ map:   0.66 kB
+.svelte-kit/output/server/entries/pages/account/register/_page.server.ts.js                                 0.24 kB │ map:   0.61 kB
+.svelte-kit/output/server/entries/pages/account/reset-password/_page.server.ts.js                           0.24 kB │ map:   0.61 kB
+.svelte-kit/output/server/entries/pages/_page.server.ts.js                                                  0.26 kB │ map:   0.70 kB
+.svelte-kit/output/server/entries/pages/_layout.ts.js                                                       0.26 kB │ map:   0.73 kB
+.svelte-kit/output/server/entries/pages/create/_page.server.ts.js                                           0.26 kB │ map:   0.62 kB
+.svelte-kit/output/server/chunks/stores.js                                                                  0.28 kB │ map:   0.55 kB
+.svelte-kit/output/server/entries/pages/_layout.server.ts.js                                                0.28 kB │ map:   0.73 kB
+.svelte-kit/output/server/entries/pages/dashboard/_page.server.ts.js                                        0.28 kB │ map:   0.67 kB
+.svelte-kit/output/server/entries/pages/results/_page.ts.js                                                 0.29 kB │ map:   0.80 kB
+.svelte-kit/output/server/entries/pages/account/settings/_page.server.ts.js                                 0.29 kB │ map:   0.68 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/features/_page.svx.js                               0.29 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/results/_result_id_/_page.ts.js                                     0.31 kB │ map:   0.83 kB
+.svelte-kit/output/server/chunks/index-server.js                                                            0.33 kB │ map:   1.69 kB
+.svelte-kit/output/server/chunks/index4.js                                                                  0.33 kB │ map:   5.45 kB
+.svelte-kit/output/server/entries/pages/play/_page.server.ts.js                                             0.35 kB │ map:   0.76 kB
+.svelte-kit/output/server/entries/pages/account/controllers/add/wait/_page.server.ts.js                     0.36 kB │ map:   0.95 kB
+.svelte-kit/output/server/internal.js                                                                       0.36 kB │ map:   0.09 kB
+.svelte-kit/output/server/entries/pages/dashboard/_page.ts.js                                               0.36 kB │ map:   0.86 kB
+.svelte-kit/output/server/entries/pages/account/_layout.svelte.js                                           0.37 kB │ map:   0.56 kB
+.svelte-kit/output/server/entries/pages/explore/_page.ts.js                                                 0.37 kB │ map:   0.95 kB
+.svelte-kit/output/server/chunks/play.js                                                                    0.37 kB │ map:   0.82 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/multiple-choice/_page.svx.js    0.38 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/text/_page.svx.js               0.38 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/account/controllers/_controller_id_/_page.ts.js                     0.38 kB │ map:   1.13 kB
+.svelte-kit/output/server/entries/pages/controller/_page.svelte.js                                          0.38 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/edit/files/_page.ts.js                                              0.38 kB │ map:   1.11 kB
+.svelte-kit/output/server/chunks/types.js                                                                   0.38 kB │ map:   1.52 kB
+.svelte-kit/output/server/entries/pages/import/_page.server.ts.js                                           0.40 kB │ map:   0.83 kB
+.svelte-kit/output/server/entries/pages/moderation/_page.ts.js                                              0.41 kB │ map:   1.00 kB
+.svelte-kit/output/server/chunks/state.svelte.js                                                            0.41 kB │ map:   2.05 kB
+.svelte-kit/output/server/entries/pages/quiztivity/edit/_page.ts.js                                         0.42 kB │ map:   1.09 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/voting/_page.svx.js             0.42 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/range/_page.svx.js              0.43 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/account/login/_page.server.ts.js                                    0.44 kB │ map:   0.97 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/_layout.svelte.js                                   0.45 kB │ map:   0.84 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/order/_page.svx.js              0.47 kB │ map:   0.10 kB
+.svelte-kit/output/server/chunks/slide.js                                                                   0.47 kB │ map:   1.32 kB
+.svelte-kit/output/server/chunks/quiz_types.js                                                              0.47 kB │ map:   3.11 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/features/remote-control/_page.svx.js                0.48 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/edit/_page.server.ts.js                                             0.51 kB │ map:   1.04 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/check-choice/_page.svx.js       0.52 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/view/_quiz_id_/_page.server.ts.js                                   0.53 kB │ map:   1.24 kB
+.svelte-kit/output/server/entries/pages/user/_user_id_/_page.ts.js                                          0.55 kB │ map:   1.27 kB
+.svelte-kit/output/server/chunks/client.js                                                                  0.56 kB │ map: 112.31 kB
+.svelte-kit/output/server/entries/pages/quiztivity/play/_page.ts.js                                         0.56 kB │ map:   1.38 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/quiz/question-types/_page.svx.js                    0.56 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/docs/_layout.svelte.js                                              0.58 kB │ map:   0.73 kB
+.svelte-kit/output/server/entries/pages/admin/_page.server.ts.js                                            0.58 kB │ map:   1.22 kB
+.svelte-kit/output/server/chunks/environment.js                                                             0.66 kB │ map:   1.35 kB
+.svelte-kit/output/server/chunks/inline-editor.js                                                           0.68 kB │ map:   2.69 kB
+.svelte-kit/output/server/chunks/circular_progress.js                                                       0.79 kB │ map:   1.60 kB
+.svelte-kit/output/server/chunks/code.js                                                                    0.84 kB │ map:   1.11 kB
+.svelte-kit/output/server/chunks/Spinner.js                                                                 0.91 kB │ map:   1.20 kB
+.svelte-kit/output/server/entries/pages/docs/_page.svelte.js                                                0.93 kB │ map:   0.11 kB
+.svelte-kit/output/server/entries/pages/account/controllers/add/wait/_page.svelte.js                        0.96 kB │ map:   2.01 kB
+.svelte-kit/output/server/chunks/play3.js                                                                   0.96 kB │ map:   1.44 kB
+.svelte-kit/output/server/chunks/hooks.server.js                                                            0.99 kB │ map:   2.24 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/classquizcontroller/_page.svx.js                    1.02 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/docs/(markdown)/features/custom-field/_page.svx.js                  1.08 kB │ map:   0.10 kB
+.svelte-kit/output/server/entries/pages/docs/roadmap/_page.svelte.js                                        1.08 kB │ map:   0.11 kB
+.svelte-kit/output/server/entries/pages/dashboard/files/_page.svelte.js                                     1.10 kB │ map:   1.28 kB
+.svelte-kit/output/server/chunks/utils.js                                                                   1.19 kB │ map:   2.70 kB
+.svelte-kit/output/server/chunks/helpers.js                                                                 1.19 kB │ map:   3.09 kB
+.svelte-kit/output/server/chunks/MediaComponent.js                                                          1.20 kB │ map:   3.42 kB
+.svelte-kit/output/server/entries/pages/docs/import-from-kahoot/_page.svelte.js                             1.28 kB │ map:   0.11 kB
+.svelte-kit/output/server/entries/pages/quiztivity/create/_page.svelte.js                                   1.34 kB │ map:   1.38 kB
+.svelte-kit/output/server/entries/pages/view/_error.svelte.js                                               1.34 kB │ map:   1.33 kB
+.svelte-kit/output/server/chunks/gray.js                                                                    1.35 kB │ map:   1.73 kB
+.svelte-kit/output/server/entries/pages/account/oauth-error/_page.svelte.js                                 1.35 kB │ map:   1.72 kB
+.svelte-kit/output/server/entries/pages/quiztivity/edit/_page.svelte.js                                     1.39 kB │ map:   1.53 kB
+.svelte-kit/output/server/chunks/brown.js                                                                   1.43 kB │ map:   1.87 kB
+.svelte-kit/output/server/entries/pages/_error.svelte.js                                                    1.62 kB │ map:   1.48 kB
+.svelte-kit/output/server/entries/pages/docs/pow/_page.svelte.js                                            1.74 kB │ map:   0.12 kB
+.svelte-kit/output/server/entries/pages/docs/attribution/_page.svelte.js                                    1.86 kB │ map:   0.11 kB
+.svelte-kit/output/server/chunks/DownloadQuiz.js                                                            1.90 kB │ map:   2.08 kB
+.svelte-kit/output/server/entries/pages/quiztivity/play/_error.svelte.js                                    1.95 kB │ map:   1.66 kB
+.svelte-kit/output/server/chunks/imported_or_not.js                                                         1.96 kB │ map:   2.67 kB
+.svelte-kit/output/server/entries/pages/docs/privacy-policy/_page.svelte.js                                 2.19 kB │ map:   2.96 kB
+.svelte-kit/output/server/chunks/check.js                                                                   2.25 kB │ map:   3.20 kB
+.svelte-kit/output/server/chunks/play2.js                                                                   2.31 kB │ map:   3.79 kB
+.svelte-kit/output/server/entries/pages/search/_page.svelte.js                                              2.42 kB │ map:   4.79 kB
+.svelte-kit/output/server/chunks/yupSchemas.js                                                              2.55 kB │ map:   4.85 kB
+.svelte-kit/output/server/entries/pages/moderation/_page.svelte.js                                          2.57 kB │ map:   2.74 kB
+.svelte-kit/output/server/entries/pages/explore/_page.svelte.js                                             2.57 kB │ map:   2.88 kB
+.svelte-kit/output/server/chunks/index.js                                                                   2.69 kB │ map:   7.81 kB
+.svelte-kit/output/server/chunks/footer.js                                                                  2.73 kB │ map:   4.22 kB
+.svelte-kit/output/server/chunks/results.js                                                                 2.78 kB │ map:   4.48 kB
+.svelte-kit/output/server/entries/pages/results/_page.svelte.js                                             2.79 kB │ map:   3.34 kB
+.svelte-kit/output/server/entries/pages/docs/tos/_page.svelte.js                                            2.81 kB │ map:   0.12 kB
+.svelte-kit/output/server/chunks/voting_results.js                                                          2.93 kB │ map:   3.29 kB
+.svelte-kit/output/server/chunks/smalltop.js                                                                3.15 kB │ map:   3.58 kB
+.svelte-kit/output/server/entries/pages/create/_page.svelte.js                                              3.17 kB │ map:   4.69 kB
+.svelte-kit/output/server/entries/pages/account/reset-password/_page.svelte.js                              3.26 kB │ map:   5.93 kB
+.svelte-kit/output/server/entries/pages/account/controllers/_page.svelte.js                                 3.63 kB │ map:   4.30 kB
+.svelte-kit/output/server/entries/pages/account/controllers/add/_page.svelte.js                             3.64 kB │ map:   6.84 kB
+.svelte-kit/output/server/chunks/TextEditorPart.js                                                          3.89 kB │ map:   5.74 kB
+.svelte-kit/output/server/entries/pages/account/controllers/_controller_id_/_page.svelte.js                 4.10 kB │ map:   7.82 kB
+.svelte-kit/output/server/entries/pages/account/settings/avatar/_page.svelte.js                             4.17 kB │ map:   6.70 kB
+.svelte-kit/output/server/entries/pages/account/password-reset/_page.svelte.js                              4.21 kB │ map:   7.50 kB
+.svelte-kit/output/server/chunks/VotingEditorPart.js                                                        4.22 kB │ map:   5.75 kB
+.svelte-kit/output/server/chunks/OrderEditorPart.js                                                         4.31 kB │ map:   7.83 kB
+.svelte-kit/output/server/entries/pages/docs/develop/_page.svelte.js                                        4.32 kB │ map:   5.83 kB
+.svelte-kit/output/server/entries/pages/quiztivity/play/_page.svelte.js                                     4.45 kB │ map:   3.69 kB
+.svelte-kit/output/server/chunks/ABCDEditorPart.js                                                          5.03 kB │ map:   7.08 kB
+.svelte-kit/output/server/entries/pages/import/_page.svelte.js                                              5.55 kB │ map:  12.45 kB
+.svelte-kit/output/server/chunks/exports.js                                                                 5.56 kB │ map:  12.09 kB
+.svelte-kit/output/server/entries/pages/user/_user_id_/_page.svelte.js                                      5.59 kB │ map:   8.23 kB
+.svelte-kit/output/server/entries/pages/practice/_page.svelte.js                                            5.69 kB │ map:   7.47 kB
+.svelte-kit/output/server/entries/pages/_layout.svelte.js                                                   6.11 kB │ map:  23.58 kB
+.svelte-kit/output/server/entries/pages/docs/self-host/_page.svelte.js                                      6.27 kB │ map:   7.44 kB
+.svelte-kit/output/server/entries/pages/edit/videos/_page.svelte.js                                         6.57 kB │ map:   8.78 kB
+.svelte-kit/output/server/entries/pages/dashboard/_page.svelte.js                                           6.72 kB │ map:  22.59 kB
+.svelte-kit/output/server/entries/pages/edit/files/_page.svelte.js                                          7.20 kB │ map:   8.20 kB
+.svelte-kit/output/server/chunks/internal.js                                                                7.38 kB │ map:  12.50 kB
+.svelte-kit/output/server/chunks/slide2.js                                                                  7.56 kB │ map:  15.64 kB
+.svelte-kit/output/server/entries/pages/account/settings/_page.svelte.js                                    9.83 kB │ map:  12.08 kB
+.svelte-kit/output/server/entries/pages/remote/_page.svelte.js                                             13.09 kB │ map:  13.10 kB
+.svelte-kit/output/server/chunks/final_results.js                                                          13.19 kB │ map:  13.81 kB
+.svelte-kit/output/server/entries/pages/account/settings/security/_page.svelte.js                          14.31 kB │ map:  17.51 kB
+.svelte-kit/output/server/entries/pages/results/_result_id_/_page.svelte.js                                14.79 kB │ map:  17.79 kB
+.svelte-kit/output/server/chunks/shared.js                                                                 16.61 kB │ map:  34.10 kB
+.svelte-kit/output/server/entries/pages/_page.svelte.js                                                    17.31 kB │ map:  21.62 kB
+.svelte-kit/output/server/entries/pages/account/login/_page.svelte.js                                      22.83 kB │ map:  37.64 kB
+.svelte-kit/output/server/chunks/legacy-server.js                                                          23.97 kB │ map:  91.75 kB
+.svelte-kit/output/server/chunks/index2.js                                                                 26.36 kB │ map:  74.22 kB
+.svelte-kit/output/server/chunks/editor.js                                                                 26.92 kB │ map:  30.13 kB
+.svelte-kit/output/server/entries/pages/play/_page.svelte.js                                               27.60 kB │ map:  33.16 kB
+.svelte-kit/output/server/entries/pages/view/_quiz_id_/_page.svelte.js                                     27.68 kB │ map:  37.75 kB
+.svelte-kit/output/server/remote-entry.js                                                                  27.91 kB │ map:  70.94 kB
+.svelte-kit/output/server/chunks/index5.js                                                                 31.53 kB │ map:  79.89 kB
+.svelte-kit/output/server/entries/pages/admin/_page.svelte.js                                              31.58 kB │ map:  38.44 kB
+.svelte-kit/output/server/chunks/uploader.js                                                               40.81 kB │ map:  69.08 kB
+.svelte-kit/output/server/entries/pages/edit/_page.svelte.js                                               49.59 kB │ map:  56.19 kB
+.svelte-kit/output/server/chunks/utils2.js                                                                 51.85 kB │ map: 183.61 kB
+.svelte-kit/output/server/entries/pages/account/register/_page.svelte.js                                   71.77 kB │ map: 141.03 kB
+.svelte-kit/output/server/index.js                                                                        140.99 kB │ map: 321.93 kB
+.svelte-kit/output/server/chunks/index3.js                                                                477.61 kB │ map:  11.28 kB
+✓ built in 26.43s
+
+Run npm run preview to preview your production build locally.
+
+> Using @sveltejs/adapter-node
+Circular dependency: ../../../../../Documents/AntiGravity/ClassQuiz/frontend/node_modules/.pnpm/es-toolkit@1.39.5/node_modules/es-toolkit/dist/compat/predicate/isMatch.mjs -> ../../../../../Documents/AntiGravity/ClassQuiz/frontend/node_modules/.pnpm/es-toolkit@1.39.5/node_modules/es-toolkit/dist/compat/predicate/isMatchWith.mjs -> ../../../../../Documents/AntiGravity/ClassQuiz/frontend/node_modules/.pnpm/es-toolkit@1.39.5/node_modules/es-toolkit/dist/compat/predicate/isMatch.mjs
+  ✔ done

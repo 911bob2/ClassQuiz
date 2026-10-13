@@ -1,0 +1,20 @@
+{
+  "id": 5003,
+  "sources": [
+    {
+      "file": "frontend/src/lib/play/question.svelte",
+      "lines": "146-189",
+      "elements": 7
+    },
+    {
+      "file": "frontend/src/routes/play/+page.svelte",
+      "lines": "165-184",
+      "elements": 4
+    },
+    {
+      "file": "frontend/src/lib/play/circular_progress.svelte",
+      "lines": "25-25",
+      "elements": 1
+    }
+  ]
+}

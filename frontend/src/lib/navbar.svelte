@@ -9,7 +9,6 @@ SPDX-License-Identifier: MPL-2.0
 	import { getLocalization } from '$lib/i18n';
 	import { signedIn, pathname } from '$lib/stores';
 	import { createTippy } from 'svelte-tippy';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { browser } from '$app/environment';
 	import { beforeNavigate } from '$app/navigation';
 	import { draw, slide } from 'svelte/transition';
@@ -103,9 +102,6 @@ SPDX-License-Identifier: MPL-2.0
 			{/if}
 
 			<div class="fit-content flex items-center justify-center gap-2">
-				<BrownButton href="https://mawoka.eu/donate" target="_blank"
-					>{$t('navbar.donate')} <span class="">❤️</span></BrownButton
-				>
 				<div class="lg:flex items-center justify-center">
 					{#if darkMode}
 						<button
@@ -331,12 +327,6 @@ SPDX-License-Identifier: MPL-2.0
 						>{$t('words.login')}</a
 					>
 				{/if}
-
-				<div class="fit-content flex items-center justify-center my-2">
-					<BrownButton href="https://mawoka.eu/donate" target="_blank"
-						>{$t('navbar.donate')} <span class="">❤️</span></BrownButton
-					>
-				</div>
 			</div>
 		{/if}
 	</div>

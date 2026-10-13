@@ -7,6 +7,7 @@ import hashlib
 import hmac
 from datetime import datetime, timedelta
 from typing import Tuple, BinaryIO, Generator
+from urllib.parse import urlsplit
 
 from aiohttp import ClientSession
 import minio
@@ -30,15 +31,29 @@ class S3Storage:
         secret_key: str,
         bucket_name: str,
         region: str = "us-east-1",
+        public_url: str | None = None,
     ):
-        self.base_url = base_url
+        self.base_url = base_url.rstrip("/")
         self.access_key = access_key
         self.secret_key = secret_key
         self.bucket_name = bucket_name
         self.region = region
         self.DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
-        self.host = base_url.replace("http://", "").replace("https://", "")
-        self.client = minio.Minio(self.host, access_key=access_key, secret_key=secret_key)
+        endpoint = urlsplit(self.base_url)
+        public_endpoint = urlsplit(public_url or self.base_url)
+        for url in (endpoint, public_endpoint):
+            if url.scheme not in ("http", "https") or not url.netloc or url.path not in ("", "/"):
+                raise ValueError("S3 endpoints must be HTTP(S) origins without a path")
+        self.host = endpoint.netloc
+        self.client = minio.Minio(
+            self.host, access_key=access_key, secret_key=secret_key,
+            secure=endpoint.scheme == "https", region=region,
+        )
+        # Presigning uses the public host but never needs to connect to it.
+        self.public_client = minio.Minio(
+            public_endpoint.netloc, access_key=access_key, secret_key=secret_key,
+            secure=public_endpoint.scheme == "https", region=region,
+        )
         if not self.client.bucket_exists(self.bucket_name):
             self.client.make_bucket(self.bucket_name)
 
@@ -142,6 +157,8 @@ class S3Storage:
                 file.seek(0)
                 break
         headers["Content-Length"] = str(file_size)
+        if mime_type is not None:
+            headers["Content-Type"] = mime_type
 
         async with (
             ClientSession() as session,
@@ -160,13 +177,11 @@ class S3Storage:
                 ClientSession() as session,
                 session.delete(url, headers=headers) as resp,
             ):
-                if resp.status == 204:
-                    return None
-                else:
+                if resp.status != 204:
                     raise DeletionFailedError
 
     def get_url(self, expire: int, file_name: str) -> str:
-        return self.client.presigned_get_object(
+        return self.public_client.presigned_get_object(
             object_name=file_name,
             bucket_name=self.bucket_name,
             expires=timedelta(seconds=expire),

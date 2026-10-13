@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "parent": "836bbd76786efe363ce201ce1cd7ed2eaa2e0a1a47e6694fbffe52b5a1cc6f35",
+  "tree": "8ab127c55e873c93d56ed50a2781f95fab7064f6cf6b3fbe9f1505f3897e2f2c",
+  "branch": "git/head",
+  "message": "Git HEAD with local analytics shim",
+  "createdAt": "2026-10-12T23:18:38.246Z",
+  "provenance": {
+    "kind": "git",
+    "gitCommit": "711bdde7a7dcd2d217cfc75dbbbb2592a78582d3",
+    "gitBranch": "master",
+    "gitRef": "HEAD"
+  },
+  "changes": [
+    {
+      "file": "ui-preview/render.html",
+      "status": "modified"
+    },
+    {
+      "file": "ui-preview/src/render/main.ts",
+      "status": "modified"
+    }
+  ],
+  "id": "e6f6a33763fbd3588e7bbf24ca460aab228538161ec2d1fb365274f27f32fa5d"
+}

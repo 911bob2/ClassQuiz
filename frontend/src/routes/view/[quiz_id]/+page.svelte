@@ -228,14 +228,6 @@ SPDX-License-Identifier: MPL-2.0
 				{/if}
 			</div>
 		</div>
-		<div class="flex justify-center">
-			<a
-				href="mailto:report@mawoka.eu?subject=Report quiz {quiz.id}"
-				class="text-sm underline"
-			>
-				{$t('words.report')}
-			</a>
-		</div>
 	</div>
 
 	{#each quiz.questions as question, index_question}

@@ -1,0 +1,77 @@
+<!--
+SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
+
+	import { fly } from 'svelte/transition';
+	import confetti from 'canvas-confetti';
+	interface Props {
+		data: any;
+		username?: any;
+		show_final_results: boolean;
+	}
+
+	let { data = $bindable(), username, show_final_results }: Props = $props();
+
+	let player_names = $derived(Object.keys(data).sort((a, b) => {
+		const scoreA = parseFloat(data[a]) || 0;
+		const scoreB = parseFloat(data[b]) || 0;
+		return scoreB - scoreA;
+	}));
+
+	let player_count_or_five = $derived(player_names.length >= 5 ? 5 : player_names.length);
+
+	let canvas: HTMLCanvasElement = $state();
+	onMount(() => {
+		setTimeout(
+			() => {
+				confetti.create(canvas, {
+					resize: true,
+					useWorker: true
+				});
+				confetti({ particleCount: 200, spread: 160 });
+			},
+			player_count_or_five * 1200 - 800
+		);
+	});
+</script>
+
+{#if show_final_results}
+	<canvas bind:this={canvas}></canvas>
+	<div>
+		{#each player_names as player, i}
+			{#if i <= player_count_or_five - 1}
+				<p
+					in:fly|global={{ y: -300, delay: player_count_or_five * 1200 - (i + 1) * 1000 }}
+					style="font-size: {player_count_or_five - i / 2}rem"
+					class="text-center"
+				>
+					{$t('play_page.final_result_rank', {
+						place: i + 1,
+						username: player,
+						points: data[player]
+					})}
+				</p>
+			{/if}
+		{/each}
+	</div>
+	{#if data[username]}
+		<div class="fixed bottom-0 left-0 flex justify-center w-full mb-6">
+			<div class="mx-auto p-2 border-[#B07156] border-4 rounded-sm">
+				<p class="text-center">{$t('play_page.your_score', { score: data[username] })}</p>
+				{#each player_names as player, i}
+					{#if player === username}
+						<p class="text-center">{$t('play_page.your_place', { place: i + 1 })}</p>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	{/if}
+{/if}

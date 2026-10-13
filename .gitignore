@@ -13,3 +13,10 @@ survey.json
 .coverage
 export_deta.py
 target/
+.deploy/
+deploy/*.log
+deploy/backups/
+.agents/
+# Local load generator binaries
+/stresstest.exe
+/stresstest

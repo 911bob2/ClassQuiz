@@ -193,7 +193,7 @@ async def mark_file_as_deleted(file_id: UUID, user: User = Depends(get_current_u
     storage_path = file_data.storage_path
     if storage_path is None:
         storage_path = file_data.id.hex
-    await storage.delete(storage_path)
+    await storage.delete([storage_path])
     file_data.deleted_at = datetime.now()
     await file_data.update()
     return

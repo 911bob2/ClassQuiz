@@ -1,0 +1,66 @@
+{
+  "command": "inspect",
+  "createdAt": "2026-10-12T18:11:39.254Z",
+  "settings": {
+    "viewport": "desktop",
+    "theme": "light",
+    "lang": "en"
+  },
+  "total": 1,
+  "ok": 0,
+  "warnings": 1,
+  "failed": 0,
+  "results": [
+    {
+      "id": 4011,
+      "slug": "editor.settings",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 37
+        },
+        {
+          "file": "frontend/src/lib/editor/settings-card.svelte",
+          "lines": "36-197",
+          "elements": 34
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-140",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ],
+      "inspection": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\4011-editor.settings-desktop-light-en.inspect.json",
+      "count": 28,
+      "screenshot": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\4011-editor.settings-desktop-light-en.png"
+    }
+  ],
+  "report": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\inspect-report.json"
+}

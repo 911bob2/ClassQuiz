@@ -1,0 +1,10 @@
+{
+  "port": 9998,
+  "passed": true,
+  "sharedProcess": 21512,
+  "persistedAfterCommands": true,
+  "clients": [
+    12,
+    11
+  ]
+}

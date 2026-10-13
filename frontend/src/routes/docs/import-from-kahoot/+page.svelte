@@ -4,6 +4,10 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 
+<script lang="ts">
+	import { resolve } from '$app/paths';
+</script>
+
 <svelte:head>
 	<title>ClassQuiz/docs - Import from Kahoot</title>
 	<meta
@@ -22,9 +26,7 @@ SPDX-License-Identifier: MPL-2.0
 			rel="nofollow"
 			target="_blank">create.kahoot.it/discover</a
 		>, find the quiz you want to import, click on it and copy the URL into your clipboard. Then
-		go to
-		<a href="https://classquiz.de/import" rel="nofollow" target="_blank">classquiz.de/import</a>
-		and paste the url into the text field.
+		go to the <a href={resolve('/import')}>import page</a> and paste the URL into the text field.
 	</p>
 
 	<h2>Limitations</h2>

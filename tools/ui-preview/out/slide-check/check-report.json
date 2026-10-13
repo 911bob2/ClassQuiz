@@ -1,0 +1,48 @@
+{
+  "command": "check",
+  "createdAt": "2026-10-13T07:28:15.100Z",
+  "revision": "working",
+  "settings": {
+    "viewport": "desktop",
+    "theme": "light",
+    "lang": "en"
+  },
+  "total": 1,
+  "ok": 0,
+  "warnings": 1,
+  "failed": 0,
+  "results": [
+    {
+      "id": 6016,
+      "slug": "host.question.slide",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "The real host exports its slide canvas while hidden and before import completes; this currently produces a blank slide image. The slide editor is available as #4007."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/admin.svelte",
+          "lines": "88-154",
+          "elements": 6
+        },
+        {
+          "file": "frontend/src/lib/play/admin/controls.svelte",
+          "lines": "30-105",
+          "elements": 4
+        },
+        {
+          "file": "frontend/src/routes/admin/+page.svelte",
+          "lines": "245-310",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/Spinner.svelte",
+          "lines": "15-20",
+          "elements": 3
+        }
+      ]
+    }
+  ]
+}

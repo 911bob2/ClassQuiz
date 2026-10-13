@@ -1,0 +1,124 @@
+[
+  {
+    "id": 5001,
+    "slug": "play.join",
+    "title": "Join a game",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5002,
+    "slug": "play.title",
+    "title": "Waiting for the host",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5003,
+    "slug": "play.question.abcd",
+    "title": "Player · ABCD",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5004,
+    "slug": "play.question.range",
+    "title": "Player · RANGE",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5005,
+    "slug": "play.question.voting",
+    "title": "Player · VOTING",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5006,
+    "slug": "play.question.text",
+    "title": "Player · TEXT",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5007,
+    "slug": "play.question.order",
+    "title": "Player · ORDER",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5008,
+    "slug": "play.question.check",
+    "title": "Player · CHECK",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5009,
+    "slug": "play.question.slide",
+    "title": "Player · SLIDE",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ],
+    "limitations": "The real player component has no SLIDE branch and renders an empty screen. Slides are shown on the host (#6016).",
+    "allowBlank": true
+  },
+  {
+    "id": 5020,
+    "slug": "play.answered-waiting",
+    "title": "Answer submitted",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5021,
+    "slug": "play.results",
+    "title": "Question leaderboard",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  },
+  {
+    "id": 5030,
+    "slug": "play.final",
+    "title": "Final leaderboard",
+    "group": "Player",
+    "route": "/play",
+    "sources": [
+      "routes/play/+page.svelte"
+    ]
+  }
+]

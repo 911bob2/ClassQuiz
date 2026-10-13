@@ -24,6 +24,6 @@ COPY gunicorn_conf.py /app/
 
 EXPOSE 80
 ENV PYTHONPATH=/app
-RUN chmod +x start.sh
+RUN sed -i 's/\r$//' /app/*start.sh && chmod +x start.sh
 ENV APP_MODULE=classquiz:app
 CMD ["./start.sh"]

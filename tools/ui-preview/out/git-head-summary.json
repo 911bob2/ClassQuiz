@@ -1,0 +1,132 @@
+{
+  "command": "check",
+  "createdAt": "2026-10-13T07:39:22.720Z",
+  "revision": "e6f6a33763fbd3588e7bbf24ca460aab228538161ec2d1fb365274f27f32fa5d",
+  "settings": {
+    "viewport": "desktop",
+    "theme": "light",
+    "lang": "en"
+  },
+  "total": 3,
+  "ok": 3,
+  "warnings": 0,
+  "failed": 0,
+  "results": [
+    {
+      "id": 1001,
+      "slug": "landing",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/routes/+page.svelte",
+          "lines": "108-456",
+          "elements": 78
+        },
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "49-255",
+          "elements": 32
+        },
+        {
+          "file": "frontend/src/lib/footer.svelte",
+          "lines": "14-71",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/lib/landing/newsletter.svelte",
+          "lines": "20-71",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "63-65",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/language-toggle.svelte",
+          "lines": "148-158",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "30-30",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 3001,
+      "slug": "dashboard",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/routes/dashboard/+page.svelte",
+          "lines": "114-403",
+          "elements": 49
+        },
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "49-255",
+          "elements": 28
+        },
+        {
+          "file": "frontend/src/lib/footer.svelte",
+          "lines": "14-71",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "63-65",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/language-toggle.svelte",
+          "lines": "148-158",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "30-45",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/editor/MediaComponent.svelte",
+          "lines": "72-72",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 5003,
+      "slug": "play.question.abcd",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/play/question.svelte",
+          "lines": "146-189",
+          "elements": 7
+        },
+        {
+          "file": "frontend/src/routes/play/+page.svelte",
+          "lines": "167-186",
+          "elements": 4
+        },
+        {
+          "file": "frontend/src/lib/play/circular_progress.svelte",
+          "lines": "25-25",
+          "elements": 1
+        }
+      ]
+    }
+  ],
+  "report": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\git-head-check\\check-e6f6a33763fb-report.json"
+}

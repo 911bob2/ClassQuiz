@@ -13,7 +13,6 @@ interface ImportMetaEnv {
 	readonly VITE_HCAPTCHA?: string;
 	readonly VITE_RECAPTCHA?: string;
 	readonly VITE_SENTRY?: string;
-	readonly VITE_PLAUSIBLE_DATA_URL?: string;
 }
 
 interface ImportMeta {

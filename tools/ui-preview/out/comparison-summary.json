@@ -1,0 +1,335 @@
+{
+  "id": 5003,
+  "url": "http://127.0.0.1:9999/5003?before=d4d0bff63bf4056840186fe0424e1c289e732b425b4d533aa0e512f64d17462b&after=a683f237d61cd340e8a73760d028777e73db2b7cd9679243d55cefe96abecdde&mode=revisions&viewport=desktop&theme=light&lang=en",
+  "from": "d4d0bff63bf4056840186fe0424e1c289e732b425b4d533aa0e512f64d17462b",
+  "to": "a683f237d61cd340e8a73760d028777e73db2b7cd9679243d55cefe96abecdde",
+  "changes": [
+    {
+      "file": "frontend/src/lib/play/question.svelte",
+      "status": "modified"
+    },
+    {
+      "file": "ui-preview/render.html",
+      "status": "modified"
+    },
+    {
+      "file": "ui-preview/src/render/main.ts",
+      "status": "modified"
+    }
+  ],
+  "renders": [
+    {
+      "revision": "d4d0bff63bf4056840186fe0424e1c289e732b425b4d533aa0e512f64d17462b",
+      "screenshot": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\comparisons\\5003-before-d4d0bff63bf4.png",
+      "elements": [
+        {
+          "ref": "e1",
+          "tag": "button",
+          "box": {
+            "x": 16,
+            "y": 16,
+            "w": 620,
+            "h": 380
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(0, 0, 0)",
+            "background-color": "rgb(214, 237, 201)",
+            "border": "2px solid rgb(0, 0, 0)",
+            "border-radius": "8px",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e2",
+          "tag": "button",
+          "box": {
+            "x": 16,
+            "y": 404,
+            "w": 620,
+            "h": 380
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(0, 0, 0)",
+            "background-color": "rgb(176, 113, 86)",
+            "border": "2px solid rgb(0, 0, 0)",
+            "border-radius": "8px",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e3",
+          "tag": "button",
+          "box": {
+            "x": 644,
+            "y": 16,
+            "w": 620,
+            "h": 380
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(255, 255, 255)",
+            "background-color": "rgb(127, 112, 87)",
+            "border": "2px solid rgb(0, 0, 0)",
+            "border-radius": "8px",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e4",
+          "tag": "button",
+          "box": {
+            "x": 644,
+            "y": 404,
+            "w": 620,
+            "h": 380
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(255, 255, 255)",
+            "background-color": "rgb(78, 110, 88)",
+            "border": "2px solid rgb(0, 0, 0)",
+            "border-radius": "8px",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        }
+      ]
+    },
+    {
+      "revision": "a683f237d61cd340e8a73760d028777e73db2b7cd9679243d55cefe96abecdde",
+      "screenshot": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\comparisons\\5003-after-a683f237d61c.png",
+      "elements": [
+        {
+          "ref": "e1",
+          "tag": "button",
+          "box": {
+            "x": 35,
+            "y": 27,
+            "w": 583,
+            "h": 357
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black svelte-1g7kqn5",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(0, 0, 0)",
+            "background-color": "rgb(214, 237, 201)",
+            "border": "6px solid rgb(255, 255, 255)",
+            "border-radius": "32px",
+            "box-shadow": "rgba(255, 255, 255, 0.133) 0px 0px 0px 8px inset",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e2",
+          "tag": "button",
+          "box": {
+            "x": 35,
+            "y": 415,
+            "w": 583,
+            "h": 357
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black svelte-1g7kqn5",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(0, 0, 0)",
+            "background-color": "rgb(176, 113, 86)",
+            "border": "6px solid rgb(255, 255, 255)",
+            "border-radius": "32px",
+            "box-shadow": "rgba(255, 255, 255, 0.133) 0px 0px 0px 8px inset",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e3",
+          "tag": "button",
+          "box": {
+            "x": 663,
+            "y": 27,
+            "w": 583,
+            "h": 357
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black svelte-1g7kqn5",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(255, 255, 255)",
+            "background-color": "rgb(127, 112, 87)",
+            "border": "6px solid rgb(255, 255, 255)",
+            "border-radius": "32px",
+            "box-shadow": "rgba(255, 255, 255, 0.133) 0px 0px 0px 8px inset",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        },
+        {
+          "ref": "e4",
+          "tag": "button",
+          "box": {
+            "x": 663,
+            "y": 415,
+            "w": 583,
+            "h": 357
+          },
+          "src": "frontend/src/lib/play/question.svelte:179:7",
+          "usedIn": "frontend/src/routes/play/+page.svelte:184:6",
+          "componentChain": [
+            "Question @ frontend/src/routes/play/+page.svelte:184:6",
+            "Screen @ ui-preview/src/render/Nest.svelte:19:3",
+            "Nest @ ui-preview/src/render/Frame.svelte:25:5",
+            "RootLayout @ ui-preview/src/render/Frame.svelte:24:3"
+          ],
+          "classes": "rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black svelte-1g7kqn5",
+          "styles": {
+            "display": "flex",
+            "width": "620px",
+            "height": "380px",
+            "padding": "12px",
+            "font-family": "ui-sans-serif",
+            "font-size": "16px",
+            "font-weight": "400",
+            "line-height": "24px",
+            "text-align": "center",
+            "color": "rgb(255, 255, 255)",
+            "background-color": "rgb(78, 110, 88)",
+            "border": "6px solid rgb(255, 255, 255)",
+            "border-radius": "32px",
+            "box-shadow": "rgba(255, 255, 255, 0.133) 0px 0px 0px 8px inset",
+            "justify-content": "center"
+          },
+          "interactive": true,
+          "visibleInViewport": true
+        }
+      ]
+    }
+  ],
+  "report": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\comparisons\\5003-comparison.json"
+}

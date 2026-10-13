@@ -1,0 +1,40 @@
+<!--
+SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
+<script lang="ts">
+	import type { Markdown } from '$lib/quiztivity/types';
+	import { marked } from 'marked';
+	import { browser } from '$app/environment';
+
+	interface Props {
+		data: Markdown | undefined;
+	}
+
+	let { data = $bindable() }: Props = $props();
+
+	if (!data) {
+		data = {
+			markdown: ''
+		};
+	}
+
+	let rendered_html = $derived(browser ? marked.parse(data.markdown) : '');
+</script>
+
+<div class="w-full h-[70vh] flex flex-row p-4 gap-4">
+	<textarea
+		class="w-full resize-none border-[#B07156] border-2 rounded-sm outline-hidden p-2 bg-white/30 dark:placeholder-gray-300"
+		bind:value={data.markdown}
+		placeholder="Enter your markdown here!"
+	></textarea>
+	<div class="w-full">
+		<div
+			class="aspect-video prose max-w-none border-[#B07156] border-2 rounded-sm p-2 dark:prose-invert"
+		>
+			{@html rendered_html}
+		</div>
+	</div>
+</div>

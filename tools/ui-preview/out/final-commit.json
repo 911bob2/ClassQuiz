@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "parent": "d4d0bff63bf4056840186fe0424e1c289e732b425b4d533aa0e512f64d17462b",
+  "tree": "ed321b1301caece68b23474c3b5102a15dbefaaba043d6f351a369fd552ed636",
+  "branch": "main",
+  "message": "Ready: versioned gallery and stable agent workflow",
+  "createdAt": "2026-10-13T07:39:56.188Z",
+  "provenance": {
+    "kind": "working-tree",
+    "gitCommit": "711bdde7a7dcd2d217cfc75dbbbb2592a78582d3",
+    "gitBranch": "master",
+    "gitRef": null
+  },
+  "changes": [
+    {
+      "file": "ui-preview/render.html",
+      "status": "modified"
+    },
+    {
+      "file": "ui-preview/src/render/main.ts",
+      "status": "modified"
+    }
+  ],
+  "id": "3bc80276aad11197a9fbc8fb55381093b863e8393f4ed98628f3add068185d41"
+}

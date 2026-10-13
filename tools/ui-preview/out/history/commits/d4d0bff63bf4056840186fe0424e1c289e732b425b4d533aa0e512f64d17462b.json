@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "parent": "51df31f564d69e9f0f8ede0fc3b7759dc68dbc4bacc4c57284208b8409cd50d0",
+  "tree": "a897baf2d70dee17e92594115844d44228e4dbe7e4cdb0a4b6f49543ab33e032",
+  "branch": "main",
+  "message": "Final renderer: local analytics and unobstructed screenshots",
+  "createdAt": "2026-10-12T23:18:38.857Z",
+  "provenance": {
+    "kind": "working-tree",
+    "gitCommit": "711bdde7a7dcd2d217cfc75dbbbb2592a78582d3",
+    "gitBranch": "master",
+    "gitRef": null
+  },
+  "changes": [
+    {
+      "file": "ui-preview/render.html",
+      "status": "modified"
+    },
+    {
+      "file": "ui-preview/src/render/main.ts",
+      "status": "modified"
+    }
+  ],
+  "id": "d4d0bff63bf4056840186fe0424e1c289e732b425b4d533aa0e512f64d17462b"
+}

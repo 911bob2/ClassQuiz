@@ -1,0 +1,654 @@
+{
+  "command": "check",
+  "createdAt": "2026-10-12T18:12:52.526Z",
+  "settings": {
+    "viewport": "desktop",
+    "theme": "light",
+    "lang": "en"
+  },
+  "total": 15,
+  "ok": 6,
+  "warnings": 9,
+  "failed": 0,
+  "results": [
+    {
+      "id": 4001,
+      "slug": "editor.abcd",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 32
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-242",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/ABCDEditorPart.svelte",
+          "lines": "69-152",
+          "elements": 12
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4002,
+      "slug": "editor.range",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 31
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-249",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/RangeSelectorEditorPart.svelte",
+          "lines": "56-82",
+          "elements": 7
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4003,
+      "slug": "editor.voting",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 31
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-254",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/editor/VotingEditorPart.svelte",
+          "lines": "58-132",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4004,
+      "slug": "editor.text",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 32
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-260",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/TextEditorPart.svelte",
+          "lines": "48-144",
+          "elements": 11
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4005,
+      "slug": "editor.order",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 31
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-266",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor/OrderEditorPart.svelte",
+          "lines": "76-182",
+          "elements": 16
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4006,
+      "slug": "editor.check",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 32
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-242",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/ABCDEditorPart.svelte",
+          "lines": "69-152",
+          "elements": 12
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4007,
+      "slug": "editor.slide",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-422",
+          "elements": 31
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor/slides/edit_menu.svelte",
+          "lines": "78-204",
+          "elements": 16
+        },
+        {
+          "file": "frontend/src/lib/editor/slide.svelte",
+          "lines": "176-249",
+          "elements": 14
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-142",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/card.svelte",
+          "lines": "99-145",
+          "elements": 12
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 4010,
+      "slug": "editor.add-question-popup",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "Rich text uses the real CKEditor. Uploads are local mock fixtures; publishing is simulated."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/editor/sidebar.svelte",
+          "lines": "76-434",
+          "elements": 38
+        },
+        {
+          "file": "frontend/src/lib/editor/settings-card.svelte",
+          "lines": "36-197",
+          "elements": 34
+        },
+        {
+          "file": "frontend/src/routes/edit/+page.svelte",
+          "lines": "80-140",
+          "elements": 17
+        },
+        {
+          "file": "frontend/src/lib/editor.svelte",
+          "lines": "99-140",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/lib/editor/AddNewQuestionPopup.svelte",
+          "lines": "101-127",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/lib/editor/uploader.svelte",
+          "lines": "223-238",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/inline-editor.svelte",
+          "lines": "92-93",
+          "elements": 2
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 5009,
+      "slug": "play.question.slide",
+      "status": "warn",
+      "errors": [],
+      "warnings": [
+        "The real player component has no SLIDE branch and renders an empty screen. Slides are shown on the host (#6016)."
+      ],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/routes/play/+page.svelte",
+          "lines": "165-184",
+          "elements": 4
+        },
+        {
+          "file": "frontend/src/lib/play/question.svelte",
+          "lines": "146-146",
+          "elements": 1
+        }
+      ]
+    },
+    {
+      "id": 6016,
+      "slug": "host.question.slide",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/admin.svelte",
+          "lines": "88-154",
+          "elements": 6
+        },
+        {
+          "file": "frontend/src/lib/play/admin/slide.svelte",
+          "lines": "38-43",
+          "elements": 5
+        },
+        {
+          "file": "frontend/src/lib/play/admin/controls.svelte",
+          "lines": "30-105",
+          "elements": 4
+        },
+        {
+          "file": "frontend/src/routes/admin/+page.svelte",
+          "lines": "245-310",
+          "elements": 3
+        }
+      ]
+    },
+    {
+      "id": 7003,
+      "slug": "result.questions",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "48-251",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/routes/results/[result_id]/+page.svelte",
+          "lines": "36-89",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/routes/results/[result_id]/question_overview.svelte",
+          "lines": "59-79",
+          "elements": 7
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "45-47",
+          "elements": 3
+        }
+      ]
+    },
+    {
+      "id": 8003,
+      "slug": "practice.question.range",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "48-251",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/lib/practice/title_screen.svelte",
+          "lines": "16-80",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/routes/practice/+page.svelte",
+          "lines": "34-81",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/lib/practice/question.svelte",
+          "lines": "101-186",
+          "elements": 7
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "45-47",
+          "elements": 3
+        }
+      ]
+    },
+    {
+      "id": 8004,
+      "slug": "practice.question.text",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "48-251",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/lib/practice/title_screen.svelte",
+          "lines": "16-80",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/routes/practice/+page.svelte",
+          "lines": "34-81",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/lib/practice/question.svelte",
+          "lines": "101-240",
+          "elements": 7
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "45-47",
+          "elements": 3
+        }
+      ]
+    },
+    {
+      "id": 8005,
+      "slug": "practice.question.order",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "48-251",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/lib/practice/title_screen.svelte",
+          "lines": "16-80",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/lib/practice/question.svelte",
+          "lines": "101-313",
+          "elements": 13
+        },
+        {
+          "file": "frontend/src/routes/practice/+page.svelte",
+          "lines": "34-81",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "45-47",
+          "elements": 3
+        }
+      ]
+    },
+    {
+      "id": 8006,
+      "slug": "practice.question.check",
+      "status": "ok",
+      "errors": [],
+      "warnings": [],
+      "unmocked": [],
+      "sources": [
+        {
+          "file": "frontend/src/lib/navbar.svelte",
+          "lines": "48-251",
+          "elements": 26
+        },
+        {
+          "file": "frontend/src/lib/practice/title_screen.svelte",
+          "lines": "16-80",
+          "elements": 18
+        },
+        {
+          "file": "frontend/src/routes/practice/+page.svelte",
+          "lines": "34-81",
+          "elements": 10
+        },
+        {
+          "file": "frontend/src/lib/practice/question.svelte",
+          "lines": "101-351",
+          "elements": 6
+        },
+        {
+          "file": "frontend/src/routes/+layout.svelte",
+          "lines": "45-47",
+          "elements": 3
+        },
+        {
+          "file": "frontend/src/lib/components/buttons/brown.svelte",
+          "lines": "45-45",
+          "elements": 1
+        }
+      ]
+    }
+  ],
+  "report": "C:\\Users\\Denis\\Documents\\AntiGravity\\ClassQuiz\\ui-preview\\out\\check-report.json"
+}
