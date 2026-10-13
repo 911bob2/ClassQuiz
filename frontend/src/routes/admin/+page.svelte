@@ -13,13 +13,13 @@ SPDX-License-Identifier: MPL-2.0
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import FinalResults from '$lib/play/admin/final_results.svelte';
-	import GrayButton from '$lib/components/buttons/gray.svelte';
 	import { page } from '$app/state';
 	import { SocketGameControls } from '$lib/play/admin/socket_game_controls.ts';
 	import type { IGameState } from '$lib/play/admin/game_state.ts';
 	import { QuizQuestionType, type QuizData } from '$lib/quiz_types';
 	import type { Player, PlayerAnswer } from '$lib/admin';
 	import { tinykeys } from '$lib/tinykeys';
+	import { backgroundText } from '$lib/play/background';
 
 	navbarVisible.visible = false;
 
@@ -209,6 +209,7 @@ SPDX-License-Identifier: MPL-2.0
 		game_state.quiz_data ? game_state.quiz_data.background_image : undefined
 	);
 	let results_saved = $state(false);
+	let text_color = $derived(backgroundText(bg_color));
 
 	let show_final_results = $derived(
 		JSON.stringify(game_state.final_results) !== JSON.stringify([null])
@@ -240,61 +241,20 @@ SPDX-License-Identifier: MPL-2.0
 
 <svelte:window onbeforeunload={confirmUnload} />
 <svelte:head>
-	<title>ClassQuiz - Host</title>
+	<title>Telekom Quiz · Host</title>
 </svelte:head>
 <div
-	class="min-h-screen min-w-full"
+	class="host-root"
 	style="background-repeat: no-repeat;background-size: 100% 100%;background-image: {bg_image
 		? `url('${bg_image}')`
 		: `unset`}; background-color: {bg_color ? bg_color : 'transparent'}"
-	class:text-black={bg_color}
+	style:color={text_color}
 >
-	{#if JSON.stringify(game_state.final_results) !== JSON.stringify([null])}
-		{#if game_state.control_visible}
-			<div class="w-screen flex justify-center mt-16">
-				<div class="w-fit">
-					{#if export_token === undefined}
-						<GrayButton onclick={request_answer_export}
-							>{$t('admin_page.request_export_results')}</GrayButton
-						>
-					{:else}
-						<GrayButton
-							target="_blank"
-							href="/api/v1/quiz/export_data/{export_token}?ts={new Date().getTime()}&game_pin={game_pin}"
-							>{$t('admin_page.download_export_results')}</GrayButton
-						>
-					{/if}
-				</div>
-			</div>
-			<div class="w-screen flex justify-center mt-2">
-				<div class="w-fit">
-					<GrayButton onclick={save_quiz} flex={true} disabled={results_saved}>
-						{#if results_saved}
-							<svg
-								class="w-4 h-4"
-								aria-hidden="true"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M5 13l4 4L19 7"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-						{:else}{$t('admin_page.save_results')}{/if}
-					</GrayButton>
-				</div>
-			</div>
-		{/if}
-		<FinalResults bind:data={game_state.player_scores} {show_final_results} />
-	{/if}
 	{#if !success}
 		{#if errorMessage !== ''}
-			<p class="text-red-700">{errorMessage}</p>
+			<main class="tq-page tq-page-narrow">
+				<p class="tq-alert tq-alert-error" role="alert">{errorMessage}</p>
+			</main>
 		{/if}
 	{:else if !game_state.game_started}
 		<GameNotStarted
@@ -306,6 +266,59 @@ SPDX-License-Identifier: MPL-2.0
 	{:else}
 		<SomeAdminScreen {game_token} {bg_color} bind:game_state />
 	{/if}
+	{#if show_final_results}
+		<FinalResults bind:data={game_state.player_scores} {show_final_results}>
+			{#snippet actions()}
+				{#if game_state.control_visible}
+					{#if export_token === undefined}
+						<button
+							class="tq-button"
+							data-ui="host-request-export"
+							onclick={request_answer_export}
+						>
+							{$t('admin_page.request_export_results')}
+						</button>
+					{:else}
+						<a
+							class="tq-button"
+							data-ui="host-download-export"
+							target="_blank"
+							href="/api/v1/quiz/export_data/{export_token}?ts={new Date().getTime()}&game_pin={game_pin}"
+						>
+							{$t('admin_page.download_export_results')}
+						</a>
+					{/if}
+					<button
+						class="tq-button tq-button-primary"
+						data-ui="host-save-results"
+						onclick={save_quiz}
+						disabled={results_saved}
+					>
+						{#if results_saved}
+							<svg
+								class="save-check"
+								aria-hidden="true"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M5 13l4 4L19 7"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							{$t('telekom.results_saved', { defaultValue: 'Results saved' })}
+						{:else}
+							{$t('admin_page.save_results')}
+						{/if}
+					</button>
+				{/if}
+			{/snippet}
+		</FinalResults>
+	{/if}
 </div>
 <a
 	onclick={request_answer_export}
@@ -315,3 +328,15 @@ SPDX-License-Identifier: MPL-2.0
 	download=""
 	class="absolute size-px overflow-hidden whitespace-nowrap opacity-0">Download</a
 >
+
+<style>
+	.host-root {
+		min-height: 100dvh;
+		min-width: 100%;
+	}
+
+	.save-check {
+		width: 20px;
+		height: 20px;
+	}
+</style>

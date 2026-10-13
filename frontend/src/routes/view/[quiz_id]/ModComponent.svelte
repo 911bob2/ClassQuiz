@@ -5,16 +5,23 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import BrownButton from '$lib/components/buttons/brown.svelte';
-	import GrayButton from '$lib/components/buttons/gray.svelte';
-
 	interface Props {
 		autoReturn?: boolean;
 		quiz_id: string;
 	}
 
 	let { autoReturn = false, quiz_id }: Props = $props();
-	let mod_rating: number | undefined = $state();
+	let mod_rating: number | null | undefined = $state();
+
+	const ratings: { value: number | null; label: string }[] = [
+		{ value: null, label: 'Not Checked' },
+		{ value: 0, label: 'Ok' },
+		{ value: 1, label: 'Attention' },
+		{ value: 2, label: 'NSFW' },
+		{ value: 3, label: 'Plausibility Checked' },
+		{ value: 4, label: 'Fact Checked' },
+		{ value: 5, label: 'Exceptional' }
+	];
 
 	const submit = async () => {
 		const res = await fetch(`/api/v1/moderation/rating/set/${quiz_id}`, {
@@ -33,27 +40,39 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="rounded-sm border-2 border-[#B07156] flex flex-col w-fit gap-2 p-2">
-	<div class:opacity-50={mod_rating !== null && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = null)}>Not Checked</BrownButton>
+<section class="tq-panel tq-panel-body tq-stack stack-4" data-ui="moderation-rating">
+	<h2 class="tq-section-title">Moderation</h2>
+	<div class="tq-toolbar" role="group" aria-label="Moderation rating">
+		{#each ratings as rating}
+			<button
+				type="button"
+				class="tq-button rating-option"
+				aria-pressed={mod_rating === rating.value}
+				onclick={() => (mod_rating = rating.value)}
+			>
+				{rating.label}
+			</button>
+		{/each}
 	</div>
-	<div class:opacity-50={mod_rating !== 0 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 0)}>Ok</BrownButton>
+	<div>
+		<button
+			type="button"
+			class="tq-button tq-button-primary"
+			onclick={submit}
+			disabled={mod_rating === undefined}
+		>
+			Submit
+		</button>
 	</div>
-	<div class:opacity-50={mod_rating !== 1 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 1)}>Attention</BrownButton>
-	</div>
-	<div class:opacity-50={mod_rating !== 2 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 2)}>NFSW</BrownButton>
-	</div>
-	<div class:opacity-50={mod_rating !== 3 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 3)}>Plausibility Checked</BrownButton>
-	</div>
-	<div class:opacity-50={mod_rating !== 4 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 4)}>Fact Checked</BrownButton>
-	</div>
-	<div class:opacity-50={mod_rating !== 5 && mod_rating !== undefined} class="transition">
-		<BrownButton onclick={() => (mod_rating = 5)}>Exceptional</BrownButton>
-	</div>
-	<GrayButton onclick={submit} disabled={mod_rating === undefined}>Submit</GrayButton>
-</div>
+</section>
+
+<style>
+	.stack-4 {
+		gap: 16px;
+	}
+	.rating-option[aria-pressed='true'] {
+		border-color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+		color: var(--tq-accent);
+	}
+</style>

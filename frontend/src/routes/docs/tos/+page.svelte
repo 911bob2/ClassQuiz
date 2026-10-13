@@ -15,16 +15,14 @@ SPDX-License-Identifier: MPL-2.0
 </script>-->
 
 <svelte:head>
-	<title>ClassQuiz/docs - Terms of Service</title>
+	<title>Telekom Quiz · Docs · Terms of Service</title>
 	<meta
 		name="description"
 		content="The terms of service of ClassQuiz, the open-source quiz-application"
 	/>
 </svelte:head>
 
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	<h1>Terms of Service</h1>
 
 	<h2>For those who don't like reading</h2>
@@ -47,7 +45,7 @@ SPDX-License-Identifier: MPL-2.0
 		content or propaganda <b>have to be reported</b> and will be reviewed and deleted, if it's
 		against these rules. This platform is made to share educational content, which can include
 		anything, but <b>NO PORNOGRAPHY, ILLEGAL CONTENT or PROPAGANDA</b>.
-		<i>I hope you understand what I mean.</i> 😇
+		<i>I hope you understand what I mean.</i>
 	</p>
 	<h2>How to report illegal content</h2>
 	<p>Contact the administrator of this ClassQuiz installation.</p>

@@ -1,281 +1,166 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
-SPDX-License-Identifier: MPL-2.0
--->
-
-<!--
-This should be okay, right?
--->
+<!-- SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+SPDX-License-Identifier: MPL-2.0 -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { tinykeys } from '$lib/tinykeys';
-	import { fade } from 'svelte/transition';
-	import MiniSearch from 'minisearch';
-
-	let open = $state(false);
+	import { getLocalization } from '$lib/i18n';
+	const { t } = getLocalization();
+	let dialog: HTMLDialogElement;
+	let searchInput: HTMLInputElement;
 	let input = $state('');
-	let bg_text = $state('');
-	let title_ms: MiniSearch;
-	let command_ms: MiniSearch;
-	let selected: null | number = $state(null);
-
-	// eslint-disable-next-line no-unused-vars
-	type ActionFunction = (args: string[]) => void;
-	const actions: {
-		id: number;
-		title: string;
-		description?: string;
-		command?: string;
-		args?: string[];
-		action: ActionFunction;
-	}[] = [
+	let selected = $state(0);
+	const actions = [
 		{
-			id: 0,
-			title: 'Close CommandPalette',
-			description: 'Closes CommandPalette',
-			command: 'close',
-			action: () => close_cp(undefined)
-		},
-		{
-			id: 1,
-			title: 'Create Quiz',
-			description: 'Opens editor to create a new quiz',
 			command: 'newquiz',
-			args: ['title'],
-			action: (args) => window.location.assign(`/create?title=${args.join(' ')}`)
+			key: 'words.create',
+			label: 'Create quiz',
+			path: '/create',
+			argument: 'title'
 		},
 		{
-			id: 2,
-			title: 'Import a Quiz',
-			description: 'Opens the import page',
 			command: 'import',
-			args: ['url'],
-			action: (args) => window.location.assign(`/import?url=${args?.[0] ?? ''}`)
+			key: 'words.import',
+			label: 'Import',
+			path: '/import',
+			argument: 'url'
 		},
 		{
-			id: 3,
-			title: 'Create Quiztivity',
-			description: 'Opens the editor for quiztivities',
 			command: 'newquiztivity',
-			args: ['title'],
-			action: (args) => window.location.assign(`/quiztivity/create?title=${args.join(' ')}`)
+			key: 'ui.create_activity',
+			label: 'Create activity',
+			path: '/quiztivity/create',
+			argument: 'title'
 		},
+		{ command: 'results', key: 'words.results', label: 'Results', path: '/results' },
+		{ command: 'explore', key: 'words.explore', label: 'Explore', path: '/explore' },
+		{ command: 'dash', key: 'words.dashboard', label: 'Dashboard', path: '/dashboard' },
+		{ command: 'docs', key: 'words.docs', label: 'Docs', path: '/docs' },
 		{
-			id: 4,
-			title: 'View Results',
-			description: 'Opens the Results viewer',
-			command: 'results',
-			action: () => window.location.assign('/results')
-		},
-		{
-			id: 5,
-			title: 'Explore Quizzes',
-			description: 'Opens the Explore-page',
-			command: 'explore',
-			action: () => window.location.assign('/explore')
-		},
-		{
-			id: 6,
-			title: 'Dashboard',
-			description: 'Go to Dashboard',
-			command: 'dash',
-			action: () => window.location.assign('/dashboard')
-		},
-		{
-			id: 7,
-			title: 'Docs',
-			description: 'Go to documentation',
-			command: 'docs',
-			action: () => window.location.assign('/docs')
-		},
-		{
-			id: 8,
-			title: 'Settings',
-			description: 'Opens the Settings page',
 			command: 'settings',
-			action: () => window.location.assign('/account/settings')
-		}
+			key: 'words.settings',
+			label: 'Settings',
+			path: '/account/settings'
+		},
+		{ command: 'close', key: 'ui.close', label: 'Close' }
 	];
-	let visible_items = $state(actions);
-
-	const toggle_open = (e: KeyboardEvent | undefined) => {
-		e.preventDefault();
-		open = !open;
-	};
-
-	const close_cp = (e: KeyboardEvent | undefined) => {
-		if (e) {
-			e.preventDefault();
-		}
-		open = false;
-	};
-
-	const close_on_outside = (e: Event) => {
-		if (e.target == e.currentTarget) {
-			open = false;
-		}
-	};
-
-	const execute_action = () => {
-		let args = [];
-		const entry = visible_items[selected];
-		if (input.startsWith('/')) {
-			const tokens = input.split(' ');
-			args = tokens.slice(1);
-		}
-		console.log(args);
-		entry.action(args);
-	};
-
-	const search = (term: string) => {
-		if (!command_ms || !title_ms) {
+	const label = (action: (typeof actions)[number]) =>
+		$t(action.key, { defaultValue: action.label });
+	const matches = $derived(
+		actions.filter((action) => {
+			const query = input.trim().toLowerCase();
+			return query.startsWith('/')
+				? action.command.startsWith(query.slice(1).split(' ')[0])
+				: label(action).toLowerCase().includes(query) || action.command.includes(query);
+		})
+	);
+	function close() {
+		dialog.close();
+	}
+	async function toggle(event: KeyboardEvent) {
+		event.preventDefault();
+		if (dialog.open) {
+			close();
 			return;
 		}
-		if (term === '' || term === '/') {
-			selected = 0;
-			visible_items = actions;
-			bg_text = '';
-			return;
-		}
-		let suggestions;
-		let res;
-		if (term.startsWith('/')) {
-			term = term.substring(1);
-			suggestions = command_ms.autoSuggest(term, { boost: { command: 2 }, prefix: true });
-			res = command_ms.search(term, { boost: { command: 2 }, prefix: true });
-			bg_text = suggestions[0]?.suggestion;
-			bg_text ??= '';
-			bg_text = `/${bg_text}`;
-		} else {
-			suggestions = title_ms.autoSuggest(term, { boost: { command: 2 }, prefix: true });
-			res = title_ms.search(term, { boost: { command: 2 }, prefix: true });
-			bg_text = suggestions[0]?.suggestion;
-			bg_text ??= '';
-		}
-
-		visible_items = [];
-
-		for (const quiz_data of res) {
-			visible_items.push(actions[quiz_data.id]);
-		}
-		visible_items = visible_items;
-		if (visible_items.length === 1) {
-			selected = 0;
-		}
-		if (visible_items.length === 0) {
-			selected = null;
-		}
-	};
-
-	const autocomplete_on_tab = (e: KeyboardEvent) => {
-		e.preventDefault();
-		input = bg_text;
-	};
-
-	const on_arrow_down = (e: KeyboardEvent) => {
-		e.preventDefault();
-		if (visible_items.length < 1) {
-			return;
-		}
-		if (selected + 1 === visible_items.length) {
-			return;
-		}
-		selected += 1;
-	};
-	const on_arrow_up = (e: KeyboardEvent) => {
-		e.preventDefault();
-		if (visible_items.length < 1) {
-			return;
-		}
-		if (selected === 0) {
-			return;
-		}
-		selected -= 1;
-	};
-
-	const on_enter = (e: KeyboardEvent) => {
-		if (selected === null) {
-			return;
-		}
-		execute_action();
 		input = '';
-	};
-
-	onMount(async () => {
-		tinykeys(window, {
-			'$mod+k': toggle_open,
-			Escape: close_cp,
-			Tab: autocomplete_on_tab,
-			ArrowDown: on_arrow_down,
-			ArrowUp: on_arrow_up,
-			Enter: on_enter
-		});
-		title_ms = new MiniSearch<any>({
-			fields: ['title'],
-			storeFields: ['id']
-		});
-		title_ms.addAll(actions);
-		command_ms = new MiniSearch<any>({
-			fields: ['command'],
-			storeFields: ['id']
-		});
-		command_ms.addAll(actions);
-	});
+		selected = 0;
+		dialog.showModal();
+		await tick();
+		searchInput.focus();
+	}
+	function execute(index = selected) {
+		const action = matches[index];
+		if (!action) return;
+		close();
+		if (!action.path) return;
+		const argument = input.startsWith('/') ? input.trim().split(/\s+/).slice(1).join(' ') : '';
+		window.location.assign(
+			action.argument
+				? action.path + '?' + action.argument + '=' + encodeURIComponent(argument)
+				: action.path
+		);
+	}
+	function navigate(event: KeyboardEvent) {
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			selected = Math.min(selected + 1, matches.length - 1);
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			selected = Math.max(0, selected - 1);
+		} else if (event.key === 'Enter') {
+			event.preventDefault();
+			execute();
+		}
+	}
+	onMount(() => tinykeys(window, { '$mod+k': toggle }));
 </script>
 
-{#if open}
-	<div
-		class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
-		onclick={close_on_outside}
-		onkeyup={close_on_outside}
-		role="button"
-		aria-label="Close"
-		tabindex="0"
-		transition:fade|global={{ duration: 60 }}
-	>
-		<div class="m-auto w-1/3 h-2/3 rounded-sm bg-black flex flex-col">
-			<div class="grid grid-cols-1 grid-rows-1 border-b border-b-white">
-				<p
-					class="col-start-1 row-start-1 w-full p-4 outline-hidden bg-gray-700 rounded-t text-gray-400"
-				>
-					{bg_text}
-				</p>
-				<input
-					type="text"
-					class="col-start-1 row-start-1 w-full p-4 outline-hidden bg-gray-700 rounded-sm"
-					bind:value={input}
-					oninput={() => search(input)}
-					autofocus
-				/>
-			</div>
-			<div class="flex flex-col p-2 gap-2 overflow-scroll">
-				{#each visible_items as vi, i}
-					<div
-						transition:fade={{ duration: 60 }}
-						class="p-2 transition rounded-sm"
-						class:bg-[#B07156]={selected === i}
-						class:bg-gray-700={selected !== i}
-						onmouseenter={() => (selected = i)}
-						onmousedown={execute_action}
-						tabindex="-2"
-						role="button"
-					>
-						<div class="flex">
-							<h3 class="text-lg my-auto">{vi.title}</h3>
-							<p class="font-mono my-auto ml-auto h-fit bg-black/50 rounded-sm p-0.5">
-								/{vi.command}
-								{#if vi.args}
-									{#each vi.args as arg}
-										&lbrace;<span class="text-indigo-400">{arg}</span
-										>&rbrace;{/each}
-								{/if}
-							</p>
-						</div>
-						<p class="text-sm">{vi.description}</p>
-					</div>
-				{/each}
-			</div>
-		</div>
+<dialog bind:this={dialog} class="tq-dialog tq-command-dialog" aria-label={$t('ui.commands')}>
+	<div class="flex justify-between items-center gap-4 mb-4">
+		<h2 class="tq-section-title">{$t('ui.commands')}</h2>
+		<button
+			type="button"
+			class="tq-icon-button tq-button-ghost"
+			aria-label={$t('ui.close')}
+			onclick={close}>×</button
+		>
 	</div>
-{/if}
+	<input
+		bind:this={searchInput}
+		bind:value={input}
+		type="search"
+		class="tq-field"
+		aria-label={$t('ui.search_commands')}
+		placeholder={$t('ui.search_commands')}
+		oninput={() => (selected = 0)}
+		onkeydown={navigate}
+	/>
+	<div class="tq-command-list">
+		{#each matches as action, index}
+			<button
+				type="button"
+				class="tq-command-item"
+				class:selected={index === selected}
+				onclick={() => execute(index)}
+				onmouseenter={() => (selected = index)}
+			>
+				<span>{label(action)}</span><code>/{action.command}</code>
+			</button>
+		{:else}
+			<p class="tq-empty">{$t('ui.no_results')}</p>
+		{/each}
+	</div>
+</dialog>
+
+<style>
+	.tq-command-dialog {
+		max-width: min(560px, calc(100vw - 32px));
+	}
+	.tq-command-list {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		margin-top: 12px;
+		max-height: 50dvh;
+		overflow-y: auto;
+	}
+	.tq-command-item {
+		min-height: 48px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		padding: 12px;
+		border-radius: 8px;
+		text-align: start;
+	}
+	.tq-command-item.selected,
+	.tq-command-item:hover {
+		background: var(--tq-brand-soft);
+		color: var(--tq-accent);
+	}
+	code {
+		font-size: 12px;
+		color: var(--tq-muted);
+	}
+</style>

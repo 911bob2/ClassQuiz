@@ -9,16 +9,14 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz/docs - Import from Kahoot</title>
+	<title>Telekom Quiz · Docs · Import from Kahoot</title>
 	<meta
 		name="description"
 		content="How to import quizzes from KAHOOT! into ClassQuiz, the open-source quiz-application,  easily"
 	/>
 </svelte:head>
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
-	<h1>Import Quizzes from Kahoot into ClassQuiz</h1>
+<article class="prose tq-prose">
+	<h1>Import Quizzes from Kahoot into Telekom Quiz</h1>
 
 	<p>
 		All in all, this procedure is pretty simple, so just go to <a

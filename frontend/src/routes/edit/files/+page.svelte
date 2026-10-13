@@ -8,9 +8,10 @@ SPDX-License-Identifier: MPL-2.0
 	import type { PageData } from './$types';
 	import { fade } from 'svelte/transition';
 	// import MediaComponent from '$lib/editor/MediaComponent.svelte';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
-	import { onMount } from 'svelte';
+
 	import Uploader from './uploader.svelte';
+	import Icon from '$lib/editor/Icon.svelte';
+	import { modal } from '$lib/editor/modal';
 	import { getLocalization } from '$lib/i18n';
 
 	const { t } = getLocalization();
@@ -27,13 +28,6 @@ SPDX-License-Identifier: MPL-2.0
 		if (e.target !== e.currentTarget) return;
 		edit_popup = null;
 	};
-	onMount(() => {
-		window.onkeydown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				edit_popup = null;
-			}
-		};
-	});
 
 	const save_image_metadata = async (e: Event) => {
 		e.preventDefault();
@@ -52,111 +46,249 @@ SPDX-License-Identifier: MPL-2.0
 		await fetch(`/api/v1/storage/meta/${id}`, { method: 'DELETE' });
 		window.location.reload();
 	};
+
+	const storage_percent = Math.min(
+		100,
+		(data.storage_usage.used / data.storage_usage.limit) * 100
+	);
 </script>
 
-<div>
-	<h2 class="text-center text-4xl">
-		{$t('file_dashboard.storage_usage', {
-			used: (data.storage_usage.used / (1024 * 1024)).toFixed(2),
-			total: (data.storage_usage.limit / (1024 * 1024)).toFixed(0),
-			percent: ((data.storage_usage.used / data.storage_usage.limit) * 100).toFixed(0)
-		})}
-	</h2>
-	<Uploader />
-	<div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
-		{#each images as image}
+<svelte:head>
+	<title>Telekom Quiz - {$t('words.files_library')}</title>
+</svelte:head>
+
+<main class="tq-page" data-ui="file-dashboard">
+	<div class="tq-page-heading">
+		<h1 class="tq-page-title">{$t('words.files_library')}</h1>
+		<a href="/dashboard" class="tq-button">
+			<Icon name="arrow-left" />
+			{$t('words.back')}
+		</a>
+	</div>
+
+	<section class="storage-panel tq-panel tq-panel-body">
+		<div class="storage-usage">
+			<p class="storage-text">
+				{$t('file_dashboard.storage_usage', {
+					used: (data.storage_usage.used / (1024 * 1024)).toFixed(2),
+					total: (data.storage_usage.limit / (1024 * 1024)).toFixed(0),
+					percent: ((data.storage_usage.used / data.storage_usage.limit) * 100).toFixed(0)
+				})}
+			</p>
 			<div
-				class="border-2 border-[#B07156] rounded-sm p-2 grid grid-cols-2 hover:opacity-100 transition-all"
-				class:opacity-40={image.quiztivities.length === 0 && image.quizzes.length === 0}
+				class="storage-meter"
+				role="progressbar"
+				aria-valuemin="0"
+				aria-valuemax="100"
+				aria-valuenow={Math.round(storage_percent)}
 			>
-				<img
-					src="/api/v1/storage/download/{image.id}"
-					class="m-auto h-auto w-auto max-h-[30vh]"
-					loading="lazy"
-					alt={image.alt_text || $t('file_dashboard.not_available')}
-				/>
-				<div class="flex flex-col my-auto ml-4">
-					<p>
+				<span style:width="{storage_percent}%"></span>
+			</div>
+		</div>
+		<Uploader />
+	</section>
+
+	<div class="file-grid">
+		{#each images as image}
+			<article class="tq-panel file-card" data-ui="file-card">
+				<div class="file-preview">
+					<img
+						src="/api/v1/storage/download/{image.id}"
+						alt={image.alt_text || $t('file_dashboard.not_available')}
+						loading="lazy"
+					/>
+				</div>
+				<div class="file-details">
+					<h2>{image.filename ?? $t('file_dashboard.unset')}</h2>
+					<p class="tq-muted">
 						{$t('file_dashboard.size', {
 							size: (image.size / (1024 * 1024)).toFixed(2)
 						})}
 					</p>
 					<p>
 						{$t('file_dashboard.caption', {
-							caption: image.alt_text ?? $t('file_dashboard.missing')
+							caption: image.alt_text ?? $t('file_dashboard.unset')
 						})}
 					</p>
-					<p>
-						{$t('file_dashboard.filename', {
-							filename: image.filename ?? $t('file_dashboard.missing')
-						})}
-					</p>
-					<p>
+					<p class="tq-muted file-meta">
 						{$t('file_dashboard.uploaded', {
 							date: new Date(image.uploaded_at).toLocaleString()
 						})}
 					</p>
-					<p>
+					<p class="tq-muted file-meta">
 						{$t('file_dashboard.imported', {
 							yes_or_no: image.imported ? $t('words.yes') : $t('words.no')
 						})}
 					</p>
-					<div class="flex flex-col gap-2">
-						<BrownButton
-							onclick={() => {
-								edit_popup = image;
-							}}
-							>{$t('file_dashboard.edit_details')}
-						</BrownButton>
+					<div class="tq-toolbar file-actions">
+						<button
+							type="button"
+							class="tq-button"
+							data-ui="file-edit-details"
+							onclick={() => (edit_popup = image)}
+						>
+							<Icon name="pencil" />
+							{$t('file_dashboard.edit_details')}
+						</button>
 						{#if image.quiztivities.length === 0 && image.quizzes.length === 0}
-							<BrownButton
-								onclick={() => {
-									delete_image(image.id);
-								}}>{$t('file_dashboard.delete_image')}</BrownButton
+							<button
+								type="button"
+								class="tq-button tq-button-danger"
+								data-ui="file-delete"
+								onclick={() => delete_image(image.id)}
 							>
+								<Icon name="trash" />
+								{$t('file_dashboard.delete_image')}
+							</button>
 						{/if}
 					</div>
 				</div>
-			</div>
+			</article>
+		{:else}
+			<p class="tq-empty file-empty">
+				{$t('telekom.no_files', { defaultValue: 'No files' })}
+			</p>
 		{/each}
 	</div>
-</div>
+</main>
 
 {#if edit_popup}
 	<div
-		transition:fade={{ duration: 100 }}
-		class="fixed top-0 left-0 h-screen w-screen z-40 flex bg-black/50"
+		class="tq-overlay"
 		onclick={close_popup_handler}
+		role="presentation"
+		use:modal={{ onclose: () => (edit_popup = null) }}
+		transition:fade={{ duration: 100 }}
 	>
-		<div class="w-auto h-auto m-auto rounded-sm bg-white dark:bg-gray-700 p-4">
-			<h1 class="text-2xl text-center">{$t('file_dashboard.edit_the_image')}</h1>
-			<form class="flex flex-col" onsubmit={save_image_metadata}>
-				<div class="flex flex-row">
-					<div class="flex flex-col mr-4">
-						<label for="name" class="m-auto">{$t('file_dashboard.filename_word')}</label
-						>
-						<label for="alt_text" class="m-auto">{$t('file_dashboard.alt_text')}</label>
-					</div>
-					<div class="flex flex-col gap-3">
-						<input
-							class="rounded-sm outline-hidden dark:bg-gray-500 p-0.5 border-4 border-transparent"
-							id="name"
-							type="text"
-							bind:value={edit_popup.filename}
-						/>
-						<input
-							class:border-red-700={!edit_popup.alt_text}
-							class="transition rounded-sm outline-hidden dark:bg-gray-500 p-0.5 border-4 border-transparent"
-							id="alt_text"
-							type="text"
-							bind:value={edit_popup.alt_text}
-						/>
-					</div>
-				</div>
-				<div class="mt-4">
-					<BrownButton type="submit">{$t('words.save')}</BrownButton>
+		<div
+			class="tq-dialog"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="file-meta-title"
+			data-ui="file-metadata-dialog"
+		>
+			<div class="dialog-heading">
+				<h2 id="file-meta-title" class="tq-section-title">
+					{$t('file_dashboard.edit_the_image')}
+				</h2>
+				<button
+					type="button"
+					class="tq-icon-button tq-button-ghost"
+					aria-label={$t('words.close')}
+					onclick={() => (edit_popup = null)}
+				>
+					<Icon name="close" />
+				</button>
+			</div>
+			<form onsubmit={save_image_metadata} class="tq-stack metadata-form">
+				<label>
+					<span class="tq-label">{$t('file_dashboard.filename_word')}</span>
+					<input
+						class="tq-field"
+						type="text"
+						data-autofocus
+						bind:value={edit_popup.filename}
+					/>
+				</label>
+				<label>
+					<span class="tq-label">{$t('file_dashboard.alt_text')}</span>
+					<input class="tq-field" type="text" bind:value={edit_popup.alt_text} />
+				</label>
+				<div class="tq-toolbar">
+					<button type="submit" class="tq-button tq-button-primary">
+						{$t('words.save')}
+					</button>
+					<button type="button" class="tq-button" onclick={() => (edit_popup = null)}>
+						{$t('words.close')}
+					</button>
 				</div>
 			</form>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.storage-panel {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 260px;
+		gap: 24px;
+		align-items: center;
+		margin-bottom: 24px;
+	}
+	.storage-text {
+		margin: 0 0 12px;
+		font-weight: 500;
+	}
+	.storage-meter {
+		height: 8px;
+		overflow: hidden;
+		border-radius: 4px;
+		background: var(--tq-surface-hover);
+	}
+	.storage-meter span {
+		display: block;
+		height: 100%;
+		background: var(--tq-brand);
+	}
+	.file-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 24px;
+	}
+	.file-card {
+		overflow: hidden;
+	}
+	.file-preview {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 200px;
+		padding: 16px;
+		overflow: hidden;
+		background: var(--tq-surface-subtle);
+		border-bottom: 1px solid var(--tq-border);
+	}
+	.file-preview img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+	}
+	.file-details {
+		padding: 20px;
+		overflow-wrap: anywhere;
+	}
+	.file-details h2 {
+		margin-bottom: 8px;
+		font-size: 20px;
+		font-weight: 700;
+	}
+	.file-details p {
+		margin: 0 0 4px;
+	}
+	.file-meta {
+		font-size: 14px;
+	}
+	.file-actions {
+		margin-top: 16px;
+	}
+	.file-empty {
+		grid-column: 1 / -1;
+	}
+	.dialog-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 20px;
+	}
+
+	@media (max-width: 767px) {
+		.storage-panel,
+		.file-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.storage-panel {
+			gap: 16px;
+		}
+	}
+</style>

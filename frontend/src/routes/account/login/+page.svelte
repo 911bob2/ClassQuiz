@@ -9,6 +9,7 @@ SPDX-License-Identifier: MPL-2.0
 	import { navbarVisible } from '$lib/stores.svelte';
 	import { slide } from 'svelte/transition';
 	import Footer from '$lib/footer.svelte';
+	import { getLocalization } from '$lib/i18n';
 	import VerifiedBadge from './verified_badge.svelte';
 	import StartWindow from './start_window.svelte';
 	import SelectMethod from './select_method.svelte';
@@ -19,11 +20,12 @@ SPDX-License-Identifier: MPL-2.0
 	import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
 
 	navbarVisible.visible = true;
+	const { t } = getLocalization();
 
 	let { data } = $props();
 	let { verified } = data;
 
-	let session_data = $state({});
+	let session_data: any = $state({});
 	let step = $state(0);
 	let selected_method = $state(null);
 	let done = $state(false);
@@ -81,47 +83,36 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - Login</title>
+	<title>Telekom Quiz · {$t('words.login')}</title>
 </svelte:head>
-<div class="flex items-center justify-center h-screen">
-	{#if verified}
-		<VerifiedBadge />
-	{/if}
 
-	<div
-		class="lg:w-1/3 max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-2xl dark:bg-gray-800"
-	>
-		{#if step === 0}
-			<!--			<p>StartWindow</p>-->
-			<div transition:slide|global>
-				<StartWindow bind:session_data bind:step />
-			</div>
-		{:else if selected_method === null}
-			<!--			<p>SelectWindow</p>-->
-			<div transition:slide|global>
-				<SelectMethod {session_data} {step} bind:selected_method />
-			</div>
-		{:else if selected_method === 'PASSWORD'}
-			<!--			<p>PasswordWindow</p>-->
-			<div transition:slide|global>
-				<PasswordComponent {session_data} bind:done bind:step bind:selected_method />
-			</div>
-		{:else if selected_method === 'PASSKEY'}
-			<!--			<p>WebauthnWindow</p>-->
-			<div transition:slide|global>
-				<WebauthnComponent {session_data} bind:done bind:step bind:selected_method />
-			</div>
-		{:else if selected_method === 'BACKUP'}
-			<!--			<p>BackupWindow</p>-->
-			<div transition:slide|global>
-				<BackupComponent {session_data} bind:done bind:step bind:selected_method />
-			</div>
-		{:else if selected_method === 'TOTP'}
-			<!--			<p>TotpWindow</p>-->
-			<div transition:slide|global>
-				<TotpComponent {session_data} bind:done bind:step bind:selected_method />
-			</div>
-		{/if}
+{#if verified}
+	<VerifiedBadge />
+{/if}
+
+{#if step === 0}
+	<div transition:slide|global>
+		<StartWindow bind:session_data bind:step />
 	</div>
-</div>
+{:else if selected_method === null}
+	<div transition:slide|global>
+		<SelectMethod {session_data} {step} bind:selected_method />
+	</div>
+{:else if selected_method === 'PASSWORD'}
+	<div transition:slide|global>
+		<PasswordComponent {session_data} bind:done bind:step bind:selected_method />
+	</div>
+{:else if selected_method === 'PASSKEY'}
+	<div transition:slide|global>
+		<WebauthnComponent {session_data} bind:done bind:step bind:selected_method />
+	</div>
+{:else if selected_method === 'BACKUP'}
+	<div transition:slide|global>
+		<BackupComponent {session_data} bind:done bind:step bind:selected_method />
+	</div>
+{:else if selected_method === 'TOTP'}
+	<div transition:slide|global>
+		<TotpComponent {session_data} bind:done bind:step bind:selected_method />
+	</div>
+{/if}
 <Footer />

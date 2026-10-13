@@ -5,40 +5,50 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import { getLocalization } from '$lib/i18n';
+	import Footer from '$lib/footer.svelte';
+	import AuthCard from '../AuthCard.svelte';
+
+	const { t } = getLocalization();
 	let { data } = $props();
 	const { error } = data;
 </script>
 
-<div>
-	<div class="flex justify-center w-full">
-		<h1 class="text-6xl">Error authenticating</h1>
-	</div>
+<svelte:head>
+	<title>
+		Telekom Quiz · {$t('telekom.authentication_error', {
+			defaultValue: 'Error authenticating'
+		})}
+	</title>
+</svelte:head>
 
-	<div class="flex justify-center w-full pt-10">
-		<p>
-			{#if error === 'email'}
-				GitHub didn't respond with an email-address. Are you sure your email-address is
-				verified?
-			{:else}
-				There was an error authenticating you. Are you sure you've got an email? Is the
-				Email verified?
-			{/if}
-		</p>
-	</div>
-	<div class="flex justify-center w-full pt-10">
-		<a
-			href="/account/login"
-			class="px-4 py-2 leading-5 text-black dark:text-white transition-colors duration-200 transform bg-gray-50 dark:bg-gray-700 rounded-sm text-center hover:bg-gray-600 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
-		>
-			Go back to login-page
+<AuthCard
+	title={$t('telekom.authentication_error', { defaultValue: 'Error authenticating' })}
+	data_ui="oauth-error"
+>
+	<p class="tq-alert tq-alert-error" role="alert">
+		{#if error === 'email'}
+			{$t('telekom.oauth_error_email', {
+				defaultValue:
+					'GitHub did not respond with an email address. Make sure your email address is verified.'
+			})}
+		{:else}
+			{$t('telekom.oauth_error_generic', {
+				defaultValue:
+					'There was an error authenticating you. Make sure your account has a verified email address.'
+			})}
+		{/if}
+	</p>
+	<div>
+		<a class="tq-button tq-button-primary" href="/account/login">
+			{$t('telekom.back_to_login', { defaultValue: 'Back to login' })}
 		</a>
 	</div>
-	<div class="flex justify-center w-full pt-10">
-		<p>
-			If the error persists, please open an <a
-				href="https://github.com/mawoka-myblock/ClassQuiz/issues/new?assignees=&labels=&template=Bug_report.md"
-				class="underline transition hover:text-blue-300">issue on GitHub</a
-			>.
-		</p>
-	</div>
-</div>
+	<p class="tq-muted text-sm">
+		{@html $t('telekom.report_issue', {
+			defaultValue: 'If the error persists, please open an {{link}}.',
+			link: `<a class="tq-link" href="https://github.com/mawoka-myblock/ClassQuiz/issues/new?assignees=&labels=&template=Bug_report.md">${$t('telekom.github_issue', { defaultValue: 'issue on GitHub' })}</a>`
+		})}
+	</p>
+</AuthCard>
+<Footer />

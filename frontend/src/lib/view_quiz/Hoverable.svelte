@@ -7,7 +7,7 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	interface Props {
 		hovering: boolean;
-		children?: import('svelte').Snippet<[any]>;
+		children?: import('svelte').Snippet<[{ hovering: boolean }]>;
 	}
 
 	let { hovering = $bindable(), children }: Props = $props();
@@ -21,6 +21,6 @@ SPDX-License-Identifier: MPL-2.0
 	}
 </script>
 
-<div onmouseenter={enter} onmouseleave={leave}>
-	{@render children?.({ hovering, })}
+<div class="contents" role="presentation" onmouseenter={enter} onmouseleave={leave}>
+	{@render children?.({ hovering })}
 </div>

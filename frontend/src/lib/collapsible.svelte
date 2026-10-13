@@ -1,77 +1,60 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
-SPDX-License-Identifier: MPL-2.0
--->
-
+<!-- SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+SPDX-License-Identifier: MPL-2.0 -->
 <script lang="ts">
-
 	interface Props {
-		headerText: any;
+		headerText: string;
 		expanded?: boolean;
 		children?: import('svelte').Snippet;
 	}
-
 	let { headerText, expanded = $bindable(false), children }: Props = $props();
+	const id = $props.id();
 </script>
 
-<div>
-	<h3 class="bg-transparent m-0">
+<section class="tq-panel overflow-hidden">
+	<h3>
 		<button
+			type="button"
+			class="tq-disclosure"
 			aria-expanded={expanded}
+			aria-controls={id}
 			onclick={() => (expanded = !expanded)}
-			class="bg-white dark:bg-gray-700 flex justify-between w-full border-none m-0 p-2 rounded-t-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition"
-			class:rounded-b-lg={!expanded}
-			><span>{@html headerText}</span>
+		>
+			<span>{@html headerText}</span>
 			<svg
-				viewBox="0 0 20 20"
+				aria-hidden="true"
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
 				fill="none"
-				class="my-auto fill-black dark:fill-white"
 				stroke="currentColor"
+				stroke-width="1.7"
 			>
-				<path class="vert" d="M10 1V19" stroke-width="2" stroke="currentColor" />
-				<path d="M1 10L19 10" stroke-width="2" stroke="currentColor" />
+				<path d="M5 12h14" />{#if !expanded}<path d="M12 5v14" />{/if}
 			</svg>
 		</button>
 	</h3>
-
-	<div class:hidden={!expanded}>
-		{@render children?.()}
-	</div>
-</div>
+	<div {id} hidden={!expanded} class="tq-disclosure-body">{@render children?.()}</div>
+</section>
 
 <style>
-	/*	h3 {
-		margin: 0;
-	}
-
-	button {
-		background-color: var(--background, #fff);
-		color: var(--gray-darkest, #282828);
+	.tq-disclosure {
+		width: 100%;
 		display: flex;
 		justify-content: space-between;
-		width: 100%;
-		border: none;
-		margin: 0;
-		padding: 1em 0.5em;
-	}*/
-	button {
+		align-items: center;
+		gap: 16px;
+		padding: 16px;
+		min-height: 56px;
+		text-align: start;
+		font-size: 16px;
 	}
-
-	button[aria-expanded='true'] {
-		border-bottom: 1px solid var(--gray-light, #eee);
+	.tq-disclosure:hover {
+		background: var(--tq-surface-subtle);
 	}
-
-	button[aria-expanded='true'] .vert {
-		display: none;
+	.tq-disclosure[aria-expanded='true'] {
+		border-bottom: 1px solid var(--tq-border);
 	}
-
-	button:focus svg {
-		outline: 2px solid;
-	}
-
-	svg {
-		height: 0.7em;
-		width: 0.7em;
+	.tq-disclosure-body {
+		padding: 16px;
 	}
 </style>

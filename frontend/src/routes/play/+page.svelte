@@ -8,7 +8,7 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import { socket } from '$lib/socket';
 	import JoinGame from '$lib/play/join.svelte';
-	import type { Answer, Question as QuestionType } from '$lib/quiz_types';
+	import type { Question as QuestionType } from '$lib/quiz_types';
 	import ShowTitle from '$lib/play/title.svelte';
 	import Question from '$lib/play/question.svelte';
 	import { navbarVisible } from '$lib/stores.svelte.ts';
@@ -16,6 +16,7 @@ SPDX-License-Identifier: MPL-2.0
 	import KahootResults from '$lib/play/results_kahoot.svelte';
 	import { getLocalization } from '$lib/i18n';
 	import Cookies from 'js-cookie';
+	import { backgroundText } from '$lib/play/background';
 	const { t } = getLocalization();
 
 	interface Props {
@@ -44,8 +45,8 @@ SPDX-License-Identifier: MPL-2.0
 	let question_index = $state('');
 	let unique = $state({});
 	navbarVisible.visible = false;
-	let answer_results: Array<Answer> = $state();
-	let gameData = $state();
+	let answer_results: any = $state();
+	let gameData: any = $state();
 	let solution: QuestionType = $state();
 	let username = $state('');
 	let scores = $state({});
@@ -53,7 +54,7 @@ SPDX-License-Identifier: MPL-2.0
 		started: false
 	});
 
-	let question: Question = $state();
+	let question: QuestionType = $state();
 
 	let preventReload = true;
 
@@ -154,49 +155,68 @@ SPDX-License-Identifier: MPL-2.0
 	});
 
 	let bg_color = $derived(gameData ? gameData.background_color : undefined);
+	let text_color = $derived(backgroundText(bg_color));
+	// The server sends question_count; the preview fixtures send the questions themselves.
+	let question_count = $derived(
+		gameData ? (gameData.question_count ?? gameData.questions?.length) : undefined
+	);
 
 	// The rest
 </script>
 
 <svelte:window onbeforeunload={confirmUnload} />
 <svelte:head>
-	<title>ClassQuiz - Play</title>
+	<title>Telekom Quiz · {$t('words.play')}</title>
 </svelte:head>
 <div
-	class="min-h-screen min-w-full"
+	class="play-root"
 	style="background: {bg_color ? bg_color : 'transparent'}"
-	class:text-black={bg_color}
+	style:color={text_color}
 >
-	<div>
-		{#if !gameMeta.started && gameData === undefined}
-			<JoinGame bind:game_pin bind:game_mode bind:username />
-		{:else if JSON.stringify(final_results) !== JSON.stringify([null])}
-			<ShowEndScreen bind:data={scores} show_final_results={true} {username} />
-		{:else if gameData !== undefined && question_index === ''}
-			<ShowTitle
-				title={gameData.title}
-				description={gameData.description}
-				cover_image={gameData.cover_image}
-			/>
-		{:else if gameMeta.started && gameData !== undefined && question_index !== '' && answer_results === undefined}
+	{#if !gameMeta.started && gameData === undefined}
+		<JoinGame bind:game_pin bind:game_mode bind:username />
+	{:else if JSON.stringify(final_results) !== JSON.stringify([null])}
+		<ShowEndScreen bind:data={scores} show_final_results={true} {username} />
+	{:else if gameData !== undefined && question_index === ''}
+		<ShowTitle
+			title={gameData.title}
+			description={gameData.description}
+			cover_image={gameData.cover_image}
+			{username}
+		/>
+	{:else if gameMeta.started && gameData !== undefined && question_index !== '' && answer_results === undefined}
+		{#key unique}
+			<Question bind:game_mode bind:question {question_index} {question_count} {solution} />
+		{/key}
+	{:else if gameMeta.started && answer_results !== undefined}
+		{#if answer_results === null}
+			<main class="tq-page tq-page-narrow play-status">
+				<p class="tq-panel tq-panel-body play-status-text">{$t('admin_page.no_answers')}</p>
+			</main>
+		{:else}
 			{#key unique}
-				<div class="text-black dark:text-black">
-					<Question bind:game_mode bind:question {question_index} {solution} />
-				</div>
+				<KahootResults {username} question_results={answer_results} bind:scores />
 			{/key}
-		{:else if gameMeta.started && answer_results !== undefined}
-			{#if answer_results === null}
-				<div class="w-full flex justify-center">
-					<h1 class="text-3xl">{$t('admin_page.no_answers')}</h1>
-				</div>
-			{:else}
-				<div>
-					<h2 class="text-center text-3xl mb-8">{$t('words.result', { count: 2 })}</h2>
-				</div>
-				{#key unique}
-					<KahootResults {username} question_results={answer_results} bind:scores />
-				{/key}
-			{/if}
 		{/if}
-	</div>
+	{/if}
 </div>
+
+<style>
+	.play-root {
+		min-height: 100dvh;
+		min-width: 100%;
+	}
+
+	.play-status {
+		display: flex;
+		align-items: center;
+		min-height: 100dvh;
+	}
+
+	.play-status-text {
+		width: 100%;
+		font-size: 24px;
+		font-weight: 700;
+		text-align: center;
+	}
+</style>

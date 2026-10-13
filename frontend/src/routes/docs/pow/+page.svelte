@@ -5,15 +5,13 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <svelte:head>
-	<title>ClassQuiz/docs - PoW</title>
+	<title>Telekom Quiz · Docs · PoW</title>
 	<meta
 		name="description"
 		content="Use-case of PoW for ClassQuiz, the open-source quiz-application"
 	/>
 </svelte:head>
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	<h1>PoW</h1>
 	<h2>Why is it loading so long?</h2>
 	<p>

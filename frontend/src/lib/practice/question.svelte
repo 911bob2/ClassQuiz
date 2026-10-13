@@ -5,14 +5,16 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import type { OrderQuizAnswer, Question } from '$lib/quiz_types';
+	import AnswerTile from '$lib/play/answer_tile.svelte';
+	import CircularTimer from '$lib/play/circular_progress.svelte';
+	import OrderList from '$lib/play/order_list.svelte';
+	import type { Answer, OrderQuizAnswer, Question, RangeQuizAnswer } from '$lib/quiz_types';
 	import { QuizQuestionType } from '$lib/quiz_types';
 	import { fly } from 'svelte/transition';
 	import { getLocalization } from '$lib/i18n';
 	import Spinner from '$lib/Spinner.svelte';
-	import { flip } from 'svelte/animate';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import MediaComponent from '$lib/editor/MediaComponent.svelte';
+	import { rangePipStep } from '$lib/play/range';
 
 	interface Props {
 		question: Question;
@@ -41,14 +43,14 @@ SPDX-License-Identifier: MPL-2.0
 			timer_res = seconds.toString();
 		}, 1000);
 	};
+	// The answers of a question are a union that depends on its type.
+	const range = (): RangeQuizAnswer => question.answers as RangeQuizAnswer;
+	let choices = $derived(question.answers as Answer[]);
 	let slider_value = $state([0]);
 	if (question.type === QuizQuestionType.RANGE) {
-		slider_value[0] = (question.answers.max - question.answers.min) / 2 + question.answers.min;
+		slider_value[0] = (range().max - range().min) / 2 + range().min;
 	}
-	let slider_values = $state([
-		question.answers.min_correct ?? 0,
-		question.answers.max_correct ?? 0
-	]);
+	let slider_values = $state([range().min_correct ?? 0, range().max_correct ?? 0]);
 
 	let text_input = $state();
 	timer(question.time);
@@ -63,23 +65,16 @@ SPDX-License-Identifier: MPL-2.0
 		return a;
 	}
 
-	const swapArrayElements = (arr, a: number, b: number) => {
-		let _arr = [...arr];
-		let temp = _arr[a];
-		_arr[a] = _arr[b];
-		_arr[b] = temp;
-		return _arr;
-	};
-
 	let original_order: OrderQuizAnswer[] = [];
 
 	if (question.type === QuizQuestionType.ORDER) {
-		for (let i = 0; i < question.answers.length; i++) {
-			question.answers[i] = { answer: question.answers[i].answer, id: i };
+		const order_answers = question.answers as OrderQuizAnswer[];
+		for (let i = 0; i < order_answers.length; i++) {
+			order_answers[i] = { ...order_answers[i], id: i };
 		}
-		original_order = [...question.answers];
+		original_order = [...order_answers];
 		console.log(original_order);
-		shuffleArray(question.answers);
+		shuffleArray(order_answers);
 	}
 
 	let order_corrected = $state(false);
@@ -96,75 +91,84 @@ SPDX-License-Identifier: MPL-2.0
 		order_corrected = true;
 		timer_res = '0';
 	};
+
+	let circular_progress = $derived.by(() => {
+		const total = parseInt(question.time);
+		const left = parseInt(timer_res);
+		return total > 0 && !isNaN(left) ? 1 - left / total : 0;
+	});
 </script>
 
-<div
-	class="w-full px-6 lg:px-20 h-[80vh] absolute"
+<section
+	class="tq-panel tq-panel-body practice-question"
+	data-ui="practice-question"
 	in:fly|global={{ x: 100 }}
 	out:fly|global={{ x: -100 }}
 >
-	<h1 class="text-3xl text-center">{@html question.question}</h1>
+	<header class="practice-head">
+		<h1 class="practice-title">{@html question.question}</h1>
+		<CircularTimer text={timer_res} progress={circular_progress} size={64} />
+	</header>
 	{#if question.image !== null}
-		<div>
+		<div class="practice-media">
 			<MediaComponent
 				src={question.image}
-				css_classes="max-h-[40vh] object-cover mx-auto mb-8 w-auto"
+				css_classes="max-h-[40vh] object-contain mx-auto w-auto rounded-lg"
 			/>
 		</div>
 	{/if}
-	<p class="text-center">{timer_res}</p>
+
 	{#if question.type === QuizQuestionType.ABCD}
-		{#if show_results}
-			<div>
-				{#each question.answers as answer, i}
-					<button
-						disabled
-						class:bg-green-500={question.answers[i].right}
-						class:bg-red-500={!question.answers[i].right}
-						class:text-xl={i === selected_answer}
-						class:underline={i === selected_answer}
-						class="p-2 rounded-lg flex justify-center w-full transition my-5 text-black"
-						>{answer.answer}</button
-					>
-				{/each}
-			</div>
-		{:else}
-			<div>
-				{#each question.answers as answer, i}
-					<button
+		<div class="practice-answers">
+			{#each choices as answer, i}
+				{#if show_results}
+					<AnswerTile
+						index={i}
+						label={answer.answer}
+						color={answer.color}
+						selected={i === selected_answer}
+						status={answer.right ? 'correct' : 'incorrect'}
+					/>
+				{:else}
+					<AnswerTile
+						index={i}
+						label={answer.answer}
+						color={answer.color}
+						selected={i === selected_answer}
 						disabled={selected_answer !== undefined || timer_res === '0'}
-						type="button"
-						class="p-2 rounded-lg flex justify-center w-full transition bg-amber-300 my-5 disabled:grayscale text-black"
 						onclick={() => {
 							selected_answer = i;
 							timer_res = '0';
-						}}>{answer.answer}</button
-					>
-				{/each}
-				{#if timer_res === '0'}
-					<button
-						class="bg-orange-500 p-2 rounded-lg flex justify-center w-full transition my-5 text-black"
-						type="button"
-						onclick={() => {
-							show_results = true;
-						}}>{$t('admin_page.get_results')}</button
-					>
+						}}
+					/>
 				{/if}
-			</div>
+			{/each}
+		</div>
+		{#if !show_results && timer_res === '0'}
+			<button
+				class="tq-button tq-button-primary practice-action"
+				type="button"
+				onclick={() => {
+					show_results = true;
+				}}
+			>
+				{$t('admin_page.get_results')}
+			</button>
 		{/if}
 	{:else if question.type === QuizQuestionType.RANGE}
 		{#if timer_res === '0'}
 			{#await import('svelte-range-slider-pips')}
 				<Spinner />
 			{:then c}
-				<div class="grayscale pointer-events-none w-full">
+				<div class="grayscale pointer-events-none w-full practice-slider">
 					<c.default
 						bind:values={slider_values}
-						bind:min={question.answers.min}
-						bind:max={question.answers.max}
+						min={range().min}
+						max={range().max}
 						pips
 						float
 						all="label"
+						pipstep={rangePipStep(range().min, range().max)}
 					/>
 				</div>
 			{/await}
@@ -172,198 +176,222 @@ SPDX-License-Identifier: MPL-2.0
 			{#await import('svelte-range-slider-pips')}
 				<Spinner />
 			{:then c}
-				<div class:pointer-events-none={selected_answer !== undefined}>
+				<div
+					class:pointer-events-none={selected_answer !== undefined}
+					class="practice-slider"
+				>
 					<c.default
 						bind:values={slider_value}
-						bind:min={question.answers.min}
-						bind:max={question.answers.max}
+						min={range().min}
+						max={range().max}
 						pips
 						float
 						all="label"
+						pipstep={rangePipStep(range().min, range().max)}
 					/>
 				</div>
-				<div class="flex justify-center">
-					<button
-						type="button"
-						class="w-1/3 text-3xl bg-[#B07156] my-2 disabled:opacity-60 rounded-lg p-1 transition"
-						disabled={selected_answer !== undefined}
-						onclick={() => {
-							selected_answer = slider_value[0];
-							timer_res = '0';
-						}}
-						>{$t('words.submit')}
-					</button>
-				</div>
+				<button
+					type="button"
+					class="tq-button tq-button-primary practice-action"
+					disabled={selected_answer !== undefined}
+					onclick={() => {
+						selected_answer = slider_value[0];
+						timer_res = '0';
+					}}
+				>
+					{$t('words.submit')}
+				</button>
 			{/await}
 		{/if}
 	{:else if question.type === QuizQuestionType.VOTING}
-		{#each question.answers as answer, i}
-			<button
-				type="button"
-				disabled={selected_answer !== undefined || timer_res === '0'}
-				class="p-2 rounded-lg flex justify-center w-full transition bg-amber-300 my-5 disabled:grayscale text-black"
-				onclick={() => {
-					selected_answer = i;
-					timer_res = '0';
-				}}>{answer.answer}</button
-			>
-		{/each}
+		<div class="practice-answers">
+			{#each choices as answer, i}
+				<AnswerTile
+					index={i}
+					label={answer.answer}
+					color={answer.color}
+					selected={i === selected_answer}
+					disabled={selected_answer !== undefined || timer_res === '0'}
+					onclick={() => {
+						selected_answer = i;
+						timer_res = '0';
+					}}
+				/>
+			{/each}
+		</div>
 		{#if timer_res === '0'}
-			<p>No correct answers, since this is a poll-question</p>
+			<p class="tq-muted" role="status">
+				{$t('telekom.answer_recorded', { defaultValue: 'Answer recorded' })}
+			</p>
 		{/if}
 	{:else if question.type === QuizQuestionType.SLIDE}
 		{#await import('$lib/play/admin/slide.svelte')}
-			<Spinner my={false} />
+			<Spinner my_20={false} />
 		{:then c}
 			<div class="max-h-[90%] max-w-[90%]">
-				<c.default bind:question />
+				<c.default {question} />
 			</div>
 		{/await}
 	{:else if question.type === QuizQuestionType.TEXT}
 		{#if timer_res === '0'}
-			{#each question.answers as answer, i}
-				<div
-					class="p-2 rounded-lg flex justify-center w-full transition bg-gray-200 my-5 text-black"
-				>
-					{answer.answer}
-				</div>
-			{/each}
+			<div class="practice-answers">
+				{#each choices as answer}
+					<AnswerTile label={answer.answer} color={answer.color} />
+				{/each}
+			</div>
 		{:else}
-			<div class="flex justify-center mt-2">
+			<div class="tq-field-group">
+				<label class="tq-label" for="practice-text-answer">
+					{$t('telekom.your_answer', { defaultValue: 'Your answer' })}
+				</label>
 				<input
+					id="practice-text-answer"
 					type="text"
+					class="tq-field practice-text"
 					bind:value={text_input}
-					class="bg-gray-50 focus:ring text-gray-900 rounded-lg focus:ring-blue-500 block w-full p-2 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-500 outline-hidden transition text-center"
+					autocomplete="off"
 				/>
 			</div>
-			<div class="flex justify-center">
-				<button
-					type="button"
-					disabled={!text_input}
-					class="w-1/3 text-3xl bg-[#B07156] my-2 disabled:opacity-60 rounded-lg p-1 transition"
-					onclick={() => {
-						selected_answer = text_input;
-						timer_res = '0';
-					}}>{$t('words.submit')}</button
-				>
-			</div>
-		{/if}
-	{:else if question.type === QuizQuestionType.ORDER}
-		<div class="flex flex-col w-full h-full gap-4 px-4 py-6">
-			{#each question.answers as answer, i (answer.id)}
-				<div
-					class="w-full h-fit flex-row rounded-lg p-2 align-middle"
-					animate:flip={{ duration: 100 }}
-					style="background-color: {answer.color ?? '#b07156'}"
-				>
-					<button
-						onclick={() => {
-							question.answers = swapArrayElements(question.answers, i, i - 1);
-						}}
-						class="disabled:opacity-50 transition shadow-lg bg-black/30 w-full flex justify-center rounded-lg p-2 hover:bg-black/20 transition"
-						type="button"
-						disabled={i === 0 || order_corrected}
-					>
-						<svg
-							class="w-8 h-8"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							color="currentColor"
-						>
-							<path
-								d="M12 22a2 2 0 110-4 2 2 0 010 4zM12 15V2m0 0l3 3m-3-3L9 5"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</button>
-					<p class="w-full text-center p-2 text-2xl">{answer.answer}</p>
-
-					<button
-						onclick={() => {
-							question.answers = swapArrayElements(question.answers, i, i + 1);
-						}}
-						class="disabled:opacity-50 transition shadow-lg bg-black/30 w-full flex justify-center rounded-lg p-2 hover:bg-black/20 transition"
-						type="button"
-						disabled={i === question.answers.length - 1 || order_corrected}
-					>
-						<svg
-							class="w-8 h-8"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							color="currentColor"
-						>
-							<path
-								d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 9v13m0 0l3-3m-3 3l-3-3"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</button>
-				</div>
-			{/each}
 			<button
-				class="bg-[#B07156] hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg mt-2 transition w-full"
 				type="button"
-				disabled={timer_res === '0'}
+				disabled={!text_input}
+				class="tq-button tq-button-primary practice-action"
 				onclick={() => {
-					select_complex_answer();
+					selected_answer = text_input;
+					timer_res = '0';
 				}}
 			>
 				{$t('words.submit')}
 			</button>
-		</div>
+		{/if}
+	{:else if question.type === QuizQuestionType.ORDER}
+		<OrderList bind:answers={question.answers} disabled={order_corrected} />
+		<button
+			class="tq-button tq-button-primary practice-action"
+			type="button"
+			disabled={timer_res === '0'}
+			onclick={() => {
+				select_complex_answer();
+			}}
+		>
+			{$t('words.submit')}
+		</button>
 	{:else if question.type === QuizQuestionType.CHECK}
-		{#if show_results}
-			<div>
-				{#each question.answers as answer, i}
-					<button
-						type="button"
-						disabled
-						class:bg-green-500={question.answers[i].right}
-						class:bg-red-500={!question.answers[i].right}
-						class="p-2 rounded-lg flex justify-center w-full transition my-5 text-black"
-						>{answer.answer}</button
-					>
-				{/each}
-			</div>
-		{:else}
-			<div>
-				{#each question.answers as answer, i}
-					<button
-						type="button"
+		<p class="tq-muted practice-hint">
+			{$t('telekom.select_all_that_apply', { defaultValue: 'Select all that apply' })}
+		</p>
+		<div class="practice-answers">
+			{#each choices as answer, i}
+				{#if show_results}
+					<AnswerTile
+						index={i}
+						label={answer.answer}
+						color={answer.color}
+						selected={check_choice_selected[i]}
+						status={answer.right ? 'correct' : 'incorrect'}
+					/>
+				{:else}
+					<AnswerTile
+						index={i}
+						label={answer.answer}
+						color={answer.color}
+						selected={check_choice_selected[i]}
 						disabled={selected_answer !== undefined || timer_res === '0'}
-						class="p-2 rounded-lg flex justify-center w-full transition bg-amber-300 my-5 disabled:grayscale text-black opacity-50"
-						class:opacity-100={check_choice_selected[i]}
 						onclick={() => {
 							check_choice_selected[i] = !check_choice_selected[i];
-						}}>{answer.answer}</button
-					>
-				{/each}
-				<BrownButton
+						}}
+					/>
+				{/if}
+			{/each}
+		</div>
+		{#if !show_results}
+			<div class="tq-toolbar">
+				<button
 					type="button"
+					class="tq-button tq-button-primary practice-action"
+					disabled={timer_res === '0'}
 					onclick={() => {
 						timer_res = '0';
-					}}>{$t('words.submit')}</BrownButton
+					}}
 				>
+					{$t('words.submit')}
+				</button>
 				{#if timer_res === '0'}
 					<button
 						type="button"
-						class="bg-orange-500 p-2 rounded-lg flex justify-center w-full transition my-5 text-black"
+						class="tq-button practice-action"
 						onclick={() => {
 							show_results = true;
-						}}>{$t('admin_page.get_results')}</button
+						}}
 					>
+						{$t('admin_page.get_results')}
+					</button>
 				{/if}
 			</div>
 		{/if}
 	{/if}
-</div>
+</section>
+
+<style>
+	.practice-question {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.practice-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.practice-title {
+		min-width: 0;
+		font-size: clamp(22px, 4vw, 32px);
+		font-weight: 700;
+		line-height: 1.2;
+		overflow-wrap: anywhere;
+	}
+
+	.practice-title :global(p) {
+		margin: 0;
+	}
+
+	.practice-media {
+		display: flex;
+		justify-content: center;
+	}
+
+	.practice-answers {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.practice-hint {
+		margin: 0;
+		font-size: 14px;
+	}
+
+	.practice-slider {
+		padding-block: 40px 16px;
+		padding-inline: 8px;
+	}
+
+	.practice-text {
+		min-height: 56px;
+		font-size: 20px;
+	}
+
+	.practice-action {
+		align-self: flex-start;
+		min-width: 160px;
+	}
+
+	@media (max-width: 600px) {
+		.practice-action {
+			align-self: stretch;
+		}
+	}
+</style>

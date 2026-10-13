@@ -15,7 +15,7 @@ SPDX-License-Identifier: MPL-2.0
 	import type { IGameState } from '$lib/play/admin/game_state.ts';
 
 	const { t } = getLocalization();
-	const default_colors = ['#D6EDC9', '#B07156', '#7F7057', '#4E6E58'];
+	const default_colors: string[] = [];
 
 	let final_results_clicked = $state(false);
 	let timer_interval: NodeJS.Timeout;
@@ -88,20 +88,16 @@ SPDX-License-Identifier: MPL-2.0
 	<Controls {bg_color} {socket_game_controls} {game_token} bind:game_state />
 {/if}
 {#if game_state.timer_res !== '0' && game_state.selected_question >= 0}
-	<span
-		class="fixed top-0 bg-red-500 h-8 transition-all"
-		class:mt-10={game_state.control_visible}
-		style="width: {(100 /
-			parseInt(game_state.quiz_data.questions[game_state.selected_question].time)) *
-			parseInt(game_state.timer_res)}vw"
-	></span>
+	<div class="time-bar" aria-hidden="true">
+		<span
+			style="width: {(100 /
+				parseInt(game_state.quiz_data.questions[game_state.selected_question].time)) *
+				parseInt(game_state.timer_res)}%"
+		></span>
+	</div>
 {/if}
 
-<div
-	class="w-full h-full"
-	class:pt-28={game_state.control_visible}
-	class:pt-12={!game_state.control_visible}
->
+<div class="host-body">
 	{#if game_state.timer_res !== undefined && !final_results_clicked && !game_state.question_results}
 		<!-- Question is shown -->
 		{#if game_state.quiz_data.questions[game_state.selected_question].type === QuizQuestionType.SLIDE}
@@ -122,22 +118,23 @@ SPDX-License-Identifier: MPL-2.0
 			/>
 		{/if}
 	{/if}
-	<br />
 	{#if game_state.timer_res === '0' && JSON.stringify(game_state.final_results) === JSON.stringify( [null] ) && game_state.quiz_data.questions[game_state.selected_question].type !== QuizQuestionType.SLIDE && game_state.question_results !== null && game_state.quiz_data.questions[game_state.selected_question]?.hide_results !== true}
 		{#if game_state.question_results === undefined}
 			{#if !final_results_clicked}
-				<div class="w-full flex justify-center">
-					<h1 class="text-3xl">{$t('admin_page.no_answers')}</h1>
+				<div class="tq-page tq-page-narrow">
+					<p class="tq-panel tq-panel-body host-empty">{$t('admin_page.no_answers')}</p>
 				</div>
 			{/if}
 		{:else if game_state.quiz_data.questions[game_state.selected_question].type === QuizQuestionType.VOTING}
 			{#await import('$lib/play/admin/voting_results.svelte')}
 				<Spinner />
 			{:then c}
-				<c.default
-					data={game_state.question_results}
-					question={game_state.quiz_data.questions[game_state.selected_question]}
-				/>
+				<div class="tq-page tq-page-narrow">
+					<c.default
+						data={game_state.question_results}
+						question={game_state.quiz_data.questions[game_state.selected_question]}
+					/>
+				</div>
 			{/await}
 		{:else}
 			{#await import('$lib/play/admin/results.svelte')}
@@ -151,22 +148,72 @@ SPDX-License-Identifier: MPL-2.0
 			{/await}
 		{/if}
 	{/if}
-	<br />
 	{#if game_state.selected_question === -1}
-		<div class="flex flex-col justify-center w-screen h-full">
-			<h1 class="text-7xl text-center">{@html game_state.quiz_data.title}</h1>
-			<p class="text-3xl pt-8 text-center">{@html game_state.quiz_data.description}</p>
-			{#if game_state.quiz_data.cover_image}
-				<div class="flex justify-center align-middle items-center">
-					<div class="h-[30vh] m-auto w-auto mt-12">
-						<img
-							class="max-h-full max-w-full block"
-							src="/api/v1/storage/download/{game_state.quiz_data.cover_image}"
-							alt="Not provided"
-						/>
-					</div>
+		<main class="tq-page tq-page-narrow host-intro" data-ui="host-intro">
+			<section class="tq-panel tq-panel-body tq-stack">
+				<div>
+					<h1 class="tq-page-title">{@html game_state.quiz_data.title}</h1>
+					{#if game_state.quiz_data.description}
+						<div class="tq-prose host-description">
+							{@html game_state.quiz_data.description}
+						</div>
+					{/if}
 				</div>
-			{/if}
-		</div>
+				{#if game_state.quiz_data.cover_image}
+					<img
+						class="host-cover"
+						src="/api/v1/storage/download/{game_state.quiz_data.cover_image}"
+						alt={$t('telekom.cover_image', { defaultValue: 'Cover image' })}
+					/>
+				{/if}
+			</section>
+		</main>
 	{/if}
 </div>
+
+<style>
+	.time-bar {
+		position: fixed;
+		inset-block-start: 0;
+		inset-inline: 0;
+		z-index: 30;
+		height: 6px;
+		background: var(--tq-border);
+	}
+
+	.time-bar span {
+		display: block;
+		height: 100%;
+		background: var(--tq-accent);
+		transition: width 1s linear;
+	}
+
+	.host-body {
+		width: 100%;
+		padding-block-end: 32px;
+	}
+
+	.host-empty {
+		font-size: 28px;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.host-intro {
+		padding-block-start: 48px;
+	}
+
+	.host-description {
+		margin-block-start: 12px;
+		font-size: 22px;
+	}
+
+	.host-cover {
+		display: block;
+		max-height: 40vh;
+		width: auto;
+		margin-inline: auto;
+		border-radius: 8px;
+		object-fit: contain;
+	}
+</style>

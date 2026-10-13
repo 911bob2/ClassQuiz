@@ -9,19 +9,19 @@ SPDX-License-Identifier: MPL-2.0
 
 	interface Props {
 		files: {
-		id: string;
-		uploaded_at: string;
-		mime_type?: string;
-		hash?: string;
-		size: number;
-		deleted_at?: string;
-		alt_text?: string;
-		filename?: string;
-		thumbhash?: string;
-		server?: string;
-		quizzes: { id: string }[];
-		quiztivities: { id: string }[];
-	}[];
+			id: string;
+			uploaded_at: string;
+			mime_type?: string;
+			hash?: string;
+			size: number;
+			deleted_at?: string;
+			alt_text?: string;
+			filename?: string;
+			thumbhash?: string;
+			server?: string;
+			quizzes: { id: string }[];
+			quiztivities: { id: string }[];
+		}[];
 	}
 
 	let { files = $bindable() }: Props = $props();
@@ -35,6 +35,6 @@ SPDX-License-Identifier: MPL-2.0
 	}
 </script>
 
-{#if files}{:else}
+{#if !files}
 	<Spinner />
 {/if}

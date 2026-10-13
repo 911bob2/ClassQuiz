@@ -4,7 +4,6 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 <script lang="ts">
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { getLocalization } from '$lib/i18n';
@@ -20,35 +19,67 @@ SPDX-License-Identifier: MPL-2.0
 		quiz_id = null;
 	};
 	onMount(() => {
-		window.addEventListener('keydown', (e: KeyboardEvent) => {
+		const close_on_escape = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
 				quiz_id = null;
 			}
-		});
+		};
+		window.addEventListener('keydown', close_on_escape);
+		return () => window.removeEventListener('keydown', close_on_escape);
 	});
+
+	const focus_on_mount = (node: HTMLElement) => {
+		node.focus();
+	};
 </script>
 
 {#if quiz_id}
 	<div
-		class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
-		onclick={handle_on_click}
+		class="tq-overlay"
+		role="presentation"
+		onclick={(e) => {
+			if (e.target === e.currentTarget) handle_on_click();
+		}}
 		transition:fade={{ duration: 100 }}
 	>
-		<div class="m-auto w-1/3 h-auto bg-white dark:bg-gray-700 p-4 rounded-sm">
-			<h1 class="text-3xl text-center mb-4">{$t('downloader.select_download_type')}</h1>
-			<div class="flex flex-row gap-4">
-				<div class="w-full flex justify-center">
-					<BrownButton href="/api/v1/eximport/{quiz_id}"
-						>{$t('downloader.own_format')}
-					</BrownButton>
-				</div>
-				<div class="w-full flex justify-center">
-					<BrownButton href="/api/v1/eximport/excel/{quiz_id}"
-						>{$t('downloader.excel_format')}
-					</BrownButton>
-				</div>
+		<div
+			class="tq-dialog tq-stack stack-5"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="download-title"
+			data-ui="download-dialog"
+			tabindex="-1"
+			use:focus_on_mount
+		>
+			<header class="tq-page-heading flush">
+				<h2 class="tq-section-title" id="download-title">
+					{$t('downloader.select_download_type')}
+				</h2>
+				<button type="button" class="tq-button tq-button-ghost" onclick={handle_on_click}>
+					{$t('words.close')}
+				</button>
+			</header>
+			<div class="grid gap-3 sm:grid-cols-2">
+				<a class="tq-button" href="/api/v1/eximport/{quiz_id}"
+					>{$t('downloader.own_format')}</a
+				>
+				<a class="tq-button" href="/api/v1/eximport/excel/{quiz_id}">
+					{$t('downloader.excel_format')}
+				</a>
 			</div>
-			<p class="mt-2 text-sm text-center">{$t('downloader.help')}</p>
+			<p class="tq-muted text-sm">{$t('downloader.help')}</p>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.tq-dialog:focus-visible {
+		outline: none;
+	}
+	.stack-5 {
+		gap: 20px;
+	}
+	.flush {
+		margin-bottom: 0;
+	}
+</style>

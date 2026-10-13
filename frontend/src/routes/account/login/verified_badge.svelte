@@ -4,15 +4,18 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 
-<div
-	class="flex items-center justify-center p-4 text-green-700 border-2 border-current rounded-lg bg-white"
-	role="alert"
->
+<script lang="ts">
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
+</script>
+
+<div class="verified tq-alert tq-alert-success" role="status" data-ui="login-verified">
 	<svg
+		aria-hidden="true"
 		width="24"
 		height="24"
 		viewBox="0 0 24 24"
-		class="w-6 h-6"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 	>
@@ -27,6 +30,27 @@ SPDX-License-Identifier: MPL-2.0
 			fill="currentColor"
 		/>
 	</svg>
-
-	<h3 class="ml-3 text-sm font-medium">You've successfully confirmed your email address.</h3>
+	<p>
+		{$t('telekom.email_verified', {
+			defaultValue: 'Your email address has been confirmed.'
+		})}
+	</p>
 </div>
+
+<style>
+	.verified {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: calc(100% - 32px);
+		max-width: 440px;
+		margin: 24px auto 0;
+	}
+	svg {
+		flex-shrink: 0;
+	}
+	p {
+		margin: 0;
+		font-weight: 500;
+	}
+</style>

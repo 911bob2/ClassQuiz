@@ -29,6 +29,8 @@ export interface Scenario {
   route?: string;
   /** Route params for $app/state page.params */
   params?: Record<string, string>;
+  /** HTTP status for rendering real route error components. */
+  status?: number;
   /** Real SvelteKit page component */
   page?: Loader;
   /** ...or an isolated lib component (popups, sub-screens) */

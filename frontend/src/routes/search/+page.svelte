@@ -3,11 +3,16 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 
 SPDX-License-Identifier: MPL-2.0
 -->
+
 <script lang="ts">
 	import { getLocalization } from '$lib/i18n';
-	const { t } = getLocalization();
+	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import SearchCard from '$lib/search-card.svelte';
+	import Footer from '$lib/footer.svelte';
 	import { onMount } from 'svelte';
+
+	navbarVisible.visible = true;
+	const { t } = getLocalization();
 	let search_term = $state('');
 	let resp_data = $state(null);
 
@@ -42,75 +47,94 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - Search</title>
+	<title>Telekom Quiz · {$t('words.search')}</title>
 </svelte:head>
 
-<div>
-	<div class="flex justify-center">
-		<div class="mb-3 xl:w-96">
-			<form
-				class="input-group relative flex items-stretch flex-row w-full mb-4"
-				onsubmit={(e: Event) => {
-					e.preventDefault();
-					submit();
-				}}
-			>
-				<input
-					type="search"
-					class="form-control relative flex-auto min-w-0 block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-sm transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-hidden"
-					placeholder={$t('search_page.at_least_3_characters')}
-					aria-label="Search"
-					aria-describedby="button-addon2"
-					bind:value={search_term}
-				/>
-				<button
-					class="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded-sm shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-hidden focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-					id="button-addon2"
-					aria-label="Search"
-					disabled={search_term.length <= 2}
-					type="submit"
-				>
-					<svg
-						aria-hidden="true"
-						focusable="false"
-						data-prefix="fas"
-						data-icon="search"
-						class="w-4"
-						role="img"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 512 512"
-					>
-						<path
-							fill="currentColor"
-							d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
-						/>
-					</svg>
-				</button>
-			</form>
-		</div>
-	</div>
-</div>
+<main class="tq-page tq-stack" data-ui="search">
+	<h1 class="tq-page-title">{$t('words.search')}</h1>
+	<form
+		class="search-form"
+		role="search"
+		onsubmit={(e: Event) => {
+			e.preventDefault();
+			submit();
+		}}
+	>
+		<input
+			data-ui="quiz-search"
+			class="tq-field"
+			type="search"
+			bind:value={search_term}
+			aria-label={$t('words.search')}
+			placeholder={$t('search_page.at_least_3_characters')}
+		/>
+		<button
+			class="tq-button tq-button-primary"
+			disabled={search_term.length <= 2}
+			type="submit"
+		>
+			{$t('words.search')}
+		</button>
+	</form>
 
-{#if resp_data}
-	{#if resp_data.hits.length !== 0}
-		<div class="grid lg:grid-cols-3 grid-cols-1">
-			{#each resp_data.hits as quiz}
-				<SearchCard quiz={quiz._formatted} />
-			{/each}
-		</div>
-	{:else}
-		<div class="flex justify-center">
-			<h1 class="text-4xl">{$t('search_page.nothing_here')}</h1>
-		</div>
-		<div class="flex justify-center">
-			<p>
-				Not finding what you are looking for? Search on <a
-					class="underline"
-					href="https://create.kahoot.it/search?query={search_term}&tags=test&filter=filter%3D1"
-					target="_blank">Kahoot!</a
-				>
-				and <a href="/import" class="underline">import</a> it!
-			</p>
-		</div>
+	{#if resp_data}
+		{#if resp_data.hits.length}
+			<div class="quiz-grid">
+				{#each resp_data.hits as quiz}
+					<SearchCard quiz={quiz._formatted} />
+				{/each}
+			</div>
+		{:else}
+			<div class="tq-panel tq-panel-body tq-stack stack-4" data-ui="search-empty">
+				<p>{$t('ui.no_results')}</p>
+				<div class="tq-toolbar">
+					<a
+						class="tq-button"
+						href="https://create.kahoot.it/search?query={encodeURIComponent(
+							search_term
+						)}&tags=test&filter=filter%3D1"
+						target="_blank"
+						rel="noreferrer"
+					>
+						{$t('telekom.search_on_kahoot', { defaultValue: 'Search on Kahoot!' })}
+					</a>
+					<a class="tq-button" href="/import">{$t('words.import')}</a>
+				</div>
+			</div>
+		{/if}
 	{/if}
-{/if}
+</main>
+<Footer />
+
+<style>
+	.stack-4 {
+		gap: 16px;
+	}
+	.search-form {
+		display: flex;
+		gap: 12px;
+		max-width: 720px;
+	}
+	.search-form input {
+		flex: 1;
+		min-width: 0;
+	}
+	.quiz-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
+	}
+	@media (max-width: 1023px) {
+		.quiz-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 639px) {
+		.quiz-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.search-form {
+			flex-direction: column;
+		}
+	}
+</style>

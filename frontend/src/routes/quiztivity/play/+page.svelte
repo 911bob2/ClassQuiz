@@ -6,7 +6,7 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { QuizTivityPage } from '$lib/quiztivity/types';
+	import type { Abcd, Markdown, Memory, QuizTivityPage } from '$lib/quiztivity/types';
 	import { QuizTivityTypes } from '$lib/quiztivity/types';
 	import NavigationBar from './navigation_bar.svelte';
 
@@ -26,21 +26,42 @@ SPDX-License-Identifier: MPL-2.0
 	let current_slide: QuizTivityPage = $derived(quiztivity.pages[current_slide_index]);
 </script>
 
-<div class="w-full h-full flex flex-col overflow-scroll">
-	<div class="w-full h-full">
-		{#if current_slide.type === QuizTivityTypes.MARKDOWN}
+<svelte:head>
+	<title>Telekom Quiz · {quiztivity.title}</title>
+</svelte:head>
+
+<main class="tq-page tq-page-narrow tq-stack activity" data-ui="activity-play">
+	<p class="tq-muted activity-title">{quiztivity.title}</p>
+	<div class="activity-page">
+		{#if current_slide?.type === QuizTivityTypes.MARKDOWN}
 			{#await import('$lib/quiztivity/components/markdown/play.svelte') then c}
-				<c.default data={current_slide.data} />
+				<c.default data={current_slide.data as Markdown} />
 			{/await}
-		{:else if current_slide.type === QuizTivityTypes.MEMORY}
+		{:else if current_slide?.type === QuizTivityTypes.MEMORY}
 			{#await import('$lib/quiztivity/components/memory/play.svelte') then c}
-				<c.default data={current_slide.data} />
+				<c.default data={current_slide.data as Memory} />
 			{/await}
-		{:else if current_slide.type === QuizTivityTypes.ABCD}
+		{:else if current_slide?.type === QuizTivityTypes.ABCD}
 			{#await import('$lib/quiztivity/components/abcd/play.svelte') then c}
-				<c.default data={current_slide.data} />
+				<c.default data={current_slide.data as unknown as Abcd} />
 			{/await}
 		{/if}
 	</div>
 	<NavigationBar bind:current_slide_index question_count={quiztivity.pages.length} />
-</div>
+</main>
+
+<style>
+	.activity {
+		gap: 16px;
+	}
+
+	.activity-title {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.activity-page {
+		width: 100%;
+	}
+</style>

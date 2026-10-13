@@ -5,6 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
+
 	interface Props {
 		data: any;
 		editor?: boolean;
@@ -17,10 +21,21 @@ SPDX-License-Identifier: MPL-2.0
 	<input
 		bind:value={data}
 		type="text"
-		class="w-full h-full dark:text-black text-center text-3xl min-h-fit"
+		class="headline headline-input"
+		aria-label={$t('editor.slide.headline')}
 	/>
 {:else}
-	<h2 class="w-full h-full text-center text-3xl min-h-fit">
+	<h2 class="headline">
 		{data}
 	</h2>
 {/if}
+
+<style>
+	.headline {
+		width: 100%;
+		height: 100%;
+		min-height: fit-content;
+		font-size: 30px;
+		text-align: center;
+	}
+</style>

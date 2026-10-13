@@ -16,18 +16,24 @@ SPDX-License-Identifier: MPL-2.0
 	import EditMenu from './slides/edit_menu.svelte';
 	import type { Konva, ShapeModel } from 'pikaso';
 	import { browser } from '$app/environment';
+	import { getLocalization } from '$lib/i18n';
+	import Icon from '$lib/editor/Icon.svelte';
+
+	const { t } = getLocalization();
 
 	interface Props {
 		data?: Question;
 	}
 
-	let { data = $bindable({
-		type: QuizQuestionType.SLIDE,
-		time: '120',
-		question: '',
-		image: undefined,
-		answers: ''
-	}) }: Props = $props();
+	let {
+		data = $bindable({
+			type: QuizQuestionType.SLIDE,
+			time: '120',
+			question: '',
+			image: undefined,
+			answers: ''
+		})
+	}: Props = $props();
 	let selected_element = $state(undefined);
 	let canvas_el: HTMLDivElement | undefined = $state();
 	let canvas: Pikaso;
@@ -45,12 +51,10 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	});
 
+	// The theme class is set on <html> by the app shell.
 	let darkMode = false;
 	if (browser) {
-		darkMode =
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches);
+		darkMode = document.documentElement.classList.contains('dark');
 	}
 	const add_text_field = () => {
 		if (selected_element === ElementTypes.Text) {
@@ -60,7 +64,9 @@ SPDX-License-Identifier: MPL-2.0
 					y: 40
 				},
 				text: {
-					text: 'Text',
+					text: $t('words.text'),
+					fontFamily: 'TeleNeo',
+					fill: darkMode ? '#ffffff' : '#171719',
 					fontSize: 20
 				}
 			});
@@ -71,7 +77,9 @@ SPDX-License-Identifier: MPL-2.0
 					y: 40
 				},
 				text: {
-					text: 'Headline',
+					text: $t('editor.slide.headline'),
+					fontFamily: 'TeleNeo',
+					fill: darkMode ? '#ffffff' : '#171719',
 					fontSize: 35
 				}
 			});
@@ -80,7 +88,7 @@ SPDX-License-Identifier: MPL-2.0
 				x: 40,
 				y: 40,
 				radius: 50,
-				fill: '#ff000d'
+				fill: '#e20074'
 			});
 		} else if (selected_element === ElementTypes.Rectangle) {
 			canvas.shapes.rect.insert({
@@ -88,7 +96,7 @@ SPDX-License-Identifier: MPL-2.0
 				y: 40,
 				width: 50,
 				height: 50,
-				fill: '#ff000d'
+				fill: '#e20074'
 			});
 		}
 	};
@@ -173,78 +181,72 @@ SPDX-License-Identifier: MPL-2.0
 	});
 </script>
 
-<div class="flex h-full relative w-full" bind:this={main_el}>
-	<div class="absolute top-0 left-0 grid grid-cols-6 w-full">
-		<div class="flex flex-col pl-2 rounded-t-lg z-40 pt-2">
-			<button
-				class="mr-auto"
-				onclick={() => {
-					settings_menu_open = !settings_menu_open;
-				}}
-				type="button"
-			>
-				<svg
-					class="w-6 h-6"
-					stroke-width="2"
-					viewBox="0 0 24 24"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					color="currentColor"
-				>
-					<path
-						d="M12 15a3 3 0 100-6 3 3 0 000 6z"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-					<path
-						d="M19.622 10.395l-1.097-2.65L20 6l-2-2-1.735 1.483-2.707-1.113L12.935 2h-1.954l-.632 2.401-2.645 1.115L6 4 4 6l1.453 1.789-1.08 2.657L2 11v2l2.401.655L5.516 16.3 4 18l2 2 1.791-1.46 2.606 1.072L11 22h2l.604-2.387 2.651-1.098C16.697 18.831 18 20 18 20l2-2-1.484-1.75 1.098-2.652 2.386-.62V11l-2.378-.605z"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
-			</button>
-			{#if settings_menu_open}
-				<SettingsMenu bind:time={data.time} bind:title={data.question} />
-			{/if}
-		</div>
-		<div class="col-start-2 col-end-6 transition bg-transparent pt-2">
-			<EditMenu bind:selected_el />
-		</div>
-
-		<div class="flex flex-col pr-2 rounded-t-lg z-40 pt-2">
-			<button
-				class="ml-auto"
-				onclick={() => {
-					selected_element = selected_element === null ? undefined : null;
-				}}
-				type="button"
-				class:add-button={selected_element === null}
-			>
-				<svg
-					class="w-6 h-6"
-					stroke-width="2"
-					viewBox="0 0 24 24"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					color="currentColor"
-				>
-					<path
-						d="M9 12h3m3 0h-3m0 0V9m0 3v3M21 3.6v16.8a.6.6 0 01-.6.6H3.6a.6.6 0 01-.6-.6V3.6a.6.6 0 01.6-.6h16.8a.6.6 0 01.6.6z"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
-			</button>
-			{#if selected_element === null}
-				<ElementSelection bind:selected_element />
-			{/if}
-		</div>
+<div class="slide-workspace" bind:this={main_el} data-ui="slide-editor">
+	<div class="slide-toolbar">
+		<button
+			type="button"
+			class="tq-button"
+			data-ui="slide-settings-toggle"
+			aria-expanded={settings_menu_open}
+			onclick={() => (settings_menu_open = !settings_menu_open)}
+		>
+			<Icon name="sliders" />
+			{$t('telekom.slide_settings', { defaultValue: 'Slide settings' })}
+		</button>
+		<EditMenu {selected_el} />
+		<button
+			type="button"
+			class="tq-button tq-button-primary slide-add"
+			data-ui="slide-add-element"
+			aria-expanded={selected_element === null}
+			onclick={() => (selected_element = selected_element === null ? undefined : null)}
+		>
+			<Icon name="plus" />
+			{$t('telekom.add_element', { defaultValue: 'Add element' })}
+		</button>
 	</div>
-	<div bind:this={canvas_el} class="w-full h-full block"></div>
+	{#if settings_menu_open}
+		<SettingsMenu bind:time={data.time} bind:title={data.question} />
+	{/if}
+	{#if selected_element === null}
+		<ElementSelection bind:selected_element />
+	{/if}
+	<div class="canvas-shell">
+		<div bind:this={canvas_el} class="slide-canvas"></div>
+	</div>
 </div>
+
+<style>
+	.slide-workspace {
+		padding: 20px 24px 24px;
+	}
+	.slide-toolbar {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px 24px;
+	}
+	.slide-add {
+		margin-inline-start: auto;
+	}
+	.canvas-shell {
+		margin-top: 16px;
+		overflow: hidden;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+	.slide-canvas {
+		width: 100%;
+		height: 520px;
+	}
+
+	@media (max-width: 767px) {
+		.slide-workspace {
+			padding: 16px;
+		}
+		.slide-canvas {
+			height: 360px;
+		}
+	}
+</style>

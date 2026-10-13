@@ -13,20 +13,15 @@ SPDX-License-Identifier: MPL-2.0
 	import { reach } from 'yup';
 	import { dataSchema } from '$lib/yupSchemas';
 	import Spinner from '../Spinner.svelte';
-	import { createTippy } from 'svelte-tippy';
+
 	import { getLocalization } from '$lib/i18n';
 	import MediaComponent from '$lib/editor/MediaComponent.svelte';
+	import Icon from '$lib/editor/Icon.svelte';
+	import { modal } from '$lib/editor/modal';
+	import { question_type_keys, question_type_description_keys } from '$lib/editor/text';
 	import { fade } from 'svelte/transition';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
-	// import MediaComponent from "$lib/editor/MediaComponent.svelte";
 
 	const { t } = getLocalization();
-
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'top'
-	});
 
 	interface Props {
 		data: EditorData;
@@ -79,220 +74,299 @@ SPDX-License-Identifier: MPL-2.0
 		data.questions;
 	});
 
-	const type_to_name = {
-		RANGE: $t('words.range'),
-		ABCD: $t('words.multiple_choice'),
-		VOTING: $t('words.voting'),
-		TEXT: $t('words.text'),
-		ORDER: $t('words.order'),
-		CHECK: $t('words.check_choice')
-	};
-
-	/*
-    if (typeof data.questions[selected_question].type !== QuizQuestionType) {
-        console.log(data.questions[selected_question].type !== QuizQuestionType.ABCD || data.questions[selected_question].type !== QuizQuestionType.RANGE)
-        data.questions[selected_question].type = QuizQuestionType.ABCD;
-    }
-     */
+	const type_name = (type: string | undefined) =>
+		$t(question_type_keys[String(type)] ?? 'words.slide');
 </script>
 
-<div class="w-full max-h-full pb-10 px-10 h-full">
-	<div class="rounded-lg bg-white w-full h-full border-gray-500 dark:bg-gray-700 shadow-2xl">
-		<div class="h-12 bg-gray-300 rounded-t-lg dark:bg-gray-500">
-			<div class="flex align-middle p-4 gap-3">
-				<span
-					class="inline-block bg-gray-600 w-4 h-4 rounded-full hover:bg-red-400 transition"
-				></span>
-				<span
-					class="inline-block bg-gray-600 w-4 h-4 rounded-full hover:bg-yellow-400 transition"
-				></span>
-				<span
-					class="inline-block bg-gray-600 w-4 h-4 rounded-full hover:bg-green-400 transition"
-				></span>
-				<button
-					class="ml-auto"
-					type="button"
-					use:tippy={{ content: $t('editor.advanced_settings') }}
-					onclick={() => (advanced_options_open = true)}
-				>
-					<svg
-						class="text-white w-5 h-5"
-						aria-hidden="true"
-						fill="none"
-						stroke="white"
-						stroke-width="2"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-						<path
-							d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</button>
-			</div>
+<section class="tq-panel question-editor" data-ui="question-editor">
+	<header class="question-header">
+		<div>
+			<span class="question-kicker">
+				{#if data.questions[selected_question].type === QuizQuestionType.SLIDE}
+					{$t('words.slide')}
+				{:else}
+					{$t('words.question')}
+				{/if}
+				{selected_question + 1}
+			</span>
+			<h2 class="tq-section-title">{type_name(data.questions[selected_question].type)}</h2>
 		</div>
-		{#if data.questions[selected_question].type === QuizQuestionType.SLIDE}
-			{#await import('./slide.svelte')}
-				<Spinner my_20={false} />
-			{:then c}
-				<c.default bind:data={data.questions[selected_question]} />
-			{/await}
-		{:else}
-			{@const type = data.questions[selected_question].type}
-			<div class="flex flex-col">
-				<div class="flex justify-center pt-10 w-full">
-					{#key unique}
-						{#await import('$lib/inline-editor.svelte')}
-							<Spinner my_20={false} />
-						{:then c}
-							<div
-								class="rounded-lg placeholder:italic placeholder:font-normal dark:bg-gray-500"
-								class:bg-yellow-500={!reach(
-									dataSchema,
-									'questions[].question'
-								).isValidSync(data.questions[selected_question].question)}
-							>
-								<c.default bind:text={data.questions[selected_question].question} />
+		<button
+			type="button"
+			class="tq-button"
+			data-ui="advanced-settings-open"
+			onclick={() => (advanced_options_open = true)}
+		>
+			<Icon name="sliders" />
+			{$t('editor.advanced_settings')}
+		</button>
+	</header>
+
+	{#if data.questions[selected_question].type === QuizQuestionType.SLIDE}
+		{#await import('./slide.svelte')}
+			<Spinner my_20={false} />
+		{:then c}
+			<c.default bind:data={data.questions[selected_question]} />
+		{/await}
+	{:else}
+		{@const type = data.questions[selected_question].type}
+		<div class="question-body">
+			<div class="field-block">
+				<span class="tq-label">{$t('words.question')}</span>
+				{#key unique}
+					{#await import('$lib/inline-editor.svelte')}
+						<Spinner my_20={false} />
+					{:then c}
+						<c.default
+							bind:text={data.questions[selected_question].question}
+							label={$t('words.question')}
+							invalid={!reach(dataSchema, 'questions[].question').isValidSync(
+								data.questions[selected_question].question
+							)}
+						/>
+					{/await}
+				{/key}
+			</div>
+
+			<div class="question-details">
+				<div class="field-block">
+					<span class="tq-label">{$t('telekom.media', { defaultValue: 'Media' })}</span>
+					{#if data.questions[selected_question].image}
+						<div class="media-preview">
+							<div class="media-frame">
+								<MediaComponent src={image_url} />
 							</div>
-						{/await}
-					{/key}
-				</div>
-				{#if data.questions[selected_question].image}
-					<div class="flex justify-center pt-10 w-full h-72">
-						<div class="h-72 relative">
 							<button
-								class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
 								type="button"
+								class="tq-button tq-button-danger"
+								data-ui="media-remove"
 								onclick={() => {
 									data.questions[selected_question].image = null;
 								}}
 							>
-								<svg
-									class="w-6 h-6 bg-red-500 rounded-full"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
+								<Icon name="trash" />
+								{$t('telekom.remove_media', { defaultValue: 'Remove media' })}
 							</button>
-							<MediaComponent bind:src={image_url} />
 						</div>
-					</div>
-				{:else}
-					{#await import('$lib/editor/uploader.svelte')}
-						<Spinner my_20={false} />
-					{:then c}
-						<c.default
-							bind:modalOpen={uppyOpen}
-							bind:edit_id
-							bind:data
-							bind:selected_question
-							video_upload={true}
-						/>
-					{/await}
-				{/if}
-				<div class="flex justify-center pt-10 w-full">
-					<div>
-						<svg
-							class="w-8 h-8 inline-block"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						<input
-							type="number"
-							max="999"
-							min="1"
-							class="w-20 bg-transparent rounded-lg text-lg border-2 border-gray-500 p-1 outline-hidden focus:shadow-2xl"
-							bind:value={data.questions[selected_question].time}
-						/>
-						<p class="inline-block">s</p>
-					</div>
-				</div>
-				<div class="flex justify-center py-5">
-					<p>{type_to_name[String(data.questions[selected_question].type)]}</p>
-				</div>
-				<div class="flex justify-center w-full">
-					{#if type === QuizQuestionType.ABCD || type === QuizQuestionType.CHECK}
-						{#await import('$lib/editor/ABCDEditorPart.svelte')}
+					{:else}
+						{#await import('$lib/editor/uploader.svelte')}
 							<Spinner my_20={false} />
 						{:then c}
 							<c.default
-								bind:data
-								bind:selected_question
-								check_choice={type === QuizQuestionType.CHECK}
+								bind:modalOpen={uppyOpen}
+								{data}
+								{selected_question}
+								video_upload={true}
 							/>
-						{/await}
-					{:else if type === QuizQuestionType.RANGE}
-						<RangeEditor bind:selected_question bind:data />
-					{:else if type === QuizQuestionType.VOTING}
-						{#await import('$lib/editor/VotingEditorPart.svelte')}
-							<Spinner my_20={false} />
-						{:then c}
-							<c.default bind:data bind:selected_question />
-						{/await}
-					{:else if type === QuizQuestionType.TEXT}
-						{#await import('$lib/editor/TextEditorPart.svelte')}
-							<Spinner my_20={false} />
-						{:then c}
-							<c.default bind:data bind:selected_question />
-						{/await}
-					{:else if type === QuizQuestionType.ORDER}
-						{#await import('$lib/editor/OrderEditorPart.svelte')}
-							<Spinner my_20={false} />
-						{:then c}
-							<c.default bind:data bind:selected_question />
 						{/await}
 					{/if}
 				</div>
+				<label class="field-block time-field">
+					<span class="tq-label">{$t('editor.time_in_seconds')}</span>
+					<input
+						type="number"
+						max="999"
+						min="1"
+						class="tq-field"
+						bind:value={data.questions[selected_question].time}
+					/>
+				</label>
 			</div>
-		{/if}
-	</div>
-</div>
+
+			<section class="answers-section">
+				<div class="answers-heading">
+					<h3 class="tq-section-title">{$t('words.answer_plural')}</h3>
+					{#if question_type_description_keys[String(type)]}
+						<p class="tq-muted">{$t(question_type_description_keys[String(type)])}</p>
+					{/if}
+				</div>
+				{#if type === QuizQuestionType.ABCD || type === QuizQuestionType.CHECK}
+					{#await import('$lib/editor/ABCDEditorPart.svelte')}
+						<Spinner my_20={false} />
+					{:then c}
+						<c.default
+							bind:data
+							{selected_question}
+							check_choice={type === QuizQuestionType.CHECK}
+						/>
+					{/await}
+				{:else if type === QuizQuestionType.RANGE}
+					<RangeEditor {selected_question} bind:data />
+				{:else if type === QuizQuestionType.VOTING}
+					{#await import('$lib/editor/VotingEditorPart.svelte')}
+						<Spinner my_20={false} />
+					{:then c}
+						<c.default bind:data {selected_question} />
+					{/await}
+				{:else if type === QuizQuestionType.TEXT}
+					{#await import('$lib/editor/TextEditorPart.svelte')}
+						<Spinner my_20={false} />
+					{:then c}
+						<c.default bind:data {selected_question} />
+					{/await}
+				{:else if type === QuizQuestionType.ORDER}
+					{#await import('$lib/editor/OrderEditorPart.svelte')}
+						<Spinner my_20={false} />
+					{:then c}
+						<c.default bind:data {selected_question} />
+					{/await}
+				{/if}
+			</section>
+		</div>
+	{/if}
+</section>
 
 {#if advanced_options_open}
 	<div
-		class="fixed top-0 left-0 w-full h-full bg-black/60 flex"
+		class="tq-overlay"
+		role="presentation"
+		use:modal={{ onclose: () => (advanced_options_open = false) }}
+		onclick={(e) => {
+			if (e.target === e.currentTarget) {
+				advanced_options_open = false;
+			}
+		}}
 		transition:fade|global={{ duration: 150 }}
 	>
 		<div
-			class="w-1/4 h-1/3 m-auto bg-white dark:bg-gray-700 rounded-lg flex flex-col p-2 gap-2"
+			class="tq-dialog advanced-dialog"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="advanced-question-title"
+			data-ui="advanced-settings-dialog"
 		>
-			<h1 class="text-3xl mx-auto">{$t('editor.advanced_settings')}</h1>
-			<label class="flex justify-around text-lg">
-				<span class="my-auto">{$t('editor.hide_question_results')}</span>
+			<div class="dialog-heading">
+				<h2 id="advanced-question-title" class="tq-section-title">
+					{$t('editor.advanced_settings')}
+				</h2>
+				<button
+					type="button"
+					class="tq-icon-button tq-button-ghost"
+					aria-label={$t('words.close')}
+					onclick={() => (advanced_options_open = false)}
+				>
+					<Icon name="close" />
+				</button>
+			</div>
+			<label class="setting-row">
+				<span>{$t('editor.hide_question_results')}</span>
 				<input
 					type="checkbox"
+					data-autofocus
 					bind:checked={data.questions[selected_question]['hide_results']}
 				/>
 			</label>
-			<div class="mt-auto w-full">
-				<BrownButton onclick={() => (advanced_options_open = false)}
-					>{$t('words.close')}</BrownButton
+			<div class="dialog-actions">
+				<button
+					type="button"
+					class="tq-button tq-button-primary"
+					onclick={() => (advanced_options_open = false)}
 				>
+					{$t('words.close')}
+				</button>
 			</div>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.question-editor {
+		overflow: hidden;
+	}
+	.question-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		padding: 20px 24px;
+		border-bottom: 1px solid var(--tq-border);
+	}
+	.question-kicker {
+		display: block;
+		color: var(--tq-muted);
+		font-size: 14px;
+	}
+	.question-body {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+		padding: 24px;
+	}
+	.field-block {
+		min-width: 0;
+	}
+	.question-details {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 220px;
+		gap: 24px;
+		align-items: start;
+	}
+	.media-preview {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+	.media-frame {
+		max-width: 100%;
+	}
+	.time-field input {
+		max-width: 160px;
+	}
+	.answers-section {
+		padding-top: 24px;
+		border-top: 1px solid var(--tq-border);
+	}
+	.answers-heading {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 4px 16px;
+		margin-bottom: 16px;
+	}
+	.answers-heading p {
+		margin: 0;
+		font-size: 14px;
+	}
+	.dialog-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 8px;
+	}
+	.advanced-dialog {
+		max-width: min(480px, calc(100vw - 32px));
+	}
+	.setting-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		min-height: 56px;
+		border-block: 1px solid var(--tq-border);
+	}
+	.dialog-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 20px;
+	}
+
+	@media (max-width: 767px) {
+		.question-header {
+			flex-wrap: wrap;
+			padding: 16px;
+		}
+		.question-body {
+			gap: 24px;
+			padding: 16px;
+		}
+		.question-details {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

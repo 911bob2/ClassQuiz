@@ -12,19 +12,15 @@ SPDX-License-Identifier: MPL-2.0
 	import { signedIn } from '$lib/stores';
 	import { navbarVisible } from '$lib/stores.svelte';
 	import CommandpaletteNotice from '$lib/components/popover/commandpalettenotice.svelte';
-	// import Spinner from "$lib/Spinner.svelte";
+	import Spinner from '$lib/Spinner.svelte';
 	import Fuse from 'fuse.js';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import type { PageData } from './$types';
-	import { fly } from 'svelte/transition';
 	import StartGamePopup from '$lib/dashboard/start_game.svelte';
 	import Analytics from './Analytics.svelte';
 	import MediaComponent from '$lib/editor/MediaComponent.svelte';
-	import { createTippy } from 'svelte-tippy';
 	import { onMount } from 'svelte';
 
 	interface Props {
-		// import GrayButton from "$lib/components/buttons/gray.svelte";
 		data: PageData;
 	}
 
@@ -32,6 +28,7 @@ SPDX-License-Identifier: MPL-2.0
 	let search_term = $state('');
 	let start_game = $state(null);
 	let download_id: string | null = $state(null);
+	let open_menu: string | null = $state(null);
 	signedIn.set(true);
 	navbarVisible.visible = true;
 	const { t } = getLocalization();
@@ -39,15 +36,10 @@ SPDX-License-Identifier: MPL-2.0
 	let items_to_show = $state([]);
 	let all_items: Array<any> = $state();
 	let fuse;
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'bottom'
-	});
 
 	let id_to_position_map = {};
 
-	const getData = async (): Promise<{ items: Array<QuizData>; fuse: Fuse<any> }> => {
+	const getData = async (): Promise<{ items: Array<any>; fuse: Fuse<any> }> => {
 		const items: any[] = [];
 
 		for (const q of data.quizzes) items.push({ ...q, type: 'quiz' });
@@ -101,307 +93,310 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		window.location.reload();
 	};
-	let create_button_clicked = $state(false);
 
 	let analytics_quiz_selected: undefined | QuizData = $state(undefined);
+
+	const menu_key = (quiz: { type: string; id: string }) => `${quiz.type}:${quiz.id}`;
+
+	const close_menu_on_outside_click = (event: MouseEvent) => {
+		if (open_menu !== null && !(event.target as HTMLElement).closest('[data-menu-root]')) {
+			open_menu = null;
+		}
+	};
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - Dashboard</title>
+	<title>Telekom Quiz · {$t('telekom.library', { defaultValue: 'Quiz library' })}</title>
 </svelte:head>
+
+<svelte:window
+	onclick={close_menu_on_outside_click}
+	onkeydown={(event) => {
+		if (event.key === 'Escape') open_menu = null;
+	}}
+/>
+
 <Analytics bind:quiz={analytics_quiz_selected} />
 <CommandpaletteNotice />
-<div class="min-h-screen flex flex-col">
+<main class="tq-page tq-stack" data-ui="library">
+	<header class="tq-page-heading flush">
+		<h1 class="tq-page-title">{$t('telekom.library', { defaultValue: 'Quiz library' })}</h1>
+		<div class="tq-toolbar" data-ui="library-create">
+			<a class="tq-button tq-button-primary" href="/create">{$t('dashboard.create_quiz')}</a>
+			<a class="tq-button" href="/quiztivity/create">{$t('words.quiztivity')}</a>
+			<a class="tq-button" href="/import">{$t('words.import')}</a>
+		</div>
+	</header>
+
+	<nav class="tq-tabs" aria-label={$t('words.dashboard')}>
+		<a class="tq-tab" href="/dashboard" aria-current="page">{$t('words.quiz')}</a>
+		<a class="tq-tab" href="/results">{$t('words.results')}</a>
+		<a class="tq-tab" href="/edit/files">{$t('words.files_library')}</a>
+		<a class="tq-tab" href="/account/settings">{$t('words.settings')}</a>
+	</nav>
+
 	{#if !all_items}
-		<svg class="h-8 w-8 animate-spin mx-auto my-20" viewBox="3 3 18 18">
-			<path
-				class="fill-black"
-				d="M12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z"
-			/>
-			<path
-				class="fill-blue-100"
-				d="M16.9497 7.05015C14.2161 4.31648 9.78392 4.31648 7.05025 7.05015C6.65973 7.44067 6.02656 7.44067 5.63604 7.05015C5.24551 6.65962 5.24551 6.02646 5.63604 5.63593C9.15076 2.12121 14.8492 2.12121 18.364 5.63593C18.7545 6.02646 18.7545 6.65962 18.364 7.05015C17.9734 7.44067 17.3403 7.44067 16.9497 7.05015Z"
-			/>
-		</svg>
+		<Spinner />
+	{:else if all_items.length === 0}
+		<div class="tq-panel tq-empty" data-ui="library-empty">
+			{$t('telekom.no_quizzes', { defaultValue: 'No quizzes' })}
+		</div>
 	{:else}
-		<div class="flex flex-col w-full mx-auto">
-			<!--		<button
-                    class='px-4 py-2 font-medium tracking-wide text-gray-500 whitespace-nowrap dark:text-gray-400 capitalize transition-colors dark:bg-gray-700 duration-200 transform bg-[#B07156] rounded-md hover:bg-green-600 focus:outline-hidden focus:ring focus:ring-blue-300 focus:ring-opacity-80'>
-                    Primary
-                </button>-->
-			<div class="w-full grid lg:grid-cols-4 gap-2 grid-cols-2 px-4">
-				<!-- {#if create_button_clicked}
-					<div
-						class="flex gap-2"
-						transition:fly|global={{ y: 10 }}
-						use:tippy={{ content: 'Unsure? Choose "Quiz".' }}
-					>
-						<BrownButton href="/create">{$t('words.quiz')}</BrownButton>
-						<BrownButton href="/quiztivity/create">{$t('words.quiztivity')}</BrownButton
-						>
-					</div>
-				{:else}
-					<BrownButton
-						onclick={() => {
-							create_button_clicked = true;
-						}}>{$t('words.create')}</BrownButton
-					>
-				{/if} -->
-				<BrownButton href="/create">{$t('dashboard.create_quiz')}</BrownButton>
-				<BrownButton href="/import">{$t('words.import')}</BrownButton>
-				<BrownButton href="/results">{$t('words.results')}</BrownButton>
-				<div class="flex gap-2">
-					<BrownButton href="/edit/files">{$t('words.files_library')}</BrownButton>
-					<BrownButton href="/account/settings">
-						{$t('words.settings')}
-					</BrownButton>
-				</div>
-			</div>
-			{#if all_items.length !== 0}
-				<div class="flex justify-center pt-4 w-full">
-					<div>
-						<div>
-							<input
-								bind:value={search_term}
-								class="p-2 rounded-lg outline-hidden text-center w-96 dark:bg-gray-700"
-								placeholder={$t('dashboard.search_for_own_quizzes')}
+		<div class="library-search">
+			<input
+				data-ui="library-search"
+				aria-label={$t('dashboard.search_for_own_quizzes')}
+				class="tq-field"
+				type="search"
+				bind:value={search_term}
+				oninput={search}
+				placeholder={$t('dashboard.search_for_own_quizzes')}
+			/>
+			{#if search_term !== ''}
+				<button
+					type="button"
+					class="tq-button"
+					data-ui="library-search-clear"
+					onclick={() => {
+						search_term = '';
+						search();
+					}}
+				>
+					{$t('telekom.clear', { defaultValue: 'Clear' })}
+				</button>
+			{/if}
+		</div>
+
+		<div class="library-list">
+			{#each items_to_show as quiz (menu_key(quiz))}
+				<article class="tq-panel library-row" data-ui="library-item">
+					{#if quiz.cover_image}
+						<div class="library-cover">
+							<MediaComponent
+								src={quiz.cover_image}
+								css_classes="library-cover-media"
+								added_thumbhash_classes=""
 							/>
+						</div>
+					{/if}
+					<div class="library-info">
+						<h2 class="library-title">{@html quiz.title}</h2>
+						{#if quiz.description}
+							<div class="tq-muted library-description">{@html quiz.description}</div>
+						{/if}
+						<span class="tq-badge">
+							{$t(quiz.type === 'quiz' ? 'words.quiz' : 'words.quiztivity')}
+						</span>
+					</div>
+					<div class="tq-toolbar library-actions">
+						{#if quiz.type === 'quiz'}
 							<button
-								onclick={() => {
-									search_term = '';
-									items_to_show = all_items;
-								}}
+								type="button"
+								data-ui="library-start"
+								class="tq-button"
+								onclick={() => (start_game = quiz.id)}
 							>
+								{$t('start_game.start_game')}
+							</button>
+						{:else}
+							<a class="tq-button" href="/quiztivity/play?id={quiz.id}">
+								{$t('words.play')}
+							</a>
+						{/if}
+						<a
+							class="tq-button"
+							data-ui="library-edit"
+							href={quiz.type === 'quiz'
+								? `/edit?quiz_id=${quiz.id}`
+								: `/quiztivity/edit?id=${quiz.id}`}
+						>
+							{$t('words.edit')}
+						</a>
+						<div class="library-menu" data-menu-root>
+							<button
+								type="button"
+								class="tq-button"
+								data-ui="library-menu"
+								aria-haspopup="true"
+								aria-expanded={open_menu === menu_key(quiz)}
+								onclick={() =>
+									(open_menu =
+										open_menu === menu_key(quiz) ? null : menu_key(quiz))}
+							>
+								{$t('telekom.actions', { defaultValue: 'Actions' })}
 								<svg
-									class="h-8 inline-block"
+									aria-hidden="true"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
-									viewBox="0 0 24 24"
-									xmlns="http://www.w3.org/2000/svg"
+									stroke-width="2"
 								>
 									<path
+										d="M6 9l6 6 6-6"
 										stroke-linecap="round"
 										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
 									/>
 								</svg>
 							</button>
+							{#if open_menu === menu_key(quiz)}
+								<div class="tq-panel library-menu-list" data-ui="library-menu-list">
+									{#if quiz.type === 'quiz'}
+										<a
+											class="tq-button tq-button-ghost"
+											aria-disabled={!quiz.public}
+											tabindex={quiz.public ? undefined : -1}
+											href={quiz.public ? `/view/${quiz.id}` : undefined}
+										>
+											{$t('telekom.view', { defaultValue: 'View' })}
+										</a>
+										<button
+											type="button"
+											class="tq-button tq-button-ghost"
+											onclick={() => {
+												analytics_quiz_selected = quiz;
+												open_menu = null;
+											}}
+										>
+											{$t('telekom.analytics', { defaultValue: 'Analytics' })}
+										</button>
+										<button
+											type="button"
+											class="tq-button tq-button-ghost"
+											onclick={() => {
+												download_id = quiz.id;
+												open_menu = null;
+											}}
+										>
+											{$t('words.download')}
+										</button>
+									{/if}
+									<button
+										type="button"
+										class="tq-button tq-button-ghost tq-button-danger"
+										onclick={() => {
+											open_menu = null;
+											deleteQuiz(quiz.id, quiz.type);
+										}}
+									>
+										{$t('words.delete')}
+									</button>
+								</div>
+							{/if}
 						</div>
 					</div>
-				</div>
-				<div class="flex flex-col gap-4 mt-4 px-2">
-					{#each items_to_show as quiz}
-						<div
-							class="grid grid-cols-2 lg:grid-cols-3 w-full rounded-sm border-[#B07156] border-2 p-2 h-[20vh] overflow-hidden max-h-[20vh]"
-						>
-							<div class="hidden lg:flex w-auto h-full items-center relative">
-								{#if quiz.cover_image}
-									<!--									<img
-										src="/api/v1/storage/download/{quiz.cover_image}"
-										alt="user provided"
-										loading="lazy"
-										class="shrink-0 max-w-full max-h-full absolute rounded-sm"
-									/>-->
-									<MediaComponent
-										src={quiz.cover_image}
-										css_classes="shrink-0 max-w-full max-h-full absolute rounded-sm"
-									/>
-								{/if}
-							</div>
-							<div class="my-auto mx-auto max-h-full overflow-hidden">
-								<p class="text-xl text-center">{@html quiz.title}</p>
-								<p class="text-sm text-center text-clip overflow-hidden">
-									{@html quiz.description ?? ''}
-								</p>
-							</div>
-							<div
-								class="grid grid-rows-2 ms-auto gap-2 w-fit self-end my-auto"
-								class:grid-cols-3={quiz.type === 'quiz'}
-								class:grid-cols-2={quiz.type !== 'quiztivity'}
-							>
-								<BrownButton
-									flex={true}
-									disabled={!quiz.public}
-									href="/view/{quiz.id}"
-								>
-									<!-- heroicons/legacy-outline/Eye -->
-									<svg
-										class="w-5 h-5"
-										aria-hidden="true"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										viewBox="0 0 24 24"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-										<path
-											d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-									</svg>
-								</BrownButton>
-								<BrownButton
-									flex={true}
-									onclick={() => (analytics_quiz_selected = quiz)}
-								>
-									<!-- heroicons/legacy-outline/ChartBar -->
-									<svg
-										class="w-5 h-5"
-										aria-hidden="true"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										viewBox="0 0 24 24"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-									</svg>
-								</BrownButton>
-								<BrownButton
-									href={quiz.type === 'quiz'
-										? `/edit?quiz_id=${quiz.id}`
-										: `/quiztivity/edit?id=${quiz.id}`}
-									flex={true}
-								>
-									<!-- heroicons/legacy-outline/Pencil -->
-									<svg
-										class="w-5 h-5"
-										aria-hidden="true"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										viewBox="0 0 24 24"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-									</svg>
-								</BrownButton>
-								{#if quiz.type === 'quiz'}
-									<BrownButton
-										onclick={() => {
-											start_game = quiz.id;
-										}}
-										flex={true}
-									>
-										<!-- heroicons/legacy-outline/Play -->
-										<svg
-											class="w-5 h-5"
-											aria-hidden="true"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-											<path
-												d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-										</svg>
-									</BrownButton>
-								{:else}
-									<BrownButton href="/quiztivity/play?id={quiz.id}" flex={true}>
-										<!-- heroicons/legacy-outline/Play -->
-										<svg
-											class="w-5 h-5"
-											aria-hidden="true"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-											<path
-												d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-										</svg>
-									</BrownButton>
-								{/if}
-
-								<BrownButton
-									onclick={() => {
-										deleteQuiz(quiz.id, quiz.type);
-									}}
-									flex={true}
-								>
-									<!-- heroicons/trash -->
-									<svg
-										class="w-5 h-5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-										/>
-									</svg>
-								</BrownButton>
-								<BrownButton
-									onclick={() => (download_id = quiz.id)}
-									flex={true}
-									disabled={quiz.type !== 'quiz'}
-									><!-- heroicons/download -->
-									<svg
-										class="w-5 h-5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-										/>
-									</svg>
-								</BrownButton>
-							</div>
-						</div>
-					{/each}
-				</div>
+				</article>
 			{:else}
-				<p>
-					{$t('overview_page.no_quizzes')}
-				</p>
-			{/if}
+				<div class="tq-panel tq-empty">{$t('ui.no_results')}</div>
+			{/each}
 		</div>
 	{/if}
-</div>
+</main>
 <Footer />
 {#if start_game !== null}
 	<StartGamePopup bind:quiz_id={start_game} />
 {/if}
 <DownloadQuiz bind:quiz_id={download_id} />
+
+<style>
+	.flush {
+		margin-bottom: 0;
+	}
+	.library-search {
+		display: flex;
+		gap: 12px;
+		max-width: 640px;
+	}
+	.library-search input {
+		flex: 1;
+		min-width: 0;
+	}
+	.library-list {
+		display: grid;
+		gap: 12px;
+	}
+	.library-row {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 16px 20px;
+	}
+	.library-cover {
+		width: 96px;
+		height: 72px;
+		flex-shrink: 0;
+		overflow: hidden;
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+	.library-cover :global(.library-cover-media) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.library-info {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 6px;
+		min-width: 0;
+	}
+	.library-title {
+		font-size: 18px;
+		font-weight: 700;
+		overflow-wrap: anywhere;
+	}
+	.library-description {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		font-size: 14px;
+	}
+	.library-actions {
+		flex-shrink: 0;
+		justify-content: flex-end;
+		gap: 8px;
+	}
+	.library-menu {
+		position: relative;
+	}
+	.library-menu-list {
+		position: absolute;
+		inset-block-start: calc(100% + 4px);
+		inset-inline-end: 0;
+		z-index: 20;
+		display: grid;
+		gap: 4px;
+		min-width: 200px;
+		padding: 8px;
+		box-shadow: var(--tq-shadow);
+	}
+	.library-menu-list > :global(.tq-button) {
+		justify-content: flex-start;
+	}
+	@media (max-width: 767px) {
+		.library-row {
+			flex-wrap: wrap;
+			padding: 16px;
+		}
+		.library-cover {
+			width: 64px;
+			height: 64px;
+		}
+		.library-info {
+			flex-basis: calc(100% - 88px);
+		}
+		.library-actions {
+			width: 100%;
+			justify-content: flex-start;
+		}
+		.library-search {
+			flex-direction: column;
+		}
+	}
+</style>

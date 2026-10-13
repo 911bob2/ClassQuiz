@@ -41,9 +41,11 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="h-full">
-	<Editor bind:data={quiztivity} on:save={save_quiztivity} bind:saving />
-</div>
+<svelte:head>
+	<title>Telekom Quiz - Quiztivity</title>
+</svelte:head>
+
+<Editor bind:data={quiztivity} on:save={save_quiztivity} {saving} />
 
 {#if shares_menu_open}
 	<SharesPopover id={quiztivity.id} bind:open={shares_menu_open} />

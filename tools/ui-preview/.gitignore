@@ -1,8 +1,3 @@
-# Runtime process state and temporary test repositories; saved preview history is tracked.
-/out/tests/
-/out/*.log
-/out/*.pid
-/out/*.lock
-/out/history/write.lock
-/out/history/refs-*.tmp
-/out/history/trees/.pending-*/
+# Everything under out/ is generated locally: screenshots, check reports, comparisons,
+# runtime state and saved preview history. It stays on disk but is not committed.
+/out/

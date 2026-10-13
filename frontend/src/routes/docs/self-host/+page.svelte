@@ -14,15 +14,13 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz/docs - Self-Host</title>
+	<title>Telekom Quiz · Docs · Self-Host</title>
 	<meta
 		name="description"
 		content="How to self-host ClassQuiz, the open-source quiz-application"
 	/>
 </svelte:head>
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	<h1>Self-Hosting</h1>
 	<p>Since ClassQuiz is open-source, it can also be self-hosted.</p>
 
@@ -165,5 +163,4 @@ SPDX-License-Identifier: MPL-2.0
 	<p>Now build and deploy:</p>
 	<pre><code>docker compose build && docker compose up -d</code></pre>
 	<p><b>ClassQuiz needs HTTPS/SSL to work properly!</b></p>
-	<p><b>Enjoy! ❤️</b></p>
 </article>

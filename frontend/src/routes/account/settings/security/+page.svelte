@@ -10,15 +10,16 @@ SPDX-License-Identifier: MPL-2.0
 	import { startRegistration } from '@simplewebauthn/browser';
 	import TotpSetup from './totp_setup.svelte';
 	import BackupCodes from './backup_codes.svelte';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
+	import Footer from '$lib/footer.svelte';
+	import SettingsNav from '../../SettingsNav.svelte';
 	import { getLocalization } from '$lib/i18n';
 
 	const { t } = getLocalization();
 
-	let user_data: object | undefined = $state();
+	let user_data: any = $state();
 	let security_keys: Array<{ id: number }> | undefined = $state();
 	let totp_activated: boolean | undefined = $state();
-	let totp_data = $state();
+	let totp_data: { url: string; secret: string } | undefined = $state();
 	let backup_code = $state();
 
 	const get_data = async () => {
@@ -153,143 +154,194 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-{#await data}
-	<Spinner my_20={false} />
-{:then _}
-	<div class="grid grid-rows-2 h-screen">
-		<div class="grid grid-cols-2 h-full border-b-2 border-black">
-			<div class="h-full w-full border-r-2 border-black">
-				<h2 class="text-center text-2xl">{$t('security_settings.backup_code')}</h2>
-				<div class="flex h-full w-full justify-center">
-					<div class="m-auto">
-						<BrownButton onclick={get_backup_code}
-							>{$t('security_settings.get_backup_code')}</BrownButton
+<svelte:head>
+	<title>Telekom Quiz · {$t('settings_page.security_settings')}</title>
+</svelte:head>
+
+<main class="tq-page settings-page tq-stack" data-ui="account-security">
+	<h1 class="tq-page-title">{$t('settings_page.security_settings')}</h1>
+	<SettingsNav current="security" />
+
+	{#await data}
+		<Spinner my_20={false} />
+	{:then _}
+		<div class="security-grid">
+			<section
+				class="tq-panel tq-panel-body security-card"
+				aria-labelledby="totp-title"
+				data-ui="security-totp"
+			>
+				<h2 class="tq-section-title" id="totp-title">{$t('security_settings.totp')}</h2>
+				<p class="tq-muted">
+					{$t(
+						totp_activated
+							? 'security_settings.totp_available'
+							: 'security_settings.totp_unavailable'
+					)}
+				</p>
+				<div class="card-actions">
+					{#if totp_activated}
+						<button
+							type="button"
+							class="tq-button tq-button-danger"
+							onclick={disable_totp}
 						>
-					</div>
-				</div>
-			</div>
-			<div class="h-full w-full">
-				<h2 class="text-center text-2xl">{$t('security_settings.activate_2fa')}</h2>
-				<div
-					class="flex h-full w-full justify-center flex-col"
-					class:pointer-events-none={!totp_activated}
-					class:grayscale={!totp_activated}
-					class:opacity-50={!totp_activated}
-				>
-					<div class="m-auto">
-						{#if user_data.require_password}
-							<div class="flex items-center space-x-2">
-								<button
-									disabled={!totp_activated}
-									onclick={() => {
-										user_data.require_password = !user_data.require_password;
-										save_password_required();
-									}}
-									type="button"
-									role="switch"
-									aria-checked="true"
-									class="relative inline-flex h-5 w-8 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-transparent bg-blue-700 transition focus:outline-hidden focus:ring focus:ring-blue-200"
-								>
-									<span
-										aria-hidden="true"
-										class="pointer-events-none inline-block h-4 w-4 translate-x-3 rounded-full bg-white transition will-change-transform"
-									></span>
-								</button>
-								<span class="text-sm font-medium text-gray-700 dark:text-white"
-									>{$t('security_settings.2fa_activated')}</span
-								>
-							</div>
-						{:else}
-							<div class="flex items-center space-x-2">
-								<button
-									disabled={!totp_activated}
-									type="button"
-									onclick={() => {
-										user_data.require_password = !user_data.require_password;
-										save_password_required();
-									}}
-									role="switch"
-									aria-checked="false"
-									class="relative inline-flex h-5 w-8 shrink-0 cursor-pointer appearance-none rounded-full border-2 border-transparent bg-gray-200 transition focus:outline-hidden focus:ring focus:ring-blue-200"
-								>
-									<span
-										aria-hidden="true"
-										class="pointer-events-none inline-block h-4 w-4 translate-x-0 rounded-full bg-white transition will-change-transform"
-									></span>
-								</button>
-								<span class="text-sm font-medium text-gray-700 dark:text-white"
-									>{$t('security_settings.2fa_deactivated')}</span
-								>
-							</div>
-						{/if}
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="grid grid-cols-2 h-full">
-			<div class="h-full w-full flex flex-col border-r-2 border-black">
-				<h2 class="text-center text-2xl">{$t('security_settings.webauthn')}</h2>
-				<div class="flex justify-center">
-					{#if security_keys.length > 0}
-						<p>{$t('security_settings.webauthn_available')}</p>
+							{$t('security_settings.disable_totp')}
+						</button>
 					{:else}
-						<p>{$t('security_settings.webauthn_unavailable')}</p>
+						<button type="button" class="tq-button" onclick={enable_totp}>
+							{$t('security_settings.enable_totp')}
+						</button>
 					{/if}
 				</div>
-				<div class="flex justify-center">
-					<div class="m-auto">
-						<BrownButton onclick={add_security_key}
-							>{$t('security_settings.add_security_key')}</BrownButton
-						>
-					</div>
-				</div>
-				<div class="flex justify-center">
-					<ul class="list-disc block">
+			</section>
+
+			<section
+				class="tq-panel tq-panel-body security-card"
+				aria-labelledby="2fa-title"
+				data-ui="security-2fa"
+			>
+				<h2 class="tq-section-title" id="2fa-title">
+					{$t('security_settings.activate_2fa')}
+				</h2>
+				<label class="switch-row">
+					<input
+						type="checkbox"
+						disabled={!totp_activated}
+						checked={user_data.require_password}
+						onchange={() => {
+							user_data.require_password = !user_data.require_password;
+							save_password_required();
+						}}
+					/>
+					<span>
+						{$t(
+							user_data.require_password
+								? 'security_settings.2fa_activated'
+								: 'security_settings.2fa_deactivated'
+						)}
+					</span>
+				</label>
+			</section>
+
+			<section
+				class="tq-panel tq-panel-body security-card"
+				aria-labelledby="webauthn-title"
+				data-ui="security-webauthn"
+			>
+				<h2 class="tq-section-title" id="webauthn-title">
+					{$t('security_settings.webauthn')}
+				</h2>
+				<p class="tq-muted">
+					{$t(
+						security_keys.length
+							? 'security_settings.webauthn_available'
+							: 'security_settings.webauthn_unavailable'
+					)}
+				</p>
+				{#if security_keys.length}
+					<ul class="key-list">
 						{#each security_keys as key, i}
-							<li>
+							<li class="key-row">
+								<span>{$t('security_settings.webauthn')} {i + 1}</span>
 								<button
-									onclick={() => {
-										remove_security_key(key.id);
-									}}
-									class="hover:line-through transition">{i + 1}</button
+									type="button"
+									class="tq-button tq-button-danger"
+									onclick={() => remove_security_key(key.id)}
 								>
+									{$t('words.delete')}
+								</button>
 							</li>
 						{/each}
 					</ul>
+				{/if}
+				<div class="card-actions">
+					<button
+						type="button"
+						class="tq-button"
+						data-ui="add-security-key"
+						onclick={add_security_key}
+					>
+						{$t('security_settings.add_security_key')}
+					</button>
 				</div>
-			</div>
-			<div class="h-full w-full flex flex-col">
-				<h2 class="text-center text-2xl">{$t('security_settings.totp')}</h2>
-				<div class="flex justify-center">
-					{#if totp_activated}
-						<p>{$t('security_settings.totp_available')}</p>
-					{:else}
-						<p>{$t('security_settings.totp_unavailable')}</p>
-					{/if}
-				</div>
+			</section>
 
-				<div class="flex justify-center">
-					<div class="m-auto">
-						{#if totp_activated}
-							<BrownButton onclick={disable_totp}
-								>{$t('security_settings.disable_totp')}</BrownButton
-							>
-						{:else}
-							<BrownButton onclick={enable_totp}
-								>{$t('security_settings.enable_totp')}</BrownButton
-							>
-						{/if}
-					</div>
+			<section
+				class="tq-panel tq-panel-body security-card"
+				aria-labelledby="backup-title"
+				data-ui="security-backup"
+			>
+				<h2 class="tq-section-title" id="backup-title">
+					{$t('security_settings.backup_code')}
+				</h2>
+				<div class="card-actions">
+					<button
+						type="button"
+						class="tq-button"
+						data-ui="get-backup-code"
+						onclick={get_backup_code}
+					>
+						{$t('security_settings.get_backup_code')}
+					</button>
 				</div>
-			</div>
+			</section>
 		</div>
-	</div>
-{/await}
+	{/await}
+</main>
+<Footer />
 
 {#if totp_data}
 	<TotpSetup bind:totp_data />
 {/if}
-
 {#if backup_code}
 	<BackupCodes bind:backup_code />
 {/if}
+
+<style>
+	.settings-page {
+		max-width: 960px;
+	}
+	.security-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+		align-items: start;
+	}
+	.security-card {
+		display: grid;
+		gap: 16px;
+	}
+	.security-card p {
+		margin: 0;
+	}
+	.switch-row {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 44px;
+	}
+	.card-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+	.key-list {
+		display: grid;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.key-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	@media (max-width: 767px) {
+		.security-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

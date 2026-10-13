@@ -23,7 +23,7 @@ SPDX-License-Identifier: MPL-2.0
 	}
 
 	let data_available = $state(false);
-	let winners_arr = $state();
+	let winners_arr: any = $state();
 
 	const getWinnersSorted = () => {
 		let winners = {};
@@ -85,60 +85,29 @@ SPDX-License-Identifier: MPL-2.0
 	let winners = getWinnersSorted();
 </script>
 
-<div>
-	<h1 class="mx-auto text-center text-6xl mt-8">{$t('play_page.end_sentence')}</h1>
-	{#if data_available}
-		{#if winners_arr[0][0] === undefined}
-			<div class="flex justify-center">
-				<h1 class="text-3xl">{$t('admin_page.no_answers')}</h1>
-			</div>
-		{:else}
-			<div class="flex mx-auto w-fit flex-col pt-8 gap-2">
-				<div>
-					<p class="text-3xl text-center">
-						{$t('play_page.1st_place')}:
-						<span class="underline">{winners_arr[0][0]}</span>
-						<span
-							>{$t('play_page.with_out_of', {
-								correct_questions: winners_arr[0][1] ?? 0,
-								total_question_count: question_count
-							})}</span
-						>
-					</p>
-				</div>
-				{#if winners_arr.length >= 2 && winners_arr[1][0] !== undefined}
-					<div>
-						<p class="text-2xl text-center">
-							{$t('play_page.2nd_place')}:
-							<span class="underline">{winners_arr[1][0]}</span>
-							<span
-								>{$t('play_page.with_out_of', {
-									correct_questions: winners_arr[1][1] ?? 0,
-									total_question_count: question_count
-								})}</span
-							>
-						</p>
-					</div>
-				{/if}
-				{#if winners_arr.length >= 3 && winners_arr[2][0] !== undefined}
-					<div>
-						<p class="text-xl text-center">
-							{$t('play_page.3rd place')}:
-							<span class="underline">{winners_arr[2][0]}</span>
-							<span>
-								{$t('play_page.with_out_of', {
-									correct_questions: winners_arr[2][1] ?? 0,
-									total_question_count: question_count
-								})}
-							</span>
-						</p>
-					</div>
-				{/if}
-			</div>
-		{/if}
-	{:else}
-		<div class="flex justify-center">
-			<h1 class="text-3xl">{$t('admin_page.no_answers')}</h1>
+<main class="tq-page tq-page-narrow tq-stack">
+	{#if data_available && winners_arr[0][0] !== undefined}
+		<div class="tq-panel tq-table-wrap">
+			<table class="tq-table">
+				<thead>
+					<tr>
+						<th>{$t('telekom.rank', { defaultValue: 'Rank' })}</th>
+						<th>{$t('words.name')}</th>
+						<th>{$t('words.correct')}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each winners_arr.slice(0, 3) as winner, i}
+						<tr>
+							<td>{i + 1}</td>
+							<td>{winner[0]}</td>
+							<td>{winner[1] ?? 0} / {question_count}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 		</div>
+	{:else}
+		<p class="tq-panel tq-empty">{$t('admin_page.no_answers')}</p>
 	{/if}
-</div>
+</main>

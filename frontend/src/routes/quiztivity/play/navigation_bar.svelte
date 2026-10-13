@@ -5,7 +5,6 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { getLocalization } from '$lib/i18n';
 
 	interface Props {
@@ -18,24 +17,43 @@ SPDX-License-Identifier: MPL-2.0
 	const { t } = getLocalization();
 </script>
 
-<div class="mt-auto h-[7vh] bg-black/50 shadow-2xl flex justify-between">
-	<div class="my-auto justify-start ml-4">
-		<BrownButton
-			disabled={current_slide_index < 1}
-			onclick={() => {
-				current_slide_index -= 1;
-			}}>{$t('words.back')}</BrownButton
-		>
-	</div>
-	<div class="my-auto">
-		{current_slide_index + 1}/{question_count}
-	</div>
-	<div class="my-auto justify-end mr-4">
-		<BrownButton
-			disabled={current_slide_index === 1}
-			onclick={() => {
-				current_slide_index += 1;
-			}}>{$t('words.next')}</BrownButton
-		>
-	</div>
-</div>
+<nav class="tq-toolbar activity-nav" aria-label={$t('words.quiztivity')} data-ui="activity-nav">
+	<button
+		type="button"
+		class="tq-button"
+		data-ui="activity-previous"
+		disabled={current_slide_index < 1}
+		onclick={() => {
+			current_slide_index -= 1;
+		}}
+	>
+		{$t('words.back')}
+	</button>
+	<p class="activity-progress" aria-live="polite">
+		{current_slide_index + 1} / {question_count}
+	</p>
+	<button
+		type="button"
+		class="tq-button tq-button-primary"
+		data-ui="activity-next"
+		disabled={current_slide_index >= question_count - 1}
+		onclick={() => {
+			current_slide_index += 1;
+		}}
+	>
+		{$t('words.next')}
+	</button>
+</nav>
+
+<style>
+	.activity-nav {
+		justify-content: space-between;
+	}
+
+	.activity-progress {
+		flex: 1;
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		text-align: center;
+	}
+</style>

@@ -10,7 +10,8 @@ SPDX-License-Identifier: MPL-2.0
 	import { UAParser } from 'ua-parser-js';
 	import Spinner from '$lib/Spinner.svelte';
 	import { onMount } from 'svelte';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
+	import Footer from '$lib/footer.svelte';
+	import SettingsNav from '../SettingsNav.svelte';
 
 	const { t } = getLocalization();
 
@@ -34,8 +35,7 @@ SPDX-License-Identifier: MPL-2.0
 		newPasswordConfirm: ''
 	});
 
-	let locationData;
-	let this_session = $state();
+	let this_session: any = $state();
 
 	let passwordChangeDataValid = $derived(
 		changePasswordData.newPassword === changePasswordData.newPasswordConfirm &&
@@ -85,14 +85,14 @@ SPDX-License-Identifier: MPL-2.0
 		api_keys = get_api_keys();
 	});
 
-	const get_api_keys = async (): Promise<Array<string>> => {
+	const get_api_keys = async (): Promise<Array<{ key: string }>> => {
 		const res = await fetch('/api/v1/users/api_keys');
 		const api_keys_temp = await res.json();
 		console.log(api_keys_temp);
 		return api_keys_temp;
 	};
 
-	let api_keys = $state();
+	let api_keys: Promise<Array<{ key: string }>> | undefined = $state();
 
 	const add_api_key = async () => {
 		await fetch('/api/v1/users/api_keys', { method: 'POST' });
@@ -110,7 +110,7 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	};
 
-	const getSessions = async () => {
+	const getSessions = async (): Promise<any[]> => {
 		const res = await fetch('/api/v1/users/sessions/list');
 		if (res.status === 200) {
 			const res2 = await fetch('/api/v1/users/session');
@@ -141,176 +141,275 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - Settings</title>
+	<title>Telekom Quiz · {$t('words.settings')}</title>
 </svelte:head>
 
-{#await getUser()}
-	<Spinner />
-{:then user}
-	<div class="w-full grid grid-cols-6">
-		<div>
-			<img
-				class="rounded-md md:w-80"
-				src="/api/v1/users/avatar"
-				alt="Profile image of {user.username}"
-			/>
-			<div class="m-2 flex justify-center">
-				<BrownButton href="/account/settings/avatar"
-					>{$t('settings_page.change_avatar')}</BrownButton
+<main class="tq-page settings-page tq-stack" data-ui="account-settings">
+	<h1 class="tq-page-title">{$t('words.settings')}</h1>
+	<SettingsNav current="settings" />
+
+	{#await getUser()}
+		<Spinner />
+	{:then user}
+		{#if user}
+			<section class="tq-panel tq-panel-body profile" aria-label={$t('ui.account')}>
+				<img class="avatar" src="/api/v1/users/avatar" alt="" />
+				<div class="profile-info">
+					<h2 class="tq-section-title">{user.username}</h2>
+					<p class="tq-muted">{user.email}</p>
+				</div>
+				<div class="tq-toolbar">
+					<a class="tq-button" href="/account/settings/avatar"
+						>{$t('settings_page.change_avatar')}</a
+					>
+					<a class="tq-button" href="/user/{user.id}">
+						{$t('telekom.public_profile', { defaultValue: 'Public profile' })}
+					</a>
+				</div>
+			</section>
+		{/if}
+	{/await}
+
+	<section class="tq-panel tq-panel-body section" aria-labelledby="password-title">
+		<h2 class="tq-section-title" id="password-title">
+			{$t('telekom.change_password', { defaultValue: 'Change password' })}
+		</h2>
+		<form class="password-form" onsubmit={changePassword}>
+			<div class="tq-field-group">
+				<label class="tq-label" for="old-password">{$t('settings_page.old_password')}</label
 				>
+				<input
+					id="old-password"
+					class="tq-field"
+					type="password"
+					autocomplete="current-password"
+					bind:value={changePasswordData.oldPassword}
+				/>
 			</div>
-		</div>
-		<div class="grid grid-rows-2 col-start-2 col-end-7">
-			<div class="grid grid-cols-2">
-				<div>
-					<h1 class="text-4xl font-bold my-2">{user.username}</h1>
-					<p class="text-lg mb-6 md:max-w-lg">
-						{$t('words.email')}: {user.email}
+			<div class="tq-field-group">
+				<label class="tq-label" for="new-password">{$t('settings_page.new_password')}</label
+				>
+				<input
+					id="new-password"
+					class="tq-field"
+					type="password"
+					autocomplete="new-password"
+					bind:value={changePasswordData.newPassword}
+				/>
+				{#if changePasswordData.newPassword !== '' && changePasswordData.newPassword.length < 8}
+					<p class="tq-field-error">
+						{$t('telekom.password_too_short', {
+							defaultValue: 'Password must be at least 8 characters long.'
+						})}
 					</p>
-				</div>
-				<div class="p-4 flex justify-center">
-					<div class="m-auto">
-						<BrownButton href="/account/settings/security"
-							>{$t('settings_page.security_settings')}
-						</BrownButton>
-						<BrownButton href="/account/controllers">ClassQuizController</BrownButton>
-						<BrownButton href="/user/{user.id}">Public profile page</BrownButton>
-					</div>
-				</div>
+				{:else if changePasswordData.newPassword !== '' && changePasswordData.newPassword === changePasswordData.oldPassword}
+					<p class="tq-field-error">
+						{$t('telekom.password_unchanged', {
+							defaultValue: 'The new password must differ from the old password.'
+						})}
+					</p>
+				{/if}
 			</div>
-			<div>
-				<form class="flex flex-col md:flex-row" onsubmit={changePassword}>
-					<label
-						>{$t('settings_page.old_password')}:<input
-							type="password"
-							class="m-2 text-black rounded-sm p-1 dark:bg-gray-700 dark:text-white"
-							bind:value={changePasswordData.oldPassword}
-						/></label
-					>
-					<label
-						>{$t('settings_page.new_password')}:<input
-							type="password"
-							class="m-2 text-black rounded-sm p-1 dark:bg-gray-700 dark:text-white"
-							bind:value={changePasswordData.newPassword}
-						/></label
-					>
-					<label
-						>{$t('settings_page.repeat_password')}:<input
-							type="password"
-							class="m-2 text-black rounded-sm p-1 dark:bg-gray-700 dark:text-white"
-							bind:value={changePasswordData.newPasswordConfirm}
-						/></label
-					>
-					<div class="my-auto">
-						<BrownButton disabled={!passwordChangeDataValid} type="submit">
-							{$t('settings_page.change_password_submit')}
-						</BrownButton>
-					</div>
-				</form>
-				<div>
-					<div class="w-fit">
-						<BrownButton onclick={add_api_key}
-							>{$t('settings_page.add_api_key')}</BrownButton
-						>
-					</div>
-					{#await api_keys}
-						<Spinner />
-					{:then keys}
-						{#each keys as key}
-							<div>
-								{key.key}
-								<div class="inline-block">
-									<BrownButton
-										onclick={() => {
-											delete_api_key(key.key);
-										}}
-										>{$t('words.delete')}
-									</BrownButton>
-								</div>
-							</div>
-						{/each}
-					{/await}
-				</div>
+			<div class="tq-field-group">
+				<label class="tq-label" for="repeat-password"
+					>{$t('settings_page.repeat_password')}</label
+				>
+				<input
+					id="repeat-password"
+					class="tq-field"
+					type="password"
+					autocomplete="new-password"
+					bind:value={changePasswordData.newPasswordConfirm}
+				/>
+				{#if changePasswordData.newPasswordConfirm !== '' && changePasswordData.newPassword !== changePasswordData.newPasswordConfirm}
+					<p class="tq-field-error">
+						{$t('telekom.passwords_mismatch', {
+							defaultValue: 'Passwords do not match.'
+						})}
+					</p>
+				{/if}
 			</div>
+			<div class="form-actions">
+				<button
+					class="tq-button tq-button-primary"
+					disabled={!passwordChangeDataValid}
+					type="submit"
+				>
+					{$t('telekom.change_password', { defaultValue: 'Change password' })}
+				</button>
+			</div>
+		</form>
+	</section>
+
+	<section class="tq-panel tq-panel-body section" aria-labelledby="api-keys-title">
+		<div class="section-heading">
+			<h2 class="tq-section-title" id="api-keys-title">
+				{$t('telekom.api_keys', { defaultValue: 'API keys' })}
+			</h2>
+			<button type="button" class="tq-button" data-ui="add-api-key" onclick={add_api_key}>
+				{$t('settings_page.add_api_key')}
+			</button>
 		</div>
-	</div>
-{/await}
-{#await getSessions()}
-	<Spinner />
-{:then sessions}
-	<table class="min-w-full">
-		<thead class="bg-gray-50 dark:bg-gray-700">
-			<tr>
-				<th
-					scope="col"
-					class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
-				>
-					{$t('overview_page.created_at')}
-				</th>
-				<th
-					scope="col"
-					class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
-				>
-					{$t('settings_page.last_seen')}
-				</th>
-				<th
-					scope="col"
-					class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
-				>
-					{$t('words.browser')}
-				</th>
-				<th
-					scope="col"
-					class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
-				>
-					{$t('settings_page.delete_this_session')}
-				</th>
-				<th
-					scope="col"
-					class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
-				>
-					{$t('settings_page.this_session?')}
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each sessions as session}
-				<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-					<td
-						class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"
-					>
-						{formatDate(session.created_at)}
-					</td>
-					<td
-						class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"
-					>
-						{formatDate(session.last_seen)}
-					</td>
-					<td
-						class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"
-					>
-						{getFormattedUserAgent(session.user_agent)}
-					</td>
-					<td
-						class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"
-					>
+		{#await api_keys}
+			<Spinner my_20={false} />
+		{:then keys}
+			<ul class="key-list">
+				{#each keys ?? [] as key}
+					<li class="key-row">
+						<code class="key-value">{key.key}</code>
 						<button
-							onclick={() => {
-								deleteSession(session.id);
-							}}>{$t('words.delete')}</button
+							type="button"
+							class="tq-button tq-button-danger"
+							onclick={() => delete_api_key(key.key)}
 						>
-					</td>
-					<td
-						class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"
-					>
-						{#if session.id === this_session?.id}
-							✅
-						{:else}
-							❌
-						{/if}
-					</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-{/await}
+							{$t('words.delete')}
+						</button>
+					</li>
+				{:else}
+					<li class="tq-muted">
+						{$t('telekom.no_api_keys', { defaultValue: 'No API keys' })}
+					</li>
+				{/each}
+			</ul>
+		{/await}
+	</section>
+
+	<section class="tq-panel section-table" aria-labelledby="sessions-title">
+		<h2 class="tq-section-title table-title" id="sessions-title">
+			{$t('telekom.sessions', { defaultValue: 'Sessions' })}
+		</h2>
+		{#await getSessions()}
+			<Spinner my_20={false} />
+		{:then sessions}
+			<div class="tq-table-wrap">
+				<table class="tq-table" data-ui="sessions-table">
+					<thead>
+						<tr>
+							<th>{$t('overview_page.created_at')}</th>
+							<th>{$t('settings_page.last_seen')}</th>
+							<th>{$t('words.browser')}</th>
+							<th>{$t('settings_page.this_session?')}</th>
+							<th>
+								<span class="sr-only"
+									>{$t('telekom.actions', { defaultValue: 'Actions' })}</span
+								>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each sessions as session}
+							<tr>
+								<td>{formatDate(session.created_at)}</td>
+								<td>{formatDate(session.last_seen)}</td>
+								<td>{getFormattedUserAgent(session.user_agent)}</td>
+								<td>
+									{#if session.id === this_session?.id}
+										<span class="tq-badge tq-badge-brand"
+											>{$t('words.yes')}</span
+										>
+									{:else}
+										<span class="tq-muted">{$t('words.no')}</span>
+									{/if}
+								</td>
+								<td>
+									<button
+										type="button"
+										class="tq-button tq-button-danger"
+										onclick={() => deleteSession(session.id)}
+									>
+										{$t('words.delete')}
+									</button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/await}
+	</section>
+</main>
+<Footer />
+
+<style>
+	.settings-page {
+		max-width: 960px;
+	}
+	.profile {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 20px;
+	}
+	.avatar {
+		width: 80px;
+		height: 80px;
+		flex-shrink: 0;
+		border-radius: 50%;
+		object-fit: cover;
+		background: var(--tq-surface-subtle);
+	}
+	.profile-info {
+		flex: 1;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+	.section {
+		display: grid;
+		gap: 20px;
+	}
+	.password-form {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 20px;
+		align-items: start;
+	}
+	.form-actions {
+		grid-column: 1 / -1;
+	}
+	.section-heading {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.key-list {
+		display: grid;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.key-row {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.key-value {
+		flex: 1;
+		min-width: 0;
+		padding: 10px 12px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+		font-size: 14px;
+		overflow-wrap: anywhere;
+	}
+	.section-table {
+		overflow: hidden;
+	}
+	.table-title {
+		padding: 24px 24px 16px;
+	}
+	@media (max-width: 767px) {
+		.password-form {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.table-title {
+			padding: 16px 16px 8px;
+		}
+		.key-row {
+			flex-wrap: wrap;
+		}
+	}
+</style>

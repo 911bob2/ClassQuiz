@@ -18,44 +18,68 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		const el = document.createElement('a');
 		el.setAttribute('href', `data:text/plain;charset=utf-8,${backup_code}`);
-		el.setAttribute('download', 'ClassQuiz-Backup-Code.txt');
+		el.setAttribute('download', 'Telekom-Quiz-Backup-Code.txt');
 		el.style.display = 'none';
 		document.body.appendChild(el);
 		el.click();
 		document.body.removeChild(el);
 		already_downloaded = true;
 	};
+
+	function openDialog(node: HTMLDialogElement) {
+		node.showModal();
+	}
 </script>
 
-<div class="w-screen h-screen fixed top-0 left-0 p-48 z-30 bg-black/50">
-	<div class="w-full h-full">
+<dialog
+	class="tq-dialog dialog"
+	use:openDialog
+	onclose={() => (backup_code = undefined)}
+	aria-labelledby="backup-code-title"
+	data-ui="backup-dialog"
+>
+	<header class="dialog-header">
+		<h2 class="tq-section-title" id="backup-code-title">
+			{$t('security_settings.backup_codes.your_backup_code')}
+		</h2>
 		<button
-			class="bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded-t-lg hover:bg-gray-300 transition"
-			onclick={() => {
-				backup_code = undefined;
-			}}
-			>{$t('words.close')}
-		</button>
-		<div
-			class="bg-white dark:bg-gray-700 rounded-b-lg rounded-tr-lg w-full h-full flex flex-col"
+			type="button"
+			class="tq-button tq-button-ghost"
+			onclick={() => (backup_code = undefined)}
 		>
-			<h2 class="text-3xl m-auto">{$t('security_settings.backup_codes.your_backup_code')}</h2>
-			<p
-				class="select-all font-mono text-xl m-auto"
-				onclick={() => {
-					download_code(false);
-				}}
-			>
-				{backup_code}
-			</p>
-			<p class="m-auto">{$t('security_settings.backup_codes.save_somewhere_save')}</p>
-			<button
-				onclick={() => {
-					download_code(true);
-				}}
-				class="m-auto p-2 bg-[#B07156] rounded-lg"
-				>{$t('security_settings.backup_codes.download_code')}
-			</button>
-		</div>
+			{$t('words.close')}
+		</button>
+	</header>
+	<code class="code">{backup_code}</code>
+	<p class="tq-muted">{$t('security_settings.backup_codes.save_somewhere_save')}</p>
+	<div>
+		<button
+			type="button"
+			class="tq-button tq-button-primary"
+			onclick={() => download_code(true)}
+		>
+			{$t('security_settings.backup_codes.download_code')}
+		</button>
 	</div>
-</div>
+</dialog>
+
+<style>
+	.dialog[open] {
+		display: grid;
+		gap: 16px;
+	}
+	.dialog-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+	.code {
+		padding: 12px 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+		overflow-wrap: anywhere;
+		user-select: all;
+	}
+</style>

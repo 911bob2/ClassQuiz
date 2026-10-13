@@ -1,333 +1,256 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
-SPDX-License-Identifier: MPL-2.0
--->
-
+<!-- SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+SPDX-License-Identifier: MPL-2.0 -->
 <script lang="ts">
-	import '@fontsource/marck-script/index.css';
 	import { getLocalization } from '$lib/i18n';
-	import { signedIn, pathname } from '$lib/stores';
-	import { createTippy } from 'svelte-tippy';
-	import { browser } from '$app/environment';
+	import { signedIn } from '$lib/stores';
+	import { page } from '$app/stores';
 	import { beforeNavigate } from '$app/navigation';
-	import { draw, slide } from 'svelte/transition';
 	import { registration_disabled } from './config';
-
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'bottom'
-	});
-
+	import { theme, setTheme } from '$lib/theme.svelte';
+	import LanguageToggle from './language-toggle.svelte';
 	const { t } = getLocalization();
-
-	let menuIsClosed = $state(true);
-	const toggleMenu = () => {
-		menuIsClosed = !menuIsClosed;
-	};
-
+	let menuOpen = $state(false);
 	beforeNavigate(() => {
-		menuIsClosed = true; // Closes menu to let the user see the page beneath
+		menuOpen = false;
 	});
-
-	let darkMode = $state(false);
-	if (browser) {
-		darkMode =
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches);
-	}
-
-	const switchDarkMode = () => {
-		!darkMode ? localStorage.setItem('theme', 'dark') : localStorage.setItem('theme', 'light');
-		window.location.reload();
-	};
+	const active = (path: string) => $page.url.pathname.startsWith(path);
 </script>
 
-<nav class="w-screen px-4 lg:px-10 py-2 fixed backdrop-blur-2xl bg-white/70 shadow-md z-30 top-0">
-	<!-- Desktop navbar -->
-	<div class="hidden lg:flex lg:items-center lg:flex-row lg:justify-between">
-		<div class="lg:flex lg:items-center lg:flex-row gap-1">
-			<a
-				href="/"
-				class="font-black tracking-tight text-xl lg:text-2xl text-black marck-script link-hover px-3 lg:px-5"
-				>ClassQuiz</a
+<svelte:window
+	onkeydown={(event) => {
+		if (event.key === 'Escape') menuOpen = false;
+	}}
+/>
+<a href="#main-content" class="tq-button tq-skip-link">{$t('ui.skip_to_content')}</a>
+<header class="tq-header">
+	<div class="tq-header-inner">
+		<a href="/" class="tq-brand" aria-label="Telekom Quiz">
+			<span class="tq-brand-mark"
+				><img src="/telekom/t-logo.svg" alt="" width="25" height="29" /></span
 			>
-			<a class="btn-nav border-2 rounded-sm" href="/play">{$t('words.play')}</a>
-			<a class="btn-nav" href="/explore">{$t('words.explore')}</a>
-			<a class="btn-nav" href="/search">{$t('words.search')}</a>
-			{#if $signedIn}
-				<a class="btn-nav" href="/dashboard">{$t('words.dashboard')}</a>
-			{:else}
-				<a class="btn-nav" href="/docs">{$t('words.docs')}</a>
-				<a
-					target="_blank"
-					class="btn-nav flex items-center gap-1"
-					href="https://github.com/mawoka-myblock/ClassQuiz"
-					>GitHub
+			<span>Telekom Quiz</span>
+		</a>
+		<nav class="tq-desktop-nav" aria-label={$t('ui.navigation')}>
+			{@render links()}
+		</nav>
+		<div class="tq-header-actions">
+			<button
+				type="button"
+				class="tq-icon-button tq-button-ghost"
+				onclick={() => setTheme(!theme.dark)}
+				aria-label={theme.dark ? $t('ui.light_mode') : $t('ui.dark_mode')}
+				title={theme.dark ? $t('ui.light_mode') : $t('ui.dark_mode')}
+			>
+				{#if theme.dark}
 					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="17"
-						height="17"
+						aria-hidden="true"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-external-link"
-						><path
-							d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-						/><polyline points="15 3 21 3 21 9" /><line
-							x1="10"
-							x2="21"
-							y1="14"
-							y2="3"
+						stroke-width="1.7"
+						><circle cx="12" cy="12" r="4" /><path
+							d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"
 						/></svg
 					>
-				</a>
-			{/if}
-		</div>
-		<div class="lg:flex lg:items-center lg:flex-row gap-1">
-			{#if $signedIn}
-				<a class="btn-nav" href="/api/v1/users/logout">{$t('words.logout')}</a>
-			{:else}
-				{#if registration_disabled}
-					<a class="btn-nav" href="/account/register">{$t('words.register')}</a>
-				{/if}
-
-				<a class="btn-nav" href="/account/login?returnTo={$pathname}">{$t('words.login')}</a
-				>
-			{/if}
-
-			<div class="fit-content flex items-center justify-center gap-2">
-				<div class="lg:flex items-center justify-center">
-					{#if darkMode}
-						<button
-							onclick={() => {
-								switchDarkMode();
-							}}
-							use:tippy={{ content: 'Switch light mode on' }}
-							aria-label="Activate light mode"
-						>
-							<!-- Heroicons: sun -->
-							<svg
-								class="w-6 h-6 text-black"
-								fill="none"
-								aria-label="Sun-Icon"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									stroke="currentColor"
-									d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-								/>
-							</svg>
-						</button>
-					{:else}
-						<button
-							onclick={() => {
-								switchDarkMode();
-							}}
-							aria-label="Activate darkmode"
-							use:tippy={{ content: 'Switch dark mode on' }}
-						>
-							<!-- Heroicons: moon -->
-							<svg
-								aria-label="Moon-Icon"
-								class="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-								/>
-							</svg>
-						</button>
-					{/if}
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Mobile navbar -->
-	<div class="lg:hidden">
-		<!-- Navbar header -->
-		<div class="flex items-center justify-between">
-			<a
-				href="/"
-				class="font-black tracking-tight text-xl lg:text-2xl text-black marck-script link-hover px-3 lg:px-5"
-				>ClassQuiz</a
-			>
-			<a class="btn-nav flex" href="/play">{$t('words.play')}</a>
-
-			<!-- Dark/Light mode toggle + Open/Close menu -->
-			<div class="flex items-center">
-				{#if darkMode}
-					<!-- Sun icon -->
-					<button
-						class="px-3"
-						onclick={() => {
-							switchDarkMode();
-						}}
-						use:tippy={{ content: 'Switch light mode on' }}
-						aria-label="Activate light mode"
-					>
-						<!-- Heroicons: sun -->
-						<svg
-							class="w-6 h-6 text-black"
-							fill="none"
-							aria-label="Sun-Icon"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								stroke="currentColor"
-								d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-							/>
-						</svg>
-					</button>
 				{:else}
-					<!-- Moon icon -->
-					<button
-						class="px-3"
-						onclick={() => {
-							switchDarkMode();
-						}}
-						aria-label="Activate darkmode"
-						use:tippy={{ content: 'Switch dark mode on' }}
+					<svg
+						aria-hidden="true"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.7"
+						><path d="M20.8 13.4A9 9 0 0 1 10.6 3.2 9 9 0 1 0 20.8 13.4Z" /></svg
 					>
-						<!-- Heroicons: moon -->
-						<svg
-							aria-label="Moon-Icon"
-							class="w-6 h-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-							/>
-						</svg>
-					</button>
 				{/if}
-
-				{#if menuIsClosed}
-					<button
-						class="px-3"
-						id="open-menu"
-						onclick={toggleMenu}
-						aria-label="Open navbar"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="#000000"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M3 6h18M3 12h18M3 18h18" />
-						</svg>
-					</button>
-				{:else}
-					<button
-						class="px-3"
-						id="close-menu"
-						onclick={toggleMenu}
-						aria-label="Close navbar"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="#000000"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							><path in:draw|global={{ duration: 300 }} d="M18 6 6 18" /><path
-								in:draw|global={{ duration: 300 }}
-								d="m6 6 12 12"
-							/></svg
-						>
-					</button>
-				{/if}
-			</div>
-		</div>
-
-		<!-- Navbar content -->
-		{#if !menuIsClosed}
-			<div class="flex flex-col" transition:slide|global={{ duration: 400 }}>
-				<a class="btn-nav" href="/explore">{$t('words.explore')}</a>
-				<a class="btn-nav" href="/search">{$t('words.search')}</a>
+			</button>
+			<div class="tq-desktop-account">
 				{#if $signedIn}
-					<a class="btn-nav" href="/dashboard">{$t('words.dashboard')}</a>
-				{:else}
-					<a class="btn-nav" href="/docs">{$t('words.docs')}</a>
 					<a
-						target="_blank"
-						class="btn-nav flex items-center gap-1"
-						href="https://github.com/mawoka-myblock/ClassQuiz"
-						>GitHub
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="17"
-							height="17"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-external-link"
-							><path
-								d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-							/><polyline points="15 3 21 3 21 9" /><line
-								x1="10"
-								x2="21"
-								y1="14"
-								y2="3"
-							/></svg
-						>
-					</a>
-				{/if}
-
-				<hr class="my-1 border" />
-				{#if $signedIn}
-					<a class="btn-nav" href="/api/v1/users/logout">{$t('words.logout')}</a>
+						href="/account/settings"
+						class="tq-nav-link"
+						aria-current={active('/account/settings') ? 'page' : undefined}
+						>{$t('ui.account')}</a
+					>
+					<a href="/api/v1/users/logout" class="tq-button">{$t('words.logout')}</a>
 				{:else}
-					{#if registration_disabled}
-						<a class="btn-nav" href="/account/register">{$t('words.register')}</a>
-					{/if}
-
-					<a class="btn-nav" href="/account/login?returnTo={$pathname}"
-						>{$t('words.login')}</a
+					{#if registration_disabled}<a href="/account/register" class="tq-nav-link"
+							>{$t('words.register')}</a
+						>{/if}
+					<a
+						href="/account/login?returnTo={encodeURIComponent($page.url.pathname)}"
+						class="tq-button tq-button-primary">{$t('words.login')}</a
 					>
 				{/if}
 			</div>
-		{/if}
+			<button
+				type="button"
+				class="tq-icon-button tq-mobile-toggle"
+				aria-label={$t('ui.menu')}
+				aria-expanded={menuOpen}
+				aria-controls="mobile-navigation"
+				onclick={() => (menuOpen = !menuOpen)}
+			>
+				<svg
+					aria-hidden="true"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.7"
+				>
+					{#if menuOpen}<path d="m6 6 12 12M6 18 18 6" />{:else}<path
+							d="M4 6h16M4 12h16M4 18h16"
+						/>{/if}
+				</svg>
+			</button>
+		</div>
 	</div>
-</nav>
+	{#if menuOpen}
+		<nav id="mobile-navigation" class="tq-mobile-nav" aria-label={$t('ui.navigation')}>
+			{@render links()}
+			{#if $signedIn}
+				<a href="/account/settings" class="tq-nav-link">{$t('ui.account')}</a>
+				<a href="/api/v1/users/logout" class="tq-nav-link">{$t('words.logout')}</a>
+			{:else}
+				<a
+					href="/account/login?returnTo={encodeURIComponent($page.url.pathname)}"
+					class="tq-nav-link">{$t('words.login')}</a
+				>
+				{#if registration_disabled}<a href="/account/register" class="tq-nav-link"
+						>{$t('words.register')}</a
+					>{/if}
+			{/if}
+			<LanguageToggle />
+		</nav>
+	{/if}
+</header>
+
+{#snippet links()}
+	<a href="/play" class="tq-nav-link" aria-current={active('/play') ? 'page' : undefined}
+		>{$t('words.play')}</a
+	>
+	<a href="/explore" class="tq-nav-link" aria-current={active('/explore') ? 'page' : undefined}
+		>{$t('words.explore')}</a
+	>
+	<a href="/search" class="tq-nav-link" aria-current={active('/search') ? 'page' : undefined}
+		>{$t('words.search')}</a
+	>
+	{#if $signedIn}
+		<a
+			href="/dashboard"
+			class="tq-nav-link"
+			aria-current={active('/dashboard') ? 'page' : undefined}>{$t('words.dashboard')}</a
+		>
+	{:else}
+		<a href="/docs" class="tq-nav-link" aria-current={active('/docs') ? 'page' : undefined}
+			>{$t('words.docs')}</a
+		>
+	{/if}
+{/snippet}
+
+<style>
+	.tq-header {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+		background: var(--tq-surface);
+		border-bottom: 1px solid var(--tq-border);
+	}
+	.tq-header-inner {
+		height: 64px;
+		display: flex;
+		align-items: center;
+		gap: 32px;
+		max-width: 1440px;
+		margin-inline: auto;
+		padding-inline: 24px;
+	}
+	.tq-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		white-space: nowrap;
+		font-size: 21px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+	.tq-brand-mark {
+		display: grid;
+		place-items: center;
+		background: #e20074;
+		width: 40px;
+		height: 44px;
+	}
+	.tq-desktop-nav {
+		display: flex;
+		align-items: stretch;
+		height: 100%;
+		gap: 20px;
+	}
+	.tq-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-inline-start: auto;
+	}
+	.tq-desktop-account {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.tq-nav-link {
+		display: flex;
+		align-items: center;
+		min-height: 44px;
+		color: var(--tq-muted);
+		font-weight: 700;
+		border-bottom: 3px solid transparent;
+		padding: 8px 0 5px;
+	}
+	.tq-nav-link:hover {
+		color: var(--tq-text);
+	}
+	.tq-nav-link[aria-current='page'] {
+		color: var(--tq-accent);
+		border-color: var(--tq-accent);
+	}
+	.tq-mobile-toggle,
+	.tq-mobile-nav {
+		display: none;
+	}
+	@media (max-width: 1023px) {
+		.tq-header-inner {
+			padding-inline: 16px;
+			gap: 12px;
+		}
+		.tq-desktop-nav,
+		.tq-desktop-account {
+			display: none;
+		}
+		.tq-mobile-toggle {
+			display: inline-flex;
+		}
+		.tq-mobile-nav {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			padding: 12px 24px 24px;
+			border-top: 1px solid var(--tq-border);
+			max-height: calc(100dvh - 64px);
+			overflow: auto;
+		}
+		.tq-mobile-nav .tq-nav-link {
+			padding-inline: 12px;
+		}
+		.tq-mobile-nav .tq-nav-link[aria-current='page'] {
+			background: var(--tq-brand-soft);
+			border-bottom-color: transparent;
+			border-radius: 8px;
+		}
+	}
+	@media (max-width: 380px) {
+		.tq-brand {
+			font-size: 18px;
+			gap: 8px;
+		}
+	}
+</style>

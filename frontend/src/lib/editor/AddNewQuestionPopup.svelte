@@ -7,27 +7,30 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import type { Answers, Question } from '$lib/quiz_types';
 	import { QuizQuestionType } from '$lib/quiz_types';
-	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { getLocalization } from '$lib/i18n';
-
+	import Icon from '$lib/editor/Icon.svelte';
+	import { modal } from '$lib/editor/modal';
 
 	interface Props {
 		questions: Question[];
 		open: boolean;
 		selected_question: number;
+		/** Called after a question was added. */
+		onadd?: () => void;
 	}
 
-	let { questions = $bindable(), open = $bindable(), selected_question = $bindable() }: Props = $props();
+	let {
+		questions = $bindable(),
+		open = $bindable(),
+		selected_question = $bindable(),
+		onadd
+	}: Props = $props();
 
 	const { t } = getLocalization();
-	onMount(() => {
-		document.body.addEventListener('keydown', close_start_game_if_esc_is_pressed);
-	});
-	const close_start_game_if_esc_is_pressed = (key: KeyboardEvent) => {
-		if (key.code === 'Escape') {
-			open = false;
-		}
+
+	const close = () => {
+		open = false;
 	};
 	const on_parent_click = (e: Event) => {
 		if (e.target === e.currentTarget) {
@@ -95,42 +98,108 @@ SPDX-License-Identifier: MPL-2.0
 		questions = [...questions, { ...empty_question }];
 		selected_question = questions.length - 1;
 		open = false;
+		onadd?.();
 	};
 </script>
 
 <div
-	class="fixed top-0 left-0 w-screen h-screen flex bg-black/50 z-50"
+	class="tq-overlay"
 	onclick={on_parent_click}
-	transition:fade={{ duration: 100 }}
+	role="presentation"
+	use:modal={{ onclose: close }}
+	transition:fade|global={{ duration: 100 }}
 >
 	<div
-		class="m-auto w-2/3 h-5/6 rounded-sm shadow-2xl bg-white dark:bg-gray-600 p-6 flex flex-col"
+		class="tq-dialog"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="question-type-title"
+		data-ui="question-type-dialog"
 	>
-		<h1 class="text-center text-3xl mb-6">{$t('quiztivity.editor.select_page_type')}</h1>
-		<div class="grid grid-cols-4 gap-4 overflow-y-scroll">
+		<div class="dialog-heading">
+			<h2 id="question-type-title" class="tq-section-title">
+				{$t('telekom.select_question_type', { defaultValue: 'Select question type' })}
+			</h2>
+			<button
+				type="button"
+				class="tq-icon-button tq-button-ghost"
+				aria-label={$t('words.close')}
+				onclick={close}
+			>
+				<Icon name="close" />
+			</button>
+		</div>
+		<div class="type-grid">
 			{#each question_types as qt, i}
-				<div class="rounded-sm p-6 border-[#B07156] border">
-					<button
-						class="text-xl text-black dark:text-white"
-						onclick={() => {
-							add_question(i);
-						}}>{qt.name}</button
-					>
-					<p class="text-sm">{qt.description}</p>
-				</div>
+				<button
+					type="button"
+					class="type-option"
+					data-autofocus={i === 0 ? '' : undefined}
+					data-ui={'question-type-' + qt.type.toLowerCase()}
+					onclick={() => add_question(i)}
+				>
+					<span class="type-name">{qt.name}</span>
+					<span class="type-description">{qt.description}</span>
+				</button>
 			{/each}
 		</div>
-
-		<div class="mt-auto flex justify-center">
-			<p>
-				{$t('editor.need_more_help')}
-				<a
-					href="/docs/quiz/question-types"
-					target="_blank"
-					class="text-sm font-bold underline text-blue-500 dark:text-blue-400"
-					>{$t('editor.visit_docs')}</a
-				>
-			</p>
-		</div>
+		<p class="dialog-help">
+			{$t('editor.need_more_help')}
+			<a class="tq-link" href="/docs/quiz/question-types" target="_blank">
+				{$t('editor.visit_docs')}
+			</a>
+		</p>
 	</div>
 </div>
+
+<style>
+	.dialog-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 20px;
+	}
+	.type-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+	}
+	.type-option {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+		min-height: 88px;
+		padding: 16px;
+		border: 1px solid var(--tq-border-strong);
+		border-radius: 8px;
+		background: var(--tq-surface);
+		text-align: start;
+	}
+	.type-option:hover {
+		border-color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+	}
+	.type-name {
+		font-weight: 700;
+	}
+	.type-description {
+		color: var(--tq-muted);
+		font-size: 14px;
+	}
+	.dialog-help {
+		margin: 20px 0 0;
+		color: var(--tq-muted);
+		font-size: 14px;
+	}
+
+	@media (max-width: 560px) {
+		.type-grid {
+			grid-template-columns: 1fr;
+		}
+		.type-option {
+			min-height: 72px;
+		}
+	}
+</style>

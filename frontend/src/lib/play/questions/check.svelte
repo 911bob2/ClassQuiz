@@ -5,12 +5,11 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import type { Question } from '$lib/quiz_types';
-	import { get_foreground_color } from '$lib/helpers';
-	import { kahoot_icons } from '$lib/play/kahoot_mode_assets/kahoot_icons';
-	import CircularTimer from '$lib/play/circular_progress.svelte';
-	// import CircularTimer from '$lib/play/circular_progress.svelte';
-	const default_colors = ['#D6EDC9', '#B07156', '#7F7057', '#4E6E58'];
+	import type { Answer, Question } from '$lib/quiz_types';
+	import { getLocalization } from '$lib/i18n';
+	import AnswerTile from '$lib/play/answer_tile.svelte';
+
+	const { t } = getLocalization();
 
 	interface Props {
 		question: Question;
@@ -18,15 +17,10 @@ SPDX-License-Identifier: MPL-2.0
 		game_mode: any;
 		timer_res: any;
 		circular_progress: any;
+		disabled?: boolean;
 	}
 
-	let {
-		question,
-		selected_answer = $bindable(),
-		game_mode,
-		timer_res,
-		circular_progress
-	}: Props = $props();
+	let { question, selected_answer = $bindable(), game_mode, disabled = false }: Props = $props();
 	let _selected_answers = $state([false, false, false, false]);
 
 	const selectAnswer = (i: number) => {
@@ -42,42 +36,54 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="w-full h-[95%]">
-	<!--
-        <div
-            class="absolute top-0 bottom-0 left-0 right-0 m-auto rounded-full h-fit w-fit border-2 border-black shadow-2xl z-50"
-        >
-            <CircularTimer
-                bind:text={timer_res}
-                bind:progress={circular_prgoress}
-                color="#ef4444"
-            />
-        </div>
-    -->
-	<div
-		class="absolute top-0 bottom-0 left-0 right-0 m-auto rounded-full h-fit w-fit border-2 border-black shadow-2xl z-40"
-	>
-		<CircularTimer text={timer_res} progress={circular_progress} color="#ef4444" />
-	</div>
-
-	<div class="grid grid-rows-2 grid-flow-col auto-cols-auto gap-2 w-full p-4 h-full">
-		{#each question.answers as answer, i}
-			<button
-				class="rounded-lg h-full flex align-middle justify-center disabled:opacity-60 p-3 border-2 border-black transition-all"
-				style="background-color: {answer.color ??
-					default_colors[i]}; color: {get_foreground_color(
-					answer.color ?? default_colors[i]
-				)}"
+<div class="check-answers">
+	<p class="tq-muted check-hint">
+		{$t('telekom.select_all_that_apply', { defaultValue: 'Select all that apply' })}
+	</p>
+	<div class="answer-grid" class:answer-grid-shapes={game_mode === 'kahoot'}>
+		{#each question.answers as Answer[] as answer, i}
+			<AnswerTile
+				index={i}
+				label={answer.answer}
+				color={answer.color}
+				shapeOnly={game_mode === 'kahoot'}
+				selected={_selected_answers[i]}
+				{disabled}
 				onclick={() => selectAnswer(i)}
-				class:opacity-100={_selected_answers[i]}
-				class:opacity-50={!_selected_answers[i]}
-			>
-				{#if game_mode === 'kahoot'}
-					<img class="h-2/3 inline-block m-auto" alt="Icon" src={kahoot_icons[i]} />
-				{:else}
-					<p class="m-auto">{answer.answer}</p>
-				{/if}
-			</button>
+			/>
 		{/each}
 	</div>
 </div>
+
+<style>
+	.check-answers {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.check-hint {
+		margin: 0;
+		font-size: 14px;
+	}
+
+	.answer-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+	}
+
+	.answer-grid-shapes {
+		grid-auto-rows: 1fr;
+	}
+
+	@media (max-width: 600px) {
+		.answer-grid:not(.answer-grid-shapes) {
+			grid-template-columns: 1fr;
+		}
+
+		.answer-grid {
+			gap: 12px;
+		}
+	}
+</style>

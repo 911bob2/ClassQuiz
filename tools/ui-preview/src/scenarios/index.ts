@@ -18,9 +18,10 @@ import {
 const pages = import.meta.glob(
   "../../../../frontend/src/routes/**/*.{svelte,svx,md}",
 );
-const components = import.meta.glob(
+const components = import.meta.glob([
   "../../../../frontend/src/lib/dashboard/start_game.svelte",
-);
+  "../../../../frontend/src/lib/modals/alert.svelte",
+]);
 const loader = (file: string): any => {
   const key = "../../../../frontend/src/" + file;
   const found = pages[key] ?? components[key];
@@ -92,8 +93,11 @@ const editorLimit =
 const activityLimit =
   "Real activity components; uploads and sharing have mock responses.";
 const scenarios: Scenario[] = [
-  page(1001, "landing", "Welcome to ClassQuiz", "/", {}, { signedIn: false }),
-  page(1010, "explore", "Explore quizzes", "/explore", { results: quizzes }),
+  page(1001, "landing", "Telekom Quiz", "/", {}, { signedIn: false }),
+  // The explore loader returns the search API response, whose quizzes are in `hits`.
+  page(1010, "explore", "Explore quizzes", "/explore", {
+    results: { hits: quizzes },
+  }),
   page(1020, "search", "Search quizzes", "/search"),
   page(
     1030,
@@ -297,7 +301,7 @@ const scenarios: Scenario[] = [
     { quiz_id: quiz.id },
     {
       run: async (ctx) => {
-        await ctx.click("button.border-r.flex-col");
+        await ctx.click('[data-ui="add-question"]');
       },
       limitations: editorLimit,
     },
@@ -343,7 +347,7 @@ const scenarios: Scenario[] = [
       route: "/results/class-7a",
       params: { result_id: result.id },
       run: (ctx) =>
-        ctx.click(".justify-around > div:nth-child(2) button").then(() => {}),
+        ctx.click('[data-ui="results-players-tab"]').then(() => {}),
     },
   ),
   page(
@@ -356,7 +360,7 @@ const scenarios: Scenario[] = [
       route: "/results/class-7a",
       params: { result_id: result.id },
       run: (ctx) =>
-        ctx.click(".justify-around > div:nth-child(3) button").then(() => {}),
+        ctx.click('[data-ui="results-questions-tab"]').then(() => {}),
     },
   ),
   page(
@@ -381,7 +385,7 @@ const scenarios: Scenario[] = [
               questions: [clone(q)],
             },
           },
-          run: (ctx) => ctx.click("button.justify-end").then(() => {}),
+          run: (ctx) => ctx.click('[data-ui="practice-start"]').then(() => {}),
         },
       ),
     ),
@@ -431,7 +435,7 @@ const scenarios: Scenario[] = [
       },
     },
   ),
-  page(8030, "controller", "ClassQuiz Controller", "/controller"),
+  page(8030, "controller", "Telekom Quiz Controller", "/controller"),
 ];
 
 const docs = [
@@ -650,6 +654,40 @@ scenarios.push(
   host(6040, "host.controls", "Host · game controls", questions[0]),
 );
 
+// Additional coverage for the redesigned UI; existing IDs remain stable.
+const themedQuestion = clone(questions[0]);
+for (const answer of themedQuestion.answers) delete answer.color;
+scenarios.push(
+  page(1050, "navigation.commands", "Command palette", "/", {}, {
+    run: async ctx => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", code: "KeyK", ctrlKey: true, bubbles: true }));
+      await ctx.tick();
+    }
+  }),
+  component(1051, "dialog.alert", "Status dialog", "lib/modals/alert.svelte", { title: "Quiz saved", body: "", open: true }),
+  { id: 1091, slug: "error.quiz", title: "Quiz not found", group: groups[1], route: "/view/missing", status: 404, page: loader("routes/view/+error.svelte"), sources: ["routes/view/+error.svelte"] },
+  { id: 1092, slug: "error.activity", title: "Activity unavailable", group: groups[1], route: "/quiztivity/play", status: 410, page: loader("routes/quiztivity/play/+error.svelte"), sources: ["routes/quiztivity/play/+error.svelte"] },
+  component(2044, "settings.totp", "Authenticator setup", "routes/account/settings/security/totp_setup.svelte", { totp_data: { url: "otpauth://totp/TelekomQuiz:preview?secret=JBSWY3DPEHPK3PXP&issuer=TelekomQuiz", secret: "JBSWY3DPEHPK3PXP" } }),
+  component(2045, "settings.backup-code", "Backup code", "routes/account/settings/security/backup_codes.svelte", { backup_code: "preview-backup-0000-1111" }),
+  page(4042, "editor.theme-answers", "Theme answer colors", "/edit", { quiz_id: quiz.id }, {
+    fetch: { "GET /api/v1/quiz/get/*": { ...clone(quiz), questions: [clone(themedQuestion)] } },
+    run: async ctx => { await ctx.click(themedQuestion.question); }, limitations: editorLimit
+  }),
+  play(5040, "play.theme-answers", "Theme answer colors", ctx => joinPlayer(ctx, themedQuestion)),
+  // The default check_captcha mock is kahoot mode (shapes only); normal mode shows question text on the phone.
+  {
+    ...play(5041, "play.question.normal-mode", "Player · normal game mode", ctx => joinPlayer(ctx, questions[0])),
+    fetch: {
+      "GET /api/v1/quiz/play/check_captcha/*": {
+        game_mode: "normal",
+        enabled: false,
+        captcha_enabled: false,
+        custom_field: null,
+      },
+    },
+  },
+  host(6050, "host.theme-answers", "Host theme answer colors", themedQuestion)
+);
 scenarios.sort((a, b) => a.id - b.id);
 for (const field of ["id", "slug"] as const)
   if (new Set(scenarios.map((s) => s[field])).size !== scenarios.length)

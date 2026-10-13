@@ -5,6 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
+
 	interface Props {
 		data: string;
 		editor?: boolean;
@@ -13,12 +17,34 @@ SPDX-License-Identifier: MPL-2.0
 	let { data = $bindable(), editor = true }: Props = $props();
 
 	if (!data) {
-		data = '#ed333b';
+		data = '#e20074';
 	}
 </script>
 
-<div class="rounded-full w-full h-full flex justify-center p-2" style="background-color: {data}">
+<!-- The fill is user-authored slide content, so it is applied as saved. -->
+<div class="shape circle" style="background-color: {data}">
 	{#if editor}
-		<input type="color" bind:value={data} class="m-auto hover:cursor-pointer" />
+		<input
+			type="color"
+			bind:value={data}
+			aria-label={$t('telekom.color', { defaultValue: 'Color' })}
+		/>
 	{/if}
 </div>
+
+<style>
+	.shape {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		padding: 8px;
+	}
+	.circle {
+		border-radius: 9999px;
+	}
+	input {
+		margin: auto;
+		cursor: pointer;
+	}
+</style>

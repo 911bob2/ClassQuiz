@@ -12,7 +12,6 @@ SPDX-License-Identifier: MPL-2.0
 	import Dashboard from '@uppy/dashboard';
 	import Compressor from '@uppy/compressor';
 	import { fade } from 'svelte/transition';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 
 	// CSS imports
 	import '@uppy/core/dist/style.css';
@@ -24,6 +23,8 @@ SPDX-License-Identifier: MPL-2.0
 	import { onMount } from 'svelte';
 	import Library from '$lib/editor/uploader/Library.svelte';
 	import Pixabay from '$lib/editor/uploader/Pixabay.svelte';
+	import Icon from '$lib/editor/Icon.svelte';
+	import { modal } from '$lib/editor/modal';
 
 	const { t } = getLocalization();
 	let {
@@ -41,7 +42,7 @@ SPDX-License-Identifier: MPL-2.0
 	} = $props();
 
 	// eslint-disable-next-line no-undef
-	let video_popup: undefined | WindowProxy = $state(undefined);
+	let video_popup: null | WindowProxy = $state(null);
 
 	let selected_type: AvailableUploadTypes | null = $state(null);
 
@@ -86,6 +87,9 @@ SPDX-License-Identifier: MPL-2.0
 		image_id = response.body.id;
 	});
 	uppy.on('complete', (_) => {
+		if (!image_id) {
+			return;
+		}
 		if (selected_question === undefined) {
 			data.cover_image = image_id;
 		} else if (selected_question === -1) {
@@ -99,14 +103,21 @@ SPDX-License-Identifier: MPL-2.0
 	});
 
 	onMount(() => {
-		window.addEventListener('storage', (e) => {
+		const handle_storage = (e: StorageEvent) => {
 			if (e.key !== 'video_upload_id') {
 				return;
 			}
 			localStorage.removeItem('video_upload_id');
-			data.questions[selected_question].image = e.newValue;
+			if (selected_question !== undefined && selected_question >= 0) {
+				data.questions[selected_question].image = e.newValue;
+			} else {
+				data.cover_image = e.newValue;
+			}
+			modalOpen = false;
 			selected_type = null;
-		});
+		};
+		window.addEventListener('storage', handle_storage);
+		return () => window.removeEventListener('storage', handle_storage);
 	});
 
 	const upload_video = async () => {
@@ -115,132 +126,173 @@ SPDX-License-Identifier: MPL-2.0
 			'_blank',
 			'popup=true,toolbar=false,menubar=false,location=false,'
 		);
-		video_popup.addEventListener('beforeunload', () => {
-			video_popup = undefined;
+		video_popup?.addEventListener('beforeunload', () => {
+			video_popup = null;
 		});
+	};
+
+	const close = () => {
+		modalOpen = false;
+		selected_type = null;
 	};
 
 	const handle_on_click = (e: Event) => {
 		if (e.target === e.currentTarget) {
-			modalOpen = false;
-			selected_type = null;
+			close();
 		}
 	};
-	onMount(() => {
-		window.addEventListener('keydown', (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				modalOpen = false;
-				selected_type = null;
-			}
-		});
-	});
 </script>
 
 {#if modalOpen}
 	<div
-		class="w-screen h-screen fixed top-0 left-0 bg-black/50 z-20 flex justify-center"
+		class="tq-overlay"
 		onclick={handle_on_click}
-		tabindex="0"
-		role="button"
-		aria-label="Close modal"
-		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ' ? handle_on_click(e) : null)}
+		role="presentation"
+		use:modal={{ onclose: close }}
 		transition:fade={{ duration: 100 }}
 	>
-		{#if selected_type === null}
-			<div class="m-auto w-1/3 h-auto bg-white dark:bg-gray-700 p-4 rounded-sm">
-				<h1 class="text-3xl text-center mb-4">{$t('uploader.select_upload_type')}</h1>
-				<div class="flex flex-row gap-4">
-					<div class="w-full">
-						<BrownButton
-							onclick={() => {
-								selected_type = AvailableUploadTypes.Image;
-							}}
-							>{$t('words.image')}
-						</BrownButton>
-					</div>
-					<div class="w-full">
-						<BrownButton
-							disabled={!video_upload}
-							onclick={() => {
-								selected_type = AvailableUploadTypes.Video;
-							}}
-							>{$t('words.video')}
-						</BrownButton>
-					</div>
-					{#if library_enabled}
-						<div class="w-full">
-							<BrownButton
-								onclick={() => {
-									selected_type = AvailableUploadTypes.Library;
-								}}
-								>{$t('words.library')}
-							</BrownButton>
-						</div>
-					{/if}
-					<div class="w-full">
-						<BrownButton
-							onclick={() => {
-								selected_type = AvailableUploadTypes.Pixabay;
-							}}
-							>Pixabay
-						</BrownButton>
-					</div>
-				</div>
+		<div
+			class="tq-dialog upload-dialog"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="upload-title"
+			data-ui="upload-dialog"
+		>
+			<div class="dialog-heading">
+				<h2 id="upload-title" class="tq-section-title">
+					{$t('uploader.select_upload_type')}
+				</h2>
+				<button
+					type="button"
+					class="tq-icon-button tq-button-ghost"
+					aria-label={$t('words.close')}
+					onclick={close}
+				>
+					<Icon name="close" />
+				</button>
 			</div>
-		{:else if selected_type === AvailableUploadTypes.Image}
-			<div class="m-auto w-1/3 h-5/6" transition:fade={{ duration: 100 }}>
-				<div>
-					<SvelteDashboard {uppy} width="100%" {properties} />
-				</div>
-			</div>
-		{:else if selected_type === AvailableUploadTypes.Video}
-			<div
-				class="m-auto w-1/3 h-auto bg-white dark:bg-gray-700 p-4 rounded-sm"
-				transition:fade={{ duration: 100 }}
-			>
-				<h1 class="text-3xl text-center mb-4">{$t('uploader.upload_a_video')}</h1>
-				{#if video_popup}
-					<p class="text-center">
-						{$t('uploader.upload_video_popup_notice')}
-					</p>
-				{:else}
-					<BrownButton onclick={upload_video} type="button"
-						>{$t('uploader.upload_video')}</BrownButton
+			<div class="upload-sources" role="group" aria-label={$t('uploader.select_upload_type')}>
+				<button
+					type="button"
+					class="tq-button"
+					class:selected={selected_type === AvailableUploadTypes.Image}
+					aria-pressed={selected_type === AvailableUploadTypes.Image}
+					data-ui="upload-source-image"
+					data-autofocus
+					onclick={() => (selected_type = AvailableUploadTypes.Image)}
+				>
+					{$t('words.image')}
+				</button>
+				<button
+					type="button"
+					class="tq-button"
+					class:selected={selected_type === AvailableUploadTypes.Video}
+					aria-pressed={selected_type === AvailableUploadTypes.Video}
+					data-ui="upload-source-video"
+					disabled={!video_upload}
+					onclick={() => (selected_type = AvailableUploadTypes.Video)}
+				>
+					{$t('words.video')}
+				</button>
+				{#if library_enabled}
+					<button
+						type="button"
+						class="tq-button"
+						class:selected={selected_type === AvailableUploadTypes.Library}
+						aria-pressed={selected_type === AvailableUploadTypes.Library}
+						data-ui="upload-source-library"
+						onclick={() => (selected_type = AvailableUploadTypes.Library)}
 					>
+						{$t('words.library')}
+					</button>
+				{/if}
+				<button
+					type="button"
+					class="tq-button"
+					class:selected={selected_type === AvailableUploadTypes.Pixabay}
+					aria-pressed={selected_type === AvailableUploadTypes.Pixabay}
+					data-ui="upload-source-pixabay"
+					onclick={() => (selected_type = AvailableUploadTypes.Pixabay)}
+				>
+					Pixabay
+				</button>
+			</div>
+			<div class="upload-content">
+				{#if selected_type === AvailableUploadTypes.Image}
+					<SvelteDashboard {uppy} width="100%" {properties} />
+				{:else if selected_type === AvailableUploadTypes.Video}
+					<h3 class="tq-label">{$t('uploader.upload_a_video')}</h3>
+					{#if video_popup}
+						<p role="status">{$t('uploader.upload_video_popup_notice')}</p>
+					{:else}
+						<button
+							type="button"
+							class="tq-button tq-button-primary"
+							onclick={upload_video}
+						>
+							{$t('uploader.upload_video')}
+						</button>
+					{/if}
+				{:else if selected_type === AvailableUploadTypes.Library}
+					<Library bind:data {selected_question} bind:modalOpen />
+				{:else if selected_type === AvailableUploadTypes.Pixabay}
+					<Pixabay bind:data {selected_question} bind:modalOpen />
 				{/if}
 			</div>
-		{:else if selected_type === AvailableUploadTypes.Library}
-			<div>
-				<Library bind:data {selected_question} bind:modalOpen />
-			</div>
-		{:else if selected_type === AvailableUploadTypes.Pixabay}
-			<div>
-				<Pixabay bind:data {selected_question} bind:modalOpen />
-			</div>
-		{/if}
+		</div>
 	</div>
 {/if}
-<div class="flex justify-center w-full pt-10" transition:fade>
-	<button
-		class="rounded-lg p-4 flex justify-center bg-transparent border-gray-500 border-2 w-1/2 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-		type="button"
-		onclick={() => {
-			modalOpen = true;
-		}}
-		><span class="italic">{$t('uploader.add_image')}</span>
-		<svg
-			class="w-6 h-6 inline-block"
-			fill="none"
-			stroke="currentColor"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-			/>
-		</svg>
-	</button>
-</div>
+<button
+	type="button"
+	class="tq-button upload-trigger"
+	data-ui="upload-open"
+	onclick={() => (modalOpen = true)}
+>
+	<Icon name="image" />
+	{$t('uploader.add_image')}
+</button>
+
+<style>
+	.dialog-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 20px;
+	}
+	.upload-dialog {
+		max-width: min(900px, calc(100vw - 32px));
+	}
+	.upload-sources {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.upload-sources .selected {
+		color: var(--tq-accent);
+		border-color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+	}
+	.upload-content:not(:empty) {
+		margin-top: 24px;
+	}
+	.upload-content :global(.uppy-Dashboard-inner) {
+		width: 100% !important;
+		max-width: 100%;
+		border-radius: 8px;
+	}
+	.upload-content :global(.uppy-Dashboard-browse) {
+		color: var(--tq-accent);
+	}
+	.upload-trigger {
+		width: 100%;
+		min-height: 88px;
+		border-style: dashed;
+		color: var(--tq-muted);
+	}
+	.upload-trigger:hover {
+		border-color: var(--tq-accent);
+		color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+	}
+</style>

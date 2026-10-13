@@ -7,8 +7,8 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import type { Memory } from '$lib/quiztivity/types';
 	import { getLocalization } from '$lib/i18n';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { flip } from 'svelte/animate';
+	import Icon from '$lib/editor/Icon.svelte';
 
 	const { t } = getLocalization();
 
@@ -63,72 +63,156 @@ SPDX-License-Identifier: MPL-2.0
 	// $: console.log(new_pair_data.text_1.replaceAll("\n", "7"))
 </script>
 
-<div class="flex justify-center">
-	<div class="grid grid-cols-4 w-11/12 gap-4">
-		<div class="border-[#B07156] border-2 rounded-sm">
-			<h2 class="text-center">{$t('quiztivity.memory.editor.add_card')}</h2>
-			<div class="grid grid-cols-2 py-2">
-				<div class="px-2 flex flex-col gap-2">
-					<textarea
-						type="text"
-						class="h-auto resize-none bg-transparent outline-hidden rounded-sm outline-[#B07156] outline"
-						rows="3"
-						contenteditable="true"
-						bind:value={new_pair_data.text_1}
+<div class="memory-editor" data-ui="activity-memory-editor">
+	<section class="add-card">
+		<h2 class="tq-section-title">{$t('quiztivity.memory.editor.add_card')}</h2>
+		<div class="pair-fields">
+			<div class="side">
+				<label class="tq-field-group">
+					<span class="tq-label">
+						{$t('telekom.card_number', { defaultValue: 'Card {{number}}', number: 1 })}
+					</span>
+					<textarea class="tq-field" rows="3" bind:value={new_pair_data.text_1}
 					></textarea>
-					<div class="flex justify-center">
-						<span class="h-0.5 bg-black block w-11/12"></span>
-					</div>
-					<BrownButton>{$t('quiztivity.memory.editor.upload_image')}</BrownButton>
-				</div>
-				<div class="px-2 flex flex-col gap-2">
-					<textarea
-						type="text"
-						class="h-auto resize-none bg-transparent outline-hidden rounded-sm outline-[#B07156] outline"
-						rows="3"
-						contenteditable="true"
-						bind:value={new_pair_data.text_2}
-					></textarea>
-					<div class="flex justify-center">
-						<span class="h-0.5 bg-black block w-11/12"></span>
-					</div>
-					<BrownButton>{$t('quiztivity.memory.editor.upload_image')}</BrownButton>
-				</div>
+				</label>
+				<button type="button" class="tq-button" disabled>
+					{$t('quiztivity.memory.editor.upload_image')}
+				</button>
 			</div>
-			<div class="flex justify-center p-2">
-				<BrownButton onclick={add_card}
-					>{$t('quiztivity.memory.editor.add_pair')}</BrownButton
-				>
+			<div class="side">
+				<label class="tq-field-group">
+					<span class="tq-label">
+						{$t('telekom.card_number', { defaultValue: 'Card {{number}}', number: 2 })}
+					</span>
+					<textarea class="tq-field" rows="3" bind:value={new_pair_data.text_2}
+					></textarea>
+				</label>
+				<button type="button" class="tq-button" disabled>
+					{$t('quiztivity.memory.editor.upload_image')}
+				</button>
 			</div>
 		</div>
-		{#each data.cards as card_pair, i (card_pair[0].id)}
-			<div
-				class="border-[#B07156] border-2 rounded-sm group flex flex-col"
-				animate:flip={{ duration: 200 }}
+		<div>
+			<button
+				type="button"
+				class="tq-button tq-button-primary"
+				data-ui="memory-add-pair"
+				onclick={add_card}
+				disabled={!new_pair_data.text_1 || !new_pair_data.text_2}
 			>
-				<div class="grid grid-cols-2 py-2 h-full">
+				<Icon name="plus" />
+				{$t('quiztivity.memory.editor.add_pair')}
+			</button>
+		</div>
+	</section>
+
+	<div class="pair-grid">
+		{#each data.cards as card_pair, i (card_pair[0].id)}
+			<article class="pair-card" animate:flip={{ duration: 200 }} data-ui="memory-pair">
+				<div class="pair-texts">
 					{#each card_pair as card}
-						<div class="px-2 flex h-full">
-							<p class="m-auto">{card.text}</p>
-						</div>
+						<p>{card.text}</p>
 					{/each}
 				</div>
-				<div class="grid grid-cols-2 p-2 gap-2">
-					<BrownButton
+				<div class="pair-actions">
+					<button
+						type="button"
+						class="tq-button"
 						onclick={() => {
 							move_card_left(i);
 						}}
-						disabled={i === 0}>{$t('quiztivity.editor.move_left')}</BrownButton
+						disabled={i === 0}
 					>
-					<BrownButton
+						<Icon name="arrow-left" />
+						{$t('quiztivity.editor.move_left')}
+					</button>
+					<button
+						type="button"
+						class="tq-button"
 						onclick={() => {
 							move_card_right(i);
 						}}
 						disabled={i + 1 === data.cards.length}
-						>{$t('quiztivity.editor.move_right')}</BrownButton
 					>
+						{$t('quiztivity.editor.move_right')}
+						<Icon name="arrow-right" />
+					</button>
 				</div>
-			</div>
+			</article>
 		{/each}
 	</div>
 </div>
+
+<style>
+	.memory-editor {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+	.add-card {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		padding: 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 12px;
+		background: var(--tq-surface-subtle);
+	}
+	.pair-fields {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+	}
+	.side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+	.side label {
+		width: 100%;
+	}
+	.pair-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 16px;
+	}
+	.pair-card {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		padding: 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 12px;
+		background: var(--tq-surface);
+	}
+	.pair-texts {
+		flex: 1;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+	}
+	.pair-texts p {
+		margin: 0;
+		padding: 12px;
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+		text-align: center;
+		overflow-wrap: anywhere;
+	}
+	.pair-actions {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+	.pair-actions .tq-button {
+		padding-inline: 8px;
+		font-size: 14px;
+	}
+
+	@media (max-width: 559px) {
+		.pair-fields {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

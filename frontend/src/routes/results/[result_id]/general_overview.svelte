@@ -5,7 +5,6 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import type { Question } from '$lib/quiz_types';
 	import { getLocalization } from '$lib/i18n';
 
 	const { t } = getLocalization();
@@ -16,9 +15,10 @@ SPDX-License-Identifier: MPL-2.0
 		};
 		title: string;
 		timestamp: string;
+		question_count?: number;
 	}
 
-	let { scores, title, timestamp }: Props = $props();
+	let { scores, title, timestamp, question_count }: Props = $props();
 
 	const usernames = Object.keys(scores);
 
@@ -31,21 +31,49 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="w-full">
-	<div class="flex justify-center w-full">
-		<p class="text-3xl w-5/6 text-center">
-			{@html $t('results_page.general_overview.sentence', {
-				title,
-				date: new Date(timestamp).toLocaleString(),
-				player_count: usernames.length,
-				average_score: get_average_final_score().toFixed(0)
-			})}
-		</p>
-	</div>
-</div>
+<section class="tq-stack" data-ui="results-overview">
+	<dl class="metrics">
+		<div class="tq-panel tq-panel-body">
+			<dt class="tq-label">{$t('words.player_plural')}</dt>
+			<dd class="metric-value">{usernames.length}</dd>
+		</div>
+		{#if question_count !== undefined}
+			<div class="tq-panel tq-panel-body">
+				<dt class="tq-label">{$t('words.question_plural')}</dt>
+				<dd class="metric-value">{question_count}</dd>
+			</div>
+		{/if}
+		<div class="tq-panel tq-panel-body">
+			<dt class="tq-label">
+				{$t('telekom.average_score', { defaultValue: 'Average score' })}
+			</dt>
+			<dd class="metric-value">
+				{usernames.length ? get_average_final_score().toFixed(0) : 0}
+			</dd>
+		</div>
+		<div class="tq-panel tq-panel-body">
+			<dt class="tq-label">
+				{$t('telekom.highest_score', { defaultValue: 'Highest score' })}
+			</dt>
+			<dd class="metric-value">{Math.max(0, ...Object.values(scores).map(Number))}</dd>
+		</div>
+	</dl>
+</section>
 
 <style>
-	underline {
-		text-decoration: underline;
+	.metrics {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 16px;
+		margin: 0;
+	}
+
+	.metric-value {
+		margin: 0;
+		font-size: 40px;
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		line-height: 1.1;
+		color: var(--tq-accent);
 	}
 </style>

@@ -5,13 +5,16 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { getLocalization } from '$lib/i18n';
 	import type { EditorData, OrderQuizAnswer } from '$lib/quiz_types';
-	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-	import { get_foreground_color } from '$lib/helpers.ts';
+	import { reach } from 'yup';
+	import { VotingQuestionSchema } from '$lib/yupSchemas';
+	import { answerStyle } from '$lib/answer-presentation';
+	import AnswerGrid from '$lib/editor/AnswerGrid.svelte';
+	import AnswerCard from '$lib/editor/AnswerCard.svelte';
+	import AnswerColor from '$lib/editor/AnswerColor.svelte';
+	import Icon from '$lib/editor/Icon.svelte';
 
 	const { t } = getLocalization();
 
@@ -21,8 +24,6 @@ SPDX-License-Identifier: MPL-2.0
 	}
 
 	let { selected_question, data = $bindable() }: Props = $props();
-
-	let parent_el: HTMLDivElement = $state();
 
 	const swapArrayElements = (arr: OrderQuizAnswer[], a: number, b: number): Array<any> => {
 		let _arr = [...arr];
@@ -35,13 +36,13 @@ SPDX-License-Identifier: MPL-2.0
 	const move_item = (up: boolean, index: number) => {
 		if (up) {
 			data.questions[selected_question].answers = swapArrayElements(
-				data.questions[selected_question].answers,
+				data.questions[selected_question].answers as OrderQuizAnswer[],
 				index,
 				index - 1
 			);
 		} else {
 			data.questions[selected_question].answers = swapArrayElements(
-				data.questions[selected_question].answers,
+				data.questions[selected_question].answers as OrderQuizAnswer[],
 				index,
 				index + 1
 			);
@@ -58,148 +59,87 @@ SPDX-License-Identifier: MPL-2.0
 			id: [i]
 		};
 	}
-	const default_colors = ['#D6EDC9', '#B07156', '#7F7057', '#4E6E58'];
-	const set_colors_if_unset = () => {
-		for (let i = 0; i < data.questions[selected_question].answers.length; i++) {
-			if (!data.questions[selected_question].answers[i].color) {
-				data.questions[selected_question].answers[i].color = default_colors[i];
-			}
-		}
-	};
-	run(() => {
-		set_colors_if_unset();
-		data;
-		selected_question;
-	});
+	let answers = $derived(data.questions[selected_question].answers as OrderQuizAnswer[]);
 </script>
 
-<div class="w-full">
-	<div class="flex flex-col w-full px-8" bind:this={parent_el}>
-		{#each data.questions[selected_question].answers as answer, i (answer.id)}
-			<div
-				animate:flip={{ duration: 200 }}
-				out:fade={{ duration: 150 }}
-				class="p-4 rounded-lg flex justify-center w-full transition relative border border-gray-600 flex-row gap-4 m-2"
-			>
-				<button
-					class="rounded-full absolute -top-2 -right-2 opacity-70 hover:opacity-100 transition"
-					type="button"
-					onclick={() => {
-						data.questions[selected_question].answers.splice(i, 1);
-						data.questions[selected_question].answers =
-							data.questions[selected_question].answers;
-					}}
-				>
-					<svg
-						class="w-6 h-6 bg-red-500 rounded-full"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-						/>
-					</svg>
-				</button>
-				<div>
-					<button
-						onclick={() => {
-							move_item(true, i);
-						}}
-						class="disabled:opacity-50 transition"
-						type="button"
-						disabled={i === 0}
-					>
-						<svg
-							class="w-8 h-8"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							color="currentColor"
-						>
-							<path
-								d="M12 22a2 2 0 110-4 2 2 0 010 4zM12 15V2m0 0l3 3m-3-3L9 5"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</button>
-					<button
-						onclick={() => {
-							move_item(false, i);
-						}}
-						class="disabled:opacity-50 transition"
-						type="button"
-						disabled={i === data.questions[selected_question].answers.length - 1}
-					>
-						<svg
-							class="w-8 h-8"
-							stroke-width="2"
-							viewBox="0 0 24 24"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							color="currentColor"
-						>
-							<path
-								d="M12 6a2 2 0 110-4 2 2 0 010 4zM12 9v13m0 0l3-3m-3 3l-3-3"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</button>
-				</div>
-				<input
-					bind:value={answer.answer}
-					type="text"
-					class="border-b-2 border-dotted w-5/6 text-center rounded-lg bg-transparent outline-hidden"
-					style="background-color: {answer.color}; color: {get_foreground_color(
-						answer.color
-					)}"
-					placeholder={$t('editor.empty')}
-				/>
-				<input
-					class="rounded-lg p-1 border-black border"
-					type="color"
-					bind:value={answer.color}
-					oncontextmenu={(e) => {
-						e.preventDefault();
-						answer.color = null;
-					}}
-				/>
-			</div>
-		{/each}
-	</div>
-
-	<div class="px-8 flex w-full">
-		{#if data.questions[selected_question].answers.length < 4}
-			<button
-				class="p-4 rounded-lg bg-transparent border-gray-500 border-2 hover:bg-gray-300 transition dark:hover:bg-gray-600 m-2 w-full"
-				type="button"
-				in:fade={{ duration: 150 }}
-				onclick={() => {
-					data.questions[selected_question].answers = [
-						...data.questions[selected_question].answers,
-						{
-							...{
-								answer: '',
-								color: undefined,
-								id: data.questions[selected_question].answers.length
-							}
-						}
-					];
+<AnswerGrid
+	count={answers.length}
+	single
+	data_ui="order-answers"
+	onadd={() => {
+		// New answers keep their colour unset, so the theme colours apply.
+		data.questions[selected_question].answers = [
+			...answers,
+			{
+				...{
+					answer: '',
+					color: undefined,
+					id: answers.length
+				}
+			}
+		];
+	}}
+>
+	{#each answers as answer, index (answer.id)}
+		<div class="order-item" animate:flip={{ duration: 200 }}>
+			<AnswerCard
+				badge={String(index + 1)}
+				invalid={!reach(VotingQuestionSchema, 'answer').isValidSync(answer.answer)}
+				onremove={() => {
+					answers.splice(index, 1);
+					data.questions[selected_question].answers = answers;
 				}}
 			>
-				<span class="italic text-center">{$t('editor_page.add_an_answer')}</span>
-			</button>
-		{/if}
-	</div>
-</div>
+				<input
+					class="answer-field"
+					type="text"
+					bind:value={answer.answer}
+					style={answerStyle(answer.color)}
+					aria-label={$t('telekom.answer_number', {
+						defaultValue: 'Answer {{number}}',
+						number: index + 1
+					})}
+					placeholder={$t('editor.enter_answer')}
+				/>
+				{#snippet options()}
+					<div class="order-controls">
+						<button
+							type="button"
+							class="tq-icon-button"
+							data-ui="answer-move-up"
+							aria-label={$t('telekom.move_up', { defaultValue: 'Move up' })}
+							disabled={index === 0}
+							onclick={() => move_item(true, index)}
+						>
+							<Icon name="arrow-up" />
+						</button>
+						<button
+							type="button"
+							class="tq-icon-button"
+							data-ui="answer-move-down"
+							aria-label={$t('telekom.move_down', { defaultValue: 'Move down' })}
+							disabled={index === answers.length - 1}
+							onclick={() => move_item(false, index)}
+						>
+							<Icon name="arrow-down" />
+						</button>
+					</div>
+					<AnswerColor
+						bind:color={answer.color}
+						label={$t('telekom.answer_color', {
+							defaultValue: 'Color of answer {{number}}',
+							number: index + 1
+						})}
+					/>
+				{/snippet}
+			</AnswerCard>
+		</div>
+	{/each}
+</AnswerGrid>
+
+<style>
+	.order-controls {
+		display: flex;
+		gap: 8px;
+	}
+</style>

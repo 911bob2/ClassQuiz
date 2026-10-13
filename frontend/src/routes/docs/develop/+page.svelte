@@ -15,15 +15,13 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz/docs - Development-setup</title>
+	<title>Telekom Quiz · Docs · Development-setup</title>
 	<meta
 		name="description"
 		content="How to import quizzes from KAHOOT! into ClassQuiz, the open-source quiz-application,  easily"
 	/>
 </svelte:head>
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	<h1>Development-setup</h1>
 
 	<h2>Requirements</h2>

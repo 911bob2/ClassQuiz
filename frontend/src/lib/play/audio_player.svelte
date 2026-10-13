@@ -6,6 +6,9 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import Audio1 from '$lib/assets/music/1-128.mp3';
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
 
 	interface Props {
 		play?: boolean;
@@ -31,16 +34,21 @@ SPDX-License-Identifier: MPL-2.0
 	});
 </script>
 
-<div class="fixed top-0 left-0">
-	{#if play}
-		<button
-			onclick={() => {
-				play = false;
-			}}
-		>
+<div class="audio-controls">
+	<button
+		type="button"
+		class="tq-icon-button"
+		aria-label={$t(play ? 'telekom.mute_music' : 'telekom.play_music', {
+			defaultValue: play ? 'Mute music' : 'Play music'
+		})}
+		aria-pressed={play}
+		onclick={() => {
+			play = !play;
+		}}
+	>
+		{#if play}
 			<!-- heroicons/volume-up -->
 			<svg
-				class="w-6 h-6"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -53,16 +61,9 @@ SPDX-License-Identifier: MPL-2.0
 					d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
 				/>
 			</svg>
-		</button>
-	{:else}
-		<button
-			onclick={() => {
-				play = true;
-			}}
-		>
+		{:else}
 			<!-- heroicons/volume-off -->
 			<svg
-				class="w-6 h-6"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -82,7 +83,26 @@ SPDX-License-Identifier: MPL-2.0
 					d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
 				/>
 			</svg>
-		</button>
-	{/if}
-	<input type="range" class="vertical_input" bind:value={volume} min="0" max="100" />
+		{/if}
+	</button>
+	<input
+		type="range"
+		class="vertical_input"
+		bind:value={volume}
+		min="0"
+		max="100"
+		aria-label={$t('telekom.volume', { defaultValue: 'Volume' })}
+	/>
 </div>
+
+<style>
+	.audio-controls {
+		position: fixed;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+	}
+</style>

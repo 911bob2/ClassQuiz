@@ -230,7 +230,7 @@ async function main() {
   configurePage({
     url: new URL(sc.route ?? "/", location.origin).href,
     params: sc.params ?? {},
-    status: sc.id === 1090 ? 404 : 200,
+    status: sc.status ?? (sc.id === 1090 ? 404 : 200),
     routeId: sc.route?.split("?")[0],
   });
   signedIn.set(sc.signedIn ?? true);

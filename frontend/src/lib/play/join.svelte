@@ -11,7 +11,6 @@ SPDX-License-Identifier: MPL-2.0
 	import * as Sentry from '@sentry/browser';
 	import { getLocalization } from '$lib/i18n';
 	import Cookies from 'js-cookie';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { hcaptcha_site_key, recaptcha_key, sentry_dsn } from '$lib/config';
 
 	const { t } = getLocalization();
@@ -43,7 +42,7 @@ SPDX-License-Identifier: MPL-2.0
 	onMount(() => {
 		if (browser) {
 			prefetch_username();
-			hcaptcha = window.hcaptcha;
+			hcaptcha = (window as any).hcaptcha;
 			if (hcaptcha.render) {
 				hcaptchaWidgetID = hcaptcha.render('hcaptcha', {
 					sitekey: hcaptchaSitekey,
@@ -157,16 +156,18 @@ SPDX-License-Identifier: MPL-2.0
 				}
 			} else if (recaptcha_key) {
 				// eslint-disable-next-line no-undef
-				grecaptcha.ready(() => {
+				(window as any).grecaptcha.ready(() => {
 					// eslint-disable-next-line no-undef
-					grecaptcha.execute(recaptcha_key, { action: 'submit' }).then(function (token) {
-						socket.emit('join_game', {
-							username: username,
-							game_pin: game_pin,
-							captcha: token,
-							custom_field: custom_field ? custom_field_value : undefined
+					(window as any).grecaptcha
+						.execute(recaptcha_key, { action: 'submit' })
+						.then(function (token) {
+							socket.emit('join_game', {
+								username: username,
+								game_pin: game_pin,
+								captcha: token,
+								custom_field: custom_field ? custom_field_value : undefined
+							});
 						});
-					});
 				});
 			}
 		} else {
@@ -202,49 +203,81 @@ SPDX-License-Identifier: MPL-2.0
 	{/if}
 </svelte:head>
 
-{#if game_pin === '' || game_pin.length < 6}
-	<div class="flex flex-col justify-center align-center w-screen h-screen">
-		<form class="flex-col flex justify-center align-center mx-auto">
-			<h1 class="text-lg text-center">{$t('words.game_pin')}</h1>
-			<input
-				class="border border-gray-400 self-center text-center text-black ring-0 outline-hidden p-2 rounded-lg focus:shadow-2xl transition-all"
-				bind:value={game_pin}
-				maxlength="6"
-				inputmode="numeric"
-			/>
-			<!--				use:tippy={{content: "Please enter the game pin", sticky: true, placement: 'top'}}-->
+<main class="join-screen">
+	<div class="join-card tq-panel">
+		<div class="join-brand">
+			<img src="/telekom/app-icon.svg" alt="" width="36" height="36" />
+			<span>Telekom Quiz</span>
+		</div>
+		<h1 class="join-title">{$t('telekom.join_game', { defaultValue: 'Join game' })}</h1>
 
-			<br />
-			<div class="mt-2">
-				<BrownButton disabled={game_pin.length < 6}>{$t('words.submit')}</BrownButton>
-			</div>
-		</form>
-	</div>
-{:else}
-	<div class="flex flex-col justify-center align-center w-screen h-screen">
-		<form onsubmit={setUsername} class="flex-col flex justify-center align-center mx-auto">
-			<h1 class="text-lg text-center">{$t('words.username')}</h1>
-			<input
-				class="border border-gray-400 self-center text-center text-black ring-0 outline-hidden p-2 rounded-lg focus:shadow-2xl transition-all"
-				bind:value={username}
-				maxlength="17"
-			/>
-			{#if custom_field}
-				<h1 class="text-lg text-center">{custom_field}</h1>
+		{#if game_pin === '' || game_pin.length < 6}
+			<form class="tq-field-group join-form" onsubmit={(e) => e.preventDefault()}>
+				<label class="tq-label" for="join-game-pin">{$t('words.game_pin')}</label>
 				<input
-					class="border border-gray-400 self-center text-center text-black ring-0 outline-hidden p-2 rounded-lg focus:shadow-2xl transition-all"
-					bind:value={custom_field_value}
+					id="join-game-pin"
+					class="tq-field join-pin"
+					bind:value={game_pin}
+					maxlength="6"
+					inputmode="numeric"
+					autocomplete="off"
+					aria-describedby="join-pin-hint"
 				/>
-			{/if}
-
-			<div class="mt-2">
-				<BrownButton disabled={username.length <= 3} onclick={setUsername}
-					>{$t('words.submit')}</BrownButton
+				<p id="join-pin-hint" class="tq-muted join-hint">
+					{$t('telekom.enter_pin_hint', {
+						defaultValue: 'Enter the PIN shown on the host screen.'
+					})}
+				</p>
+			</form>
+		{:else}
+			<form class="join-form" onsubmit={setUsername}>
+				<div class="join-pin-summary">
+					<span class="tq-muted">{$t('words.game_pin')}</span>
+					<strong class="join-pin-value">{game_pin}</strong>
+					<button
+						type="button"
+						class="tq-link join-change"
+						data-ui="join-change-pin"
+						onclick={() => (game_pin = '')}
+					>
+						{$t('telekom.change_pin', { defaultValue: 'Change PIN' })}
+					</button>
+				</div>
+				<div class="tq-field-group">
+					<label class="tq-label" for="join-username">{$t('words.username')}</label>
+					<input
+						id="join-username"
+						class="tq-field"
+						bind:value={username}
+						maxlength="17"
+						autocomplete="nickname"
+						aria-describedby="join-username-hint"
+					/>
+					<p id="join-username-hint" class="tq-muted join-hint">
+						{$t('telekom.username_hint', { defaultValue: 'At least 4 characters.' })}
+					</p>
+				</div>
+				{#if custom_field}
+					<div class="tq-field-group">
+						<label class="tq-label" for="join-custom-field">{custom_field}</label>
+						<input
+							id="join-custom-field"
+							class="tq-field"
+							bind:value={custom_field_value}
+						/>
+					</div>
+				{/if}
+				<button
+					type="submit"
+					class="tq-button tq-button-primary join-submit"
+					disabled={username.length <= 3}
 				>
-			</div>
-		</form>
+					{$t('telekom.join_game', { defaultValue: 'Join game' })}
+				</button>
+			</form>
+		{/if}
 	</div>
-{/if}
+</main>
 <div
 	id="hcaptcha"
 	class="h-captcha"
@@ -252,3 +285,89 @@ SPDX-License-Identifier: MPL-2.0
 	data-size="invisible"
 	data-theme="dark"
 ></div>
+
+<style>
+	.join-screen {
+		min-height: 100dvh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 24px 16px;
+		background: var(--tq-surface-subtle);
+	}
+
+	.join-card {
+		width: min(100%, 440px);
+		padding: 32px;
+		box-shadow: var(--tq-shadow);
+	}
+
+	.join-brand {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-block-end: 24px;
+		font-weight: 700;
+	}
+
+	.join-title {
+		margin-block-end: 24px;
+		font-size: 28px;
+		font-weight: 700;
+	}
+
+	.join-form {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.join-pin {
+		min-height: 64px;
+		font-size: 32px;
+		font-weight: 700;
+		letter-spacing: 0.3em;
+		text-align: center;
+	}
+
+	.join-hint {
+		margin: 0;
+		font-size: 14px;
+	}
+
+	.join-pin-summary {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px 12px;
+		padding: 12px 16px;
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+
+	.join-pin-value {
+		font-size: 20px;
+		letter-spacing: 0.15em;
+	}
+
+	.join-change {
+		margin-inline-start: auto;
+		min-height: 44px;
+		padding: 0 4px;
+		background: none;
+		border: 0;
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.join-submit {
+		width: 100%;
+		min-height: 52px;
+	}
+
+	@media (max-width: 480px) {
+		.join-card {
+			padding: 24px 20px;
+		}
+	}
+</style>

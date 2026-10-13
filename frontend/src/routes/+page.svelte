@@ -6,345 +6,93 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import { signedIn } from '$lib/stores';
 	import { getLocalization } from '$lib/i18n';
 	import Footer from '$lib/footer.svelte';
-	import WebPOpenGraph from '$lib/assets/landing/opengraph-home.webp';
-	import JpgOpenGraph from '$lib/assets/landing/opengraph-home.jpg';
-	import { fade } from 'svelte/transition';
 
-	import FindScreenshot from '$lib/assets/landing_new/find.webp';
-	import ImportScreenshot from '$lib/assets/landing_new/import.webp';
-	import EditScreenshot from '$lib/assets/landing_new/edit.webp';
-	import SelectScreenshot from '$lib/assets/landing_new/select.webp';
-	import ResultScreenshot from '$lib/assets/landing_new/result.webp';
-	import WinnersScreenshot from '$lib/assets/landing_new/winners.webp';
 	const { t } = getLocalization();
-
 	navbarVisible.visible = true;
-
-	// eslint-disable-next-line no-unused-vars
-	enum SelectedCreateThing {
-		// eslint-disable-next-line no-unused-vars
-		Create,
-		// eslint-disable-next-line no-unused-vars
-		Find,
-		// eslint-disable-next-line no-unused-vars
-		Import
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	enum SelectedPlayThing {
-		// eslint-disable-next-line no-unused-vars
-		Select,
-		// eslint-disable-next-line no-unused-vars
-		Results,
-		// eslint-disable-next-line no-unused-vars
-		Winners
-	}
-
-	let selected_create_thing = $state(SelectedCreateThing.Create);
-	let selected_play_thing = $state(SelectedPlayThing.Select);
+	let pin = $state('');
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - {$t('index_page.meta.title')}</title>
-	<meta name="description" content={$t('index_page.meta.description')} />
-	<title>ClassQuiz - Home</title>
-	<meta
-		name="description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
-
-	<meta property="og:url" content="https://quiz.911bob.dev/" />
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta
-		property="og:description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
-	<meta property="og:image" content={JpgOpenGraph} />
-
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content="quiz.911bob.dev" />
-	<meta property="twitter:url" content="https://quiz.911bob.dev/" />
-	<meta name="twitter:title" content="ClassQuiz - {$t('index_page.meta.title')}" />
-	<meta
-		name="twitter:description"
-		content="ClassQuiz is a quiz-application like KAHOOT!, but open-source. You can create quizzes and play them remotely with other people."
-	/>
-	<meta name="twitter:image" content={WebPOpenGraph} />
+	<title>Telekom Quiz</title>
+	<meta name="description" content="Telekom Quiz" />
 </svelte:head>
-<div class="min-h-screen flex flex-col">
-	<section class="pb-40">
-		<div class="pt-12 text-center">
-			<h1 class="sm:text-8xl text-6xl mt-6 marck-script">ClassQuiz</h1>
-			<p class="text-xl mt-4">{$t('index_page.slogan')}</p>
-		</div>
-	</section>
-	<section>
-		<h2 class="text-center text-5xl mb-6">{$t('index_page.how_does_classquiz_work')}</h2>
 
-		<div class="flex justify-center w-full">
-			<h3 class="text-center text-3xl rounded-t-lg bg-white/40 py-2 px-6">
-				{$t('index_page.get_a_quiz')}
-			</h3>
-		</div>
-		<div
-			class="grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 bg-white/40 shadow-lg mb-12 lg:mx-12 mx-4 rounded-lg"
-		>
-			<div>
-				<div class="p-2 rounded-lg">
-					{#if selected_create_thing === SelectedCreateThing.Create}
-						<img
-							class="rounded-lg relative"
-							src={EditScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
-					{:else if selected_create_thing === SelectedCreateThing.Find}
-						<img
-							class="rounded-lg relative"
-							src={FindScreenshot}
-							in:fade|global
-							alt="Screenshot of the search-page showing one found quiz for the term 'Country'"
-						/>
-					{:else if selected_create_thing === SelectedCreateThing.Import}
-						<img
-							class="rounded-lg relative"
-							src={ImportScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
-					{:else}
-						<p>Shouldn't happen!</p>
-					{/if}
-				</div>
-			</div>
-			<div
-				class="lg:border-l lg:border-l-black lg:border-t-0 border-t border-t-black flex lg:flex-col flex-row stretch"
-			>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_create_thing = SelectedCreateThing.Create;
-					}}
-					onkeyup={() => {
-						selected_create_thing = SelectedCreateThing.Create;
-					}}
-					class:shadow-2xl={selected_create_thing === SelectedCreateThing.Create}
-					class:opacity-70={selected_create_thing !== SelectedCreateThing.Create}
-					role="button"
-					tabindex="0"
-				>
-					<div
-						class="rounded-lg w-fit p-1 bg-lime-500 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="Pencil-Icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl w-fit dark:text-black">{$t('words.create')}</h5>
-					<p class="dark:text-black">{$t('index_page.create_a_quiz_from_scratch')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_create_thing = SelectedCreateThing.Find;
-					}}
-					onkeyup={() => {
-						selected_create_thing = SelectedCreateThing.Find;
-					}}
-					role="button"
-					tabindex="0"
-					class:shadow-2xl={selected_create_thing === SelectedCreateThing.Find}
-					class:opacity-70={selected_create_thing !== SelectedCreateThing.Find}
-				>
-					<div
-						class="rounded-lg w-fit p-1 bg-lime-500 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-							aria-label="magnifying glass-Icon"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl dark:text-black">{$t('words.find')}</h5>
-					<p class="dark:text-black">{$t('index_page.find_or_explore')}</p>
-				</div>
-			</div>
-		</div>
-	</section>
+<main class="tq-page tq-stack" data-ui="home">
+	<h1 class="tq-page-title">Telekom Quiz</h1>
 
-	<section class="mt-24">
-		<div class="flex justify-center w-full">
-			<h2 class="text-center text-3xl rounded-t-lg bg-white/40 py-2 px-6">
-				{$t('index_page.play_quiz')}
+	<div class="home-grid">
+		<section class="tq-panel tq-panel-body tq-stack" aria-labelledby="join-title">
+			<h2 class="tq-section-title" id="join-title">
+				{$t('telekom.join_game', { defaultValue: 'Join a game' })}
 			</h2>
-		</div>
+			<form class="tq-stack stack-4" action="/play">
+				<div class="tq-field-group">
+					<label class="tq-label" for="game-pin">{$t('words.game_pin')}</label>
+					<input
+						id="game-pin"
+						data-ui="home-pin"
+						name="pin"
+						class="tq-field pin-input"
+						inputmode="numeric"
+						autocomplete="off"
+						bind:value={pin}
+						required
+					/>
+				</div>
+				<button class="tq-button tq-button-primary" type="submit">
+					{$t('telekom.join_game', { defaultValue: 'Join a game' })}
+				</button>
+			</form>
+		</section>
 
-		<div
-			class="grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 bg-white/40 shadow-lg mb-12 lg:mx-12 mx-4 rounded-lg"
-		>
-			<div>
-				<div class="p-2 rounded-lg">
-					{#if selected_play_thing === SelectedPlayThing.Select}
-						<img
-							class="rounded-lg relative"
-							src={SelectScreenshot}
-							in:fade|global
-							alt="Screenshot of the screen where an answer can be selected"
-						/>
-					{:else if selected_play_thing === SelectedPlayThing.Results}
-						<img
-							class="rounded-lg relative"
-							src={ResultScreenshot}
-							in:fade|global
-							alt="Screenshot of the results with a table showing how many players chose which answer"
-						/>
-					{:else if selected_play_thing === SelectedPlayThing.Winners}
-						<img
-							class="rounded-lg relative"
-							src={WinnersScreenshot}
-							in:fade|global
-							alt="Screenshot of the import-page showing an URL to Kahoot! entered"
-						/>
-					{:else}
-						<p>Shouldn't happen!</p>
-					{/if}
-				</div>
-			</div>
-			<div
-				class="lg:border-l lg:border-l-black lg:border-t-0 border-t border-t-black flex lg:flex-col flex-row stretch"
-			>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Select;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Select;
-					}}
-					role="button"
-					tabindex="0"
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Select}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Select}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="Mouse-Click icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl w-fit dark:text-black">{$t('index_page.select_answer')}</h5>
-					<p class="dark:text-black">{$t('index_page.choose_answer_wisely')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					role="button"
-					tabindex="0"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Results;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Results;
-					}}
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Results}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Results}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="context-menu icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 6h16M4 10h16M4 14h16M4 18h16"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl dark:text-black">{$t('index_page.view_results')}</h5>
-					<p class="dark:text-black">{$t('index_page.check_if_chosen_wisely')}</p>
-				</div>
-				<div
-					class="m-2 rounded-lg p-2 bg-white/40 transition-all cursor-pointer lg:h-full"
-					role="button"
-					tabindex="0"
-					onclick={() => {
-						selected_play_thing = SelectedPlayThing.Winners;
-					}}
-					onkeyup={() => {
-						selected_play_thing = SelectedPlayThing.Winners;
-					}}
-					class:shadow-2xl={selected_play_thing === SelectedPlayThing.Winners}
-					class:opacity-70={selected_play_thing !== SelectedPlayThing.Winners}
-				>
-					<div
-						class="rounded-lg bg-emerald-300 w-fit p-1 hover:bg-lime-400 transition shadow-lg"
-					>
-						<svg
-							aria-label="sparkling stars-icon"
-							class="w-8 h-8 text-black"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-							/>
-						</svg>
-					</div>
-					<h5 class="text-xl dark:text-black">{$t('index_page.list_winners')}</h5>
-					<p class="dark:text-black">{$t('index_page.get_ranking_and_winners')}</p>
-				</div>
-			</div>
-		</div>
-	</section>
-</div>
+		<section class="tq-panel tq-panel-body tq-stack" aria-labelledby="quiz-title">
+			<h2 class="tq-section-title" id="quiz-title">{$t('words.quiz')}</h2>
+			<nav class="grid gap-3" aria-labelledby="quiz-title">
+				{#if $signedIn}
+					<a class="tq-button" href="/dashboard" data-ui="home-library">
+						{$t('telekom.library', { defaultValue: 'Quiz library' })}
+					</a>
+				{:else}
+					<a class="tq-button" href="/account/login" data-ui="home-login">
+						{$t('words.login')}
+					</a>
+				{/if}
+				<a class="tq-button" href="/create" data-ui="home-create">
+					{$t('dashboard.create_quiz')}
+				</a>
+				<a class="tq-button" href="/import" data-ui="home-import">{$t('words.import')}</a>
+				<a class="tq-button" href="/explore" data-ui="home-explore">
+					{$t('words.explore')}
+				</a>
+			</nav>
+		</section>
+	</div>
+</main>
 <Footer />
+
+<style>
+	.stack-4 {
+		gap: 16px;
+	}
+	.home-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 24px;
+	}
+	.pin-input {
+		font-size: 24px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-align: center;
+		min-height: 56px;
+	}
+	@media (max-width: 767px) {
+		.home-grid {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 16px;
+		}
+	}
+</style>

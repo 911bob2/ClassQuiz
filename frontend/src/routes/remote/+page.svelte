@@ -5,9 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import AnswerTile from '$lib/play/answer_tile.svelte';
 	import { page } from '$app/state';
 	import { socket } from '$lib/socket';
-	import type { QuizData } from '$lib/quiz_types';
+	import type { Answer, QuizData } from '$lib/quiz_types';
 	import { QuizQuestionType } from '$lib/quiz_types.js';
 	import Spinner from '$lib/Spinner.svelte';
 	import CircularTimer from '$lib/play/circular_progress.svelte';
@@ -178,149 +179,205 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:window onbeforeunload={confirmUnload} />
-{#if game_started}
-	{#if selected_question + 1 === game_data.questions.length && ((timer_res === '0' && question_results !== null) || game_data?.questions?.[selected_question]?.type === QuizQuestionType.SLIDE)}
-		{#if JSON.stringify(final_results) === JSON.stringify([null])}
-			<button onclick={get_final_results} class="admin-button">Get final results </button>
-		{:else}
-			<div class="w-screen flex justify-center mt-16">
-				<button onclick={request_answer_export} class="admin-button"
-					>{$t('admin_page.export_results')}</button
-				>
-			</div>
-		{/if}
-	{:else if timer_res === '0' || selected_question === -1}
-		{#if (selected_question + 1 !== game_data.questions.length && question_results !== null) || selected_question === -1}
-			<button
-				onclick={() => {
-					set_question_number(selected_question + 1);
-				}}
-				class="admin-button"
-				>Next Question ({selected_question + 2})
-			</button>
-		{/if}
-		{#if question_results === null && selected_question !== -1}
-			{#if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
-				<button
-					onclick={() => {
-						set_question_number(selected_question + 1);
-					}}
-					class="admin-button"
-					>Next Question ({selected_question + 2})
-				</button>
+<svelte:head>
+	<title>Telekom Quiz · Remote</title>
+</svelte:head>
+
+<main class="remote" data-ui="remote">
+	<header class="remote-bar tq-panel">
+		<p class="remote-progress">
+			{#if !game_started || !game_data}
+				{$t('telekom.lobby', { defaultValue: 'Lobby' })}
+			{:else if selected_question === -1}
+				{game_data.questions.length}
+				{game_data.questions.length === 1
+					? $t('words.question')
+					: $t('words.question_plural')}
 			{:else}
-				<button onclick={get_question_results} class="admin-button">Show results </button>
+				{$t('telekom.question_progress', {
+					current: selected_question + 1,
+					total: game_data.questions.length,
+					defaultValue: 'Question {{current}} of {{total}}'
+				})}
 			{/if}
-		{/if}
-	{:else if selected_question !== -1}
-		{#if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
+		</p>
+		{#if control_visible}
 			<button
+				class="tq-button"
+				data-ui="remote-hide-controls"
 				onclick={() => {
-					set_question_number(selected_question + 1);
+					socket.emit('set_control_visibility', { visible: false });
 				}}
-				class="admin-button"
-				>Next Question ({selected_question + 2})
+			>
+				{$t('telekom.hide_controls', { defaultValue: 'Hide controls' })}
 			</button>
 		{:else}
-			<button onclick={show_solutions} class="admin-button"
-				>Stop time and show solutions
+			<button
+				class="tq-button"
+				data-ui="remote-show-controls"
+				onclick={() => {
+					socket.emit('set_control_visibility', { visible: true });
+				}}
+			>
+				{$t('telekom.show_controls', { defaultValue: 'Show controls' })}
 			</button>
 		{/if}
-	{/if}
-	{#if selected_question === -1}
-		<h1>{game_data.title}</h1>
-		<p>{game_data.description}</p>
-	{:else if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
-		{#await import('$lib/play/admin/slide.svelte')}
-			<Spinner my_20={false} />
-		{:then c}
-			<c.default question={game_data.questions[selected_question]} />
-		{/await}
-	{:else}
-		<div class="flex flex-col justify-center w-screen h-1/6">
-			<h1 class="text-6xl text-center">
-				{@html game_data.questions[selected_question].question}
-			</h1>
-			<!--			<span class='text-center py-2 text-lg'>{$t('admin_page.time_left')}: {timer_res}</span>-->
-			<div class="mx-auto my-2">
-				<CircularTimer text={timer_res} progress={circular_progress} color="#ef4444" />
-			</div>
-			{#if game_data.questions[selected_question].image !== null}
-				<div>
+	</header>
+
+	{#if game_started}
+		<div class="remote-actions">
+			{#if selected_question + 1 === game_data.questions.length && ((timer_res === '0' && question_results !== null) || game_data?.questions?.[selected_question]?.type === QuizQuestionType.SLIDE)}
+				{#if JSON.stringify(final_results) === JSON.stringify([null])}
+					<button
+						onclick={get_final_results}
+						class="tq-button tq-button-primary"
+						data-ui="remote-final-results"
+					>
+						{$t('admin_page.get_final_results')}
+					</button>
+				{:else}
+					<button
+						onclick={request_answer_export}
+						class="tq-button tq-button-primary"
+						data-ui="remote-export"
+					>
+						{$t('admin_page.export_results')}
+					</button>
+				{/if}
+			{:else if timer_res === '0' || selected_question === -1}
+				{#if (selected_question + 1 !== game_data.questions.length && question_results !== null) || selected_question === -1}
+					<button
+						onclick={() => {
+							set_question_number(selected_question + 1);
+						}}
+						class="tq-button tq-button-primary"
+						data-ui="remote-next-question"
+					>
+						{$t('admin_page.next_question', { question: selected_question + 2 })}
+					</button>
+				{/if}
+				{#if question_results === null && selected_question !== -1}
+					{#if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
+						<button
+							onclick={() => {
+								set_question_number(selected_question + 1);
+							}}
+							class="tq-button tq-button-primary"
+							data-ui="remote-next-question"
+						>
+							{$t('admin_page.next_question', { question: selected_question + 2 })}
+						</button>
+					{:else}
+						<button
+							onclick={get_question_results}
+							class="tq-button tq-button-primary"
+							data-ui="remote-show-results"
+						>
+							{$t('admin_page.show_results')}
+						</button>
+					{/if}
+				{/if}
+			{:else if selected_question !== -1}
+				{#if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
+					<button
+						onclick={() => {
+							set_question_number(selected_question + 1);
+						}}
+						class="tq-button tq-button-primary"
+						data-ui="remote-next-question"
+					>
+						{$t('admin_page.next_question', { question: selected_question + 2 })}
+					</button>
+				{:else}
+					<button
+						onclick={show_solutions}
+						class="tq-button tq-button-primary"
+						data-ui="remote-stop-time"
+					>
+						{$t('admin_page.stop_time_and_solutions')}
+					</button>
+				{/if}
+			{/if}
+		</div>
+		{#if selected_question === -1}
+			<section class="tq-panel tq-panel-body tq-stack remote-intro">
+				<h1 class="remote-title">{game_data.title}</h1>
+				<p>{game_data.description}</p>
+			</section>
+		{:else if game_data.questions[selected_question].type === QuizQuestionType.SLIDE}
+			{#await import('$lib/play/admin/slide.svelte')}
+				<Spinner my_20={false} />
+			{:then c}
+				<c.default question={game_data.questions[selected_question]} />
+			{/await}
+		{:else}
+			<section class="tq-panel tq-panel-body remote-question">
+				<header class="remote-question-head">
+					<h1 class="remote-title">
+						{@html game_data.questions[selected_question].question}
+					</h1>
+					<CircularTimer text={timer_res} progress={circular_progress} size={64} />
+				</header>
+				{#if game_data.questions[selected_question].image !== null}
 					<img
 						src="/api/v1/storage/download/{game_data.questions[selected_question]
 							.image}"
-						class="max-h-[20vh] object-cover mx-auto mb-8 w-auto"
-						alt="Content for Question"
+						class="remote-image"
+						alt={$t('words.image')}
 					/>
-				</div>
-			{/if}
-			{#if game_data.questions[selected_question].type === QuizQuestionType.ABCD || game_data.questions[selected_question].type === QuizQuestionType.VOTING}
-				<div class="grid grid-cols-2 gap-2 w-full p-4">
-					{#each game_data.questions[selected_question].answers as answer, i}
-						<div
-							class="rounded-lg h-fit flex"
-							style="background-color: {answer.color ?? '#B45309'}"
-							class:opacity-50={!answer.right &&
-								game_data.questions[selected_question].type ===
-									QuizQuestionType.ABCD}
-						>
-							<span class="text-center text-2xl px-2 py-4 w-full text-black"
-								>{answer.answer}</span
-							>
-							<span class="pl-4 w-10"></span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
-	{/if}
-
-	{#if timer_res === '0' && JSON.stringify(final_results) === JSON.stringify( [null] ) && game_data.questions[selected_question].type !== QuizQuestionType.SLIDE}
-		{#if game_data.questions[selected_question].type === QuizQuestionType.VOTING && question_results}
-			{#await import('$lib/play/admin/voting_results.svelte')}
-				<Spinner />
-			{:then c}
-				<c.default
-					bind:data={question_results}
-					bind:question={game_data.questions[selected_question]}
-				/>
-			{/await}
+				{/if}
+				{#if game_data.questions[selected_question].type === QuizQuestionType.ABCD || game_data.questions[selected_question].type === QuizQuestionType.VOTING}
+					<div class="remote-answers">
+						{#each game_data.questions[selected_question].answers as Answer[] as answer, i}
+							<AnswerTile
+								index={i}
+								label={answer.answer}
+								color={answer.color}
+								dimmed={!answer.right &&
+									game_data.questions[selected_question].type ===
+										QuizQuestionType.ABCD}
+							/>
+						{/each}
+					</div>
+				{/if}
+			</section>
 		{/if}
-	{/if}
-{:else}
-	<button onclick={start_game} class="admin-button">Start Game!</button>
 
-	<h2>Players:</h2>
-	{#await get_already_joined_players()}
-		<Spinner my_20={false} />
-	{:then _}
-		<div>
-			<ul>
-				{#each players as player}
-					<li>{player.username}</li>
-				{/each}
-			</ul>
-		</div>
-	{/await}
-{/if}
-<div class="fixed top-0 right-0">
-	{#if control_visible}
-		<button
-			onclick={() => {
-				socket.emit('set_control_visibility', { visible: false });
-			}}
-			>Hide Controls
-		</button>
+		{#if timer_res === '0' && JSON.stringify(final_results) === JSON.stringify( [null] ) && game_data.questions[selected_question].type !== QuizQuestionType.SLIDE}
+			{#if game_data.questions[selected_question].type === QuizQuestionType.VOTING && question_results}
+				{#await import('$lib/play/admin/voting_results.svelte')}
+					<Spinner />
+				{:then c}
+					<c.default
+						data={question_results}
+						question={game_data.questions[selected_question]}
+					/>
+				{/await}
+			{/if}
+		{/if}
 	{:else}
 		<button
-			onclick={() => {
-				socket.emit('set_control_visibility', { visible: true });
-			}}
-			>Show Controls
+			onclick={start_game}
+			class="tq-button tq-button-primary remote-start"
+			data-ui="remote-start"
+		>
+			{$t('admin_page.start_game')}
 		</button>
+
+		<section class="tq-panel tq-panel-body tq-stack">
+			<h2 class="tq-section-title">{$t('words.player_plural')}</h2>
+			{#await get_already_joined_players()}
+				<Spinner my_20={false} />
+			{:then _}
+				<ul class="remote-players">
+					{#each players as player}
+						<li>{player.username}</li>
+					{/each}
+				</ul>
+			{/await}
+		</section>
 	{/if}
-</div>
+</main>
 
 <a
 	onclick={request_answer_export}
@@ -328,3 +385,100 @@ SPDX-License-Identifier: MPL-2.0
 	bind:this={dataexport_download_a}
 	class="absolute -top-3/4 -left-3/4 opacity-0 hidden">Download</a
 >
+
+<style>
+	.remote {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		width: 100%;
+		max-width: 720px;
+		min-height: 100dvh;
+		margin-inline: auto;
+		padding: 12px 16px 32px;
+	}
+
+	.remote-bar {
+		position: sticky;
+		inset-block-start: 8px;
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 8px 8px 8px 16px;
+		box-shadow: var(--tq-shadow);
+	}
+
+	.remote-progress {
+		font-weight: 700;
+	}
+
+	.remote-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.remote-actions :global(.tq-button),
+	.remote-start {
+		width: 100%;
+		min-height: 64px;
+		font-size: 18px;
+	}
+
+	.remote-title {
+		min-width: 0;
+		font-size: clamp(20px, 5vw, 28px);
+		font-weight: 700;
+		overflow-wrap: anywhere;
+	}
+
+	.remote-title :global(p) {
+		margin: 0;
+	}
+
+	.remote-question {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.remote-question-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.remote-image {
+		display: block;
+		max-height: 20vh;
+		width: auto;
+		margin-inline: auto;
+		border-radius: 8px;
+		object-fit: contain;
+	}
+
+	.remote-answers {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.remote-players {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.remote-players li {
+		padding: 10px 14px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		overflow-wrap: anywhere;
+	}
+</style>

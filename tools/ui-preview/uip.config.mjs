@@ -184,11 +184,15 @@ export async function createConfig(options = {}) {
       if (!result) return result;
       const lines = input.content.split("\n").length;
       if (result.code.split("\n").length > lines) {
+        // svelte-preprocess may return the TypeScript map as JSON text; Vite
+        // only combines source map objects.
+        const map =
+          typeof result.map === "string" ? JSON.parse(result.map) : result.map;
         const compact = await transformWithEsbuild(
           result.code,
           input.filename + ".js",
           { loader: "js", minifyWhitespace: true, legalComments: "none" },
-          result.map,
+          map,
         );
         result = { ...result, code: compact.code, map: compact.map };
       }

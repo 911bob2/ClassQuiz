@@ -6,7 +6,12 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import type { PageData } from './$types';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
+	import { getLocalization } from '$lib/i18n';
+	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import Footer from '$lib/footer.svelte';
+
+	navbarVisible.visible = true;
+	const { t } = getLocalization();
 
 	interface Props {
 		data: PageData;
@@ -15,47 +20,130 @@ SPDX-License-Identifier: MPL-2.0
 	let { data }: Props = $props();
 </script>
 
-<div class="flex flex-col p-2">
-	{#each data.quizzes as quiz}
-		<div class="border-2 border-[#B07156] rounded-sm w-full h-[20vh] p-2 flex flex-col gap-2">
-			<div class="grid grid-cols-3 h-full">
-				<div class="hidden lg:flex w-auto h-full items-center relative">
+<svelte:head>
+	<title>Telekom Quiz · {$t('telekom.moderation', { defaultValue: 'Moderation' })}</title>
+</svelte:head>
+
+<main class="tq-page tq-stack" data-ui="moderation">
+	<h1 class="tq-page-title">{$t('telekom.moderation', { defaultValue: 'Moderation' })}</h1>
+
+	{#if data.quizzes.length === 0}
+		<div class="tq-panel tq-empty">{$t('ui.no_results')}</div>
+	{:else}
+		<div class="quiz-list">
+			{#each data.quizzes as quiz}
+				<article class="tq-panel quiz-row" data-ui="moderation-item">
 					{#if quiz.cover_image}
 						<img
+							class="quiz-cover"
 							src="/api/v1/storage/download/{quiz.cover_image}"
-							alt="user provided"
+							alt=""
 							loading="lazy"
-							class="shrink-0 max-w-full max-h-full absolute rounded-sm"
 						/>
 					{/if}
-				</div>
-				<div class="my-auto mx-auto max-h-full overflow-hidden">
-					<p class="text-xl text-center">{@html quiz.title}</p>
-					<p class="text-sm text-center text-clip overflow-hidden">
-						{@html quiz.description ?? ''}
-					</p>
-				</div>
-				<div class="flex justify-center">
-					<p class="m-auto">Questions: {quiz.questions.length}</p>
-				</div>
-			</div>
-			<div class="flex w-full">
-				<BrownButton href="/view/{quiz.id}?mod=true&autoExpand=true&autoReturn=true"
-					>View</BrownButton
-				>
-			</div>
+					<div class="quiz-info">
+						<h2 class="quiz-title">{@html quiz.title}</h2>
+						{#if quiz.description}
+							<div class="tq-muted quiz-description">{@html quiz.description}</div>
+						{/if}
+						<span class="tq-badge"
+							>{$t('words.question_plural')}: {quiz.questions.length}</span
+						>
+					</div>
+					<a
+						class="tq-button"
+						href="/view/{quiz.id}?mod=true&autoExpand=true&autoReturn=true"
+					>
+						{$t('words.view')}
+					</a>
+				</article>
+			{/each}
 		</div>
-	{/each}
-</div>
-<div class="flex">
-	<div class="grid grid-cols-3 mx-auto">
-		<BrownButton disabled={data.page === '1'} href="/moderation?page={parseInt(data.page) + 1}"
-			>Previous Page</BrownButton
+	{/if}
+
+	<nav class="pagination" aria-label={$t('telekom.pagination', { defaultValue: 'Pagination' })}>
+		<a
+			class="tq-button"
+			aria-disabled={data.page === '1'}
+			tabindex={data.page === '1' ? -1 : undefined}
+			href={data.page === '1' ? undefined : `/moderation?page=${parseInt(data.page) - 1}`}
 		>
-		<p class="m-auto">Page {data.page}</p>
-		<BrownButton
-			disabled={data.quizzes.length !== 20}
-			href="/moderation?page={parseInt(data.page) - 1}">Next Page</BrownButton
+			{$t('uploader.previous_page')}
+		</a>
+		<span class="tq-muted">
+			{$t('telekom.page_number', { defaultValue: 'Page {{page}}', page: data.page })}
+		</span>
+		<a
+			class="tq-button"
+			aria-disabled={data.quizzes.length !== 20}
+			tabindex={data.quizzes.length !== 20 ? -1 : undefined}
+			href={data.quizzes.length !== 20
+				? undefined
+				: `/moderation?page=${parseInt(data.page) + 1}`}
 		>
-	</div>
-</div>
+			{$t('uploader.next_page')}
+		</a>
+	</nav>
+</main>
+<Footer />
+
+<style>
+	.quiz-list {
+		display: grid;
+		gap: 12px;
+	}
+	.quiz-row {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 16px 20px;
+	}
+	.quiz-cover {
+		width: 96px;
+		height: 72px;
+		flex-shrink: 0;
+		border-radius: 8px;
+		object-fit: cover;
+		background: var(--tq-surface-subtle);
+	}
+	.quiz-info {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 6px;
+		min-width: 0;
+	}
+	.quiz-title {
+		font-size: 18px;
+		font-weight: 700;
+		overflow-wrap: anywhere;
+	}
+	.quiz-description {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		font-size: 14px;
+	}
+	.pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+	}
+	@media (max-width: 767px) {
+		.quiz-row {
+			flex-wrap: wrap;
+			padding: 16px;
+		}
+		.quiz-cover {
+			width: 64px;
+			height: 64px;
+		}
+		.quiz-info {
+			flex-basis: calc(100% - 88px);
+		}
+	}
+</style>

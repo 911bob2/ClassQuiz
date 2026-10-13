@@ -14,4 +14,4 @@ After editing, use `snap <id>` and relevant `check` IDs. `compare <id> --from <s
 
 Add explicit stable IDs/slugs to src/scenarios/index.ts for new screens, never renumber existing ones. Do not perform Git checkout/reset/stash to implement a preview comparison. Preserve unrelated working-tree changes.
 
-When staging saved history for a repository Git commit, include every file declared by each completed tree's `.manifest.json`. Captured frontend `.gitignore` files can hide required snapshot assets; force-add only those declared paths, not runtime dependency junctions or caches. Keep the snapshot byte-preservation attributes intact. Temporary `.pending-*` trees and test repositories remain ignored.
+Everything under `out/`, including saved preview history, is local and ignored by Git. Never commit it or force-add snapshot files.

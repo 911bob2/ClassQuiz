@@ -34,10 +34,11 @@ SPDX-License-Identifier: MPL-2.0
 
 	onMount(() => {
 		document.body.addEventListener('keydown', keypress_listener);
+		return () => document.body.removeEventListener('keydown', keypress_listener);
 	});
 	const element_list: Array<{
 		name: string;
-		description: string;
+		description: string | undefined;
 		type: ElementTypes;
 		icon: string | undefined;
 		shortcut: string;
@@ -64,8 +65,8 @@ SPDX-License-Identifier: MPL-2.0
 			shortcut: 'r'
 		},
 		{
-			name: 'Circle',
-			description: 'Just a circle',
+			name: $t('telekom.slide_circle', { defaultValue: 'Circle' }),
+			description: undefined,
 			type: ElementTypes.Circle,
 			icon: undefined,
 			shortcut: 'c'
@@ -74,23 +75,49 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <div
-	class="bg-white m-auto rounded-lg shadow-lg p-4 flex flex-col dark:bg-gray-600 h-fit"
+	class="element-list"
+	role="group"
+	aria-label={$t('telekom.add_element', { defaultValue: 'Add element' })}
+	data-ui="slide-element-list"
 	transition:fade|global={{ duration: 100 }}
 >
-	<ul>
-		{#each element_list as el}
-			<li
-				class="flex flex-row mt-4 w-full bg-gray-200 shadow-xl rounded-lg p-2 hover:bg-gray-300 hover:shadow-2xl hover:cursor-pointer transition dark:bg-gray-800"
-				onclick={() => {
-					selected_element = el.type;
-				}}
-			>
-				<div class="flex flex-col">
-					<h3 class="text-xl">{el.name}</h3>
-					<p>{el.description}</p>
-				</div>
-				<kbd class="my-auto ml-auto">{el.shortcut}</kbd>
-			</li>
-		{/each}
-	</ul>
+	{#each element_list as el}
+		<button
+			type="button"
+			class="tq-button element-option"
+			data-ui={'slide-element-' + el.type.toLowerCase()}
+			title={el.description}
+			onclick={() => (selected_element = el.type)}
+		>
+			<span>{el.name}</span>
+			<kbd>{el.shortcut.toUpperCase()}</kbd>
+		</button>
+	{/each}
 </div>
+
+<style>
+	.element-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 16px;
+		padding: 12px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+	.element-option {
+		justify-content: space-between;
+		min-width: 128px;
+	}
+	kbd {
+		padding: 1px 6px;
+		border: 1px solid var(--tq-border-strong);
+		border-radius: 4px;
+		background: var(--tq-surface);
+		color: var(--tq-muted);
+		font-family: inherit;
+		font-size: 12px;
+		font-weight: 500;
+	}
+</style>

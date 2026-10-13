@@ -38,6 +38,8 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div class="h-full">
-	<Editor bind:data on:save={save_quiztivity} bind:saving />
-</div>
+<svelte:head>
+	<title>Telekom Quiz - Quiztivity</title>
+</svelte:head>
+
+<Editor bind:data on:save={save_quiztivity} {saving} />

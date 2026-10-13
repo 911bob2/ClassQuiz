@@ -6,83 +6,92 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import type { PageData } from './$types';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
 	import { getLocalization } from '$lib/i18n';
+	import Footer from '$lib/footer.svelte';
+	import SettingsNav from '../SettingsNav.svelte';
 	const { t } = getLocalization();
 	interface Props {
 		data: PageData;
 	}
 
 	let { data }: Props = $props();
-
-	const controllers: [] = data.controllers;
 </script>
 
-<div class="w-full h-full">
-	{#if controllers.length === 0}
-		<div class="w-full h-full flex">
-			<div class="m-auto">
-				<BrownButton href="/account/controllers/add"
-					>{$t('controllers.add_new_controller')}</BrownButton
-				>
-			</div>
+<svelte:head>
+	<title>Telekom Quiz · {$t('telekom.controllers', { defaultValue: 'Controllers' })}</title>
+</svelte:head>
+
+<main class="tq-page settings-page tq-stack" data-ui="controllers">
+	<header class="tq-page-heading flush">
+		<h1 class="tq-page-title">{$t('telekom.controllers', { defaultValue: 'Controllers' })}</h1>
+		<a
+			class="tq-button tq-button-primary"
+			href="/account/controllers/add"
+			data-ui="add-controller"
+		>
+			{$t('controllers.add_new_controller')}
+		</a>
+	</header>
+	<SettingsNav current="controllers" />
+
+	{#if data.controllers.length === 0}
+		<div class="tq-panel tq-empty">
+			{$t('telekom.no_controllers', { defaultValue: 'No controllers' })}
 		</div>
 	{:else}
-		<div class="p-2">
-			<div class="flex">
-				<div class="mx-auto">
-					<BrownButton href="/account/controllers/add"
-						>{$t('controllers.add_new_controller')}</BrownButton
-					>
-				</div>
-			</div>
-			<table class="w-full">
-				<thead>
-					<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('words.name')}</th
-						>
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('controllers.player_name')}
-						</th>
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('controllers.first_seen')}
-						</th>
-						<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-							>{$t('controllers.last_seen')}
-						</th>
-						<th class="mx-auto p-1">{$t('words.version')}</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.controllers as controller}
-						<tr class="text-left">
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								><a
-									href="/account/controllers/{controller.id}"
-									class="underline text-lg">{controller.name}</a
-								></td
-							>
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{controller.player_name}</td
-							>
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{controller.first_seen
-									? new Date(controller.first_seen).toLocaleString()
-									: $t('words.never')}</td
-							>
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{controller.last_seen
-									? new Date(controller.last_seen).toLocaleString()
-									: $t('words.never')}</td
-							>
-							<td class="mx-auto p-1"
-								>{controller.os_version ?? $t('words.unknown')}</td
-							>
+		<div class="tq-panel table-panel">
+			<div class="tq-table-wrap">
+				<table class="tq-table">
+					<thead>
+						<tr>
+							<th>{$t('words.name')}</th>
+							<th>{$t('controllers.player_name')}</th>
+							<th>{$t('controllers.first_seen')}</th>
+							<th>{$t('controllers.last_seen')}</th>
+							<th>{$t('words.version')}</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{#each data.controllers as controller}
+							<tr>
+								<td>
+									<a
+										class="tq-link font-bold"
+										href="/account/controllers/{controller.id}"
+									>
+										{controller.name}
+									</a>
+								</td>
+								<td>{controller.player_name}</td>
+								<td>
+									{controller.first_seen
+										? new Date(controller.first_seen).toLocaleString()
+										: $t('words.never')}
+								</td>
+								<td>
+									{controller.last_seen
+										? new Date(controller.last_seen).toLocaleString()
+										: $t('words.never')}
+								</td>
+								<td>{controller.os_version ?? $t('words.unknown')}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	{/if}
-</div>
+</main>
+<Footer />
+
+<style>
+	.settings-page {
+		max-width: 960px;
+	}
+	.flush {
+		margin-bottom: 0;
+	}
+	.table-panel {
+		overflow: hidden;
+	}
+</style>

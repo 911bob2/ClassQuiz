@@ -7,6 +7,8 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import { getLocalization } from '$lib/i18n';
 	import { navbarVisible } from '$lib/stores.svelte.ts';
+	import Footer from '$lib/footer.svelte';
+	import Spinner from '$lib/Spinner.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 
@@ -14,11 +16,12 @@ SPDX-License-Identifier: MPL-2.0
 
 	const { t } = getLocalization();
 	let url_input = $state('');
-	let file_input: File[] = $state();
+	let file_input: FileList | undefined = $state();
 	let kahoot_regex = /^https:\/\/create\.kahoot\.it\/details\/.*\/?([a-zA-Z-\d]{36})\/?$/;
 
 	let url_valid = $derived(kahoot_regex.test(url_input));
 	let is_loading = $state(false);
+	let source: 'kahoot' | 'file' = $state('kahoot');
 
 	const submit = async (e: Event) => {
 		e.preventDefault();
@@ -101,157 +104,146 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>ClassQuiz - Import</title>
+	<title>Telekom Quiz · {$t('words.import')}</title>
 </svelte:head>
 
-<div class="flex items-center justify-center h-full px-4">
-	<div>
-		<span class="p-4"></span>
+<main class="tq-page tq-page-narrow tq-stack" data-ui="import">
+	<h1 class="tq-page-title">{$t('words.import')}</h1>
 
-		<div
-			class="lg:w-[64rem] lg:max-w-[64rem] w-screen max-w-screen mx-auto overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800"
+	<div class="tq-tabs" role="tablist" aria-label={$t('words.import')}>
+		<button
+			type="button"
+			role="tab"
+			id="tab-kahoot"
+			class="tab"
+			data-ui="import-tab-kahoot"
+			aria-selected={source === 'kahoot'}
+			aria-controls="panel-import"
+			onclick={() => (source = 'kahoot')}
 		>
-			<div class="px-6 py-4">
-				<h2 class="text-3xl font-bold text-center text-gray-700 dark:text-white">
-					{$t('words.import')}
-				</h2>
-
-				<!--				<h3 class="mt-1 text-xl font-medium text-center text-gray-600 dark:text-gray-200">
-									Welcome Back
-								</h3>-->
-
-				<!--				<p class="mt-1 text-center text-gray-500 dark:text-gray-400">
-									Login or create account
-								</p>-->
-				<div class="grid grid-cols-2">
-					<form onsubmit={submit}>
-						<div class="w-full mt-4 h-full flex flex-col">
-							<h2 class="text-center text-2xl">{$t('import_page.a_kahoot_quiz')}</h2>
-							<div class="dark:bg-gray-800 bg-white p-4 rounded-lg">
-								<div class="relative bg-inherit w-full">
-									<input
-										id="url"
-										bind:value={url_input}
-										name="email"
-										type="url"
-										class="w-full peer bg-transparent h-10 rounded-lg text-gray-700 dark:text-white placeholder-transparent ring-2 px-2 ring-gray-500 focus:ring-sky-600 focus:outline-hidden focus:border-rose-600"
-										placeholder="https://create.kahoot.it/details/something"
-										class:ring-red-700={!url_valid}
-										class:ring-green-600={url_valid}
-									/>
-									<label
-										for="url"
-										class="absolute cursor-text left-0 -top-3 text-sm text-gray-700 dark:text-white bg-inherit mx-1 px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-sky-600 peer-focus:text-sm transition-all"
-									>
-										{$t('words.url')}
-									</label>
-									<p class="text-sm">
-										{$t('import_page.url_should_look_like_this')}
-									</p>
-								</div>
-								<p class="mt-2">
-									{$t('import_page.side_import_kahoot')}
-								</p>
-							</div>
-
-							<div class="flex items-center justify-center mt-auto">
-								<span></span>
-
-								<button
-									class="px-4 py-2 leading-5 text-white transition-colors duration-200 transform bg-gray-700 rounded-sm hover:bg-gray-600 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
-									disabled={!url_valid || is_loading}
-									type="submit"
-								>
-									{#if is_loading}
-										<svg
-											class="h-4 w-4 animate-spin mx-auto"
-											viewBox="3 3 18 18"
-										>
-											<path
-												class="fill-black"
-												d="M12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z"
-											/>
-											<path
-												class="fill-blue-100"
-												d="M16.9497 7.05015C14.2161 4.31648 9.78392 4.31648 7.05025 7.05015C6.65973 7.44067 6.02656 7.44067 5.63604 7.05015C5.24551 6.65962 5.24551 6.02646 5.63604 5.63593C9.15076 2.12121 14.8492 2.12121 18.364 5.63593C18.7545 6.02646 18.7545 6.65962 18.364 7.05015C17.9734 7.44067 17.3403 7.44067 16.9497 7.05015Z"
-											/>
-										</svg>
-									{:else}
-										{$t('words.submit')}
-									{/if}
-								</button>
-							</div>
-						</div>
-					</form>
-					<form onsubmit={file_submit}>
-						<div class="w-full mt-4 border-l-2 border-gray-600 h-full flex flex-col">
-							<h2 class="text-center text-2xl">{$t('import_page.classquiz_quiz')}</h2>
-							<div class="dark:bg-gray-800 bg-white p-4 rounded-lg">
-								<div class="relative bg-inherit w-full">
-									<input
-										id="file"
-										bind:files={file_input}
-										name="file"
-										type="file"
-										accept=".cqa,.xlsx"
-										class="w-full peer bg-transparent h-10 rounded-lg py-1.5 text-gray-700 dark:text-white placeholder-transparent ring-2 px-2 ring-gray-500 focus:ring-sky-600 focus:outline-hidden focus:border-rose-600"
-										class:ring-red-700={!file_input}
-										class:ring-green-600={file_input}
-									/>
-									<p class="text-sm">{$t('import_page.upload_file_ending')}</p>
-								</div>
-								<p class="mt-2">
-									{$t('import_page.this_side_classquiz')}
-									<br />
-									{$t('import_page.this_side_classquiz_excel')}
-								</p>
-							</div>
-
-							<div class="flex items-center justify-center mt-auto">
-								<span></span>
-
-								<button
-									class="px-4 py-2 leading-5 text-white transition-colors duration-200 transform bg-gray-700 rounded-sm hover:bg-gray-600 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
-									disabled={!file_input || is_loading}
-									type="submit"
-								>
-									{#if is_loading}
-										<svg
-											class="h-4 w-4 animate-spin mx-auto"
-											viewBox="3 3 18 18"
-										>
-											<path
-												class="fill-black"
-												d="M12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z"
-											/>
-											<path
-												class="fill-blue-100"
-												d="M16.9497 7.05015C14.2161 4.31648 9.78392 4.31648 7.05025 7.05015C6.65973 7.44067 6.02656 7.44067 5.63604 7.05015C5.24551 6.65962 5.24551 6.02646 5.63604 5.63593C9.15076 2.12121 14.8492 2.12121 18.364 5.63593C18.7545 6.02646 18.7545 6.65962 18.364 7.05015C17.9734 7.44067 17.3403 7.44067 16.9497 7.05015Z"
-											/>
-										</svg>
-									{:else}
-										{$t('words.submit')}
-									{/if}
-								</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-			<div
-				class="flex items-center justify-center py-4 text-center bg-gray-50 dark:bg-gray-700 mt-4"
-			>
-				<span class="text-sm text-gray-600 dark:text-gray-200"
-					>{$t('import_page.need_help')}</span
-				>
-
-				<a
-					href="/docs/import-from-kahoot"
-					class="mx-2 text-sm font-bold text-blue-500 dark:text-blue-400 hover:underline transition-all"
-					>{$t('import_page.visit_docs')}</a
-				>
-			</div>
-		</div>
+			{$t('import_page.a_kahoot_quiz')}
+		</button>
+		<button
+			type="button"
+			role="tab"
+			id="tab-file"
+			class="tab"
+			data-ui="import-tab-file"
+			aria-selected={source === 'file'}
+			aria-controls="panel-import"
+			onclick={() => (source = 'file')}
+		>
+			{$t('import_page.classquiz_quiz')}
+		</button>
 	</div>
-</div>
-<!--{/if}-->
+
+	<div
+		class="tq-panel tq-panel-body"
+		id="panel-import"
+		role="tabpanel"
+		aria-labelledby={source === 'kahoot' ? 'tab-kahoot' : 'tab-file'}
+	>
+		{#if source === 'kahoot'}
+			<form class="tq-stack stack-4" onsubmit={submit} data-ui="import-kahoot">
+				<p class="tq-muted">{$t('import_page.side_import_kahoot')}</p>
+				<div class="tq-field-group">
+					<label class="tq-label" for="url">{$t('words.url')}</label>
+					<input
+						class="tq-field"
+						id="url"
+						name="url"
+						type="url"
+						bind:value={url_input}
+						placeholder="https://create.kahoot.it/details/…"
+						aria-invalid={url_input !== '' && !url_valid}
+						aria-describedby="url-hint"
+					/>
+					<p class="text-sm tq-muted" id="url-hint">
+						{$t('import_page.url_should_look_like_this')}
+					</p>
+				</div>
+				<div>
+					<button
+						class="tq-button tq-button-primary"
+						type="submit"
+						disabled={!url_valid || is_loading}
+					>
+						{#if is_loading}
+							<Spinner my_20={false} />
+						{:else}
+							{$t('words.import')}
+						{/if}
+					</button>
+				</div>
+			</form>
+		{:else}
+			<form class="tq-stack stack-4" onsubmit={file_submit} data-ui="import-file">
+				<p class="tq-muted">
+					{$t('import_page.this_side_classquiz')}
+					{$t('import_page.this_side_classquiz_excel')}
+				</p>
+				<div class="tq-field-group">
+					<label class="tq-label" for="file">{$t('words.upload')}</label>
+					<input
+						class="tq-field"
+						id="file"
+						name="file"
+						type="file"
+						accept=".cqa,.xlsx"
+						bind:files={file_input}
+						aria-describedby="file-hint"
+					/>
+					<p class="text-sm tq-muted" id="file-hint">
+						{$t('import_page.upload_file_ending')}
+					</p>
+				</div>
+				<div>
+					<button
+						class="tq-button tq-button-primary"
+						type="submit"
+						disabled={!file_input?.length || is_loading}
+					>
+						{#if is_loading}
+							<Spinner my_20={false} />
+						{:else}
+							{$t('words.import')}
+						{/if}
+					</button>
+				</div>
+			</form>
+		{/if}
+	</div>
+
+	<p class="text-sm tq-muted">
+		{$t('import_page.need_help')}
+		<a class="tq-link" href="/docs/import-from-kahoot">{$t('import_page.visit_docs')}</a>
+	</p>
+</main>
+<Footer />
+
+<style>
+	.stack-4 {
+		gap: 16px;
+	}
+	.tab {
+		display: inline-flex;
+		align-items: center;
+		flex-shrink: 0;
+		min-height: 48px;
+		padding: 12px 0;
+		border-width: 0 0 3px;
+		border-style: solid;
+		border-color: transparent;
+		background: transparent;
+		color: var(--tq-muted);
+		font-weight: 700;
+	}
+	.tab[aria-selected='true'] {
+		border-bottom-color: var(--tq-accent);
+		color: var(--tq-accent);
+	}
+	input[type='file'] {
+		height: auto;
+		padding: 8px 12px;
+	}
+</style>

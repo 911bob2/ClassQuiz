@@ -17,10 +17,12 @@ SPDX-License-Identifier: MPL-2.0
 	let { data }: Props = $props();
 
 	let rendered_html = $derived(
-		browser ? DOMPurify.sanitize(marked.parse(data.markdown ?? '')) : ''
+		browser ? DOMPurify.sanitize(marked.parse(data.markdown ?? '', { async: false })) : ''
 	);
 </script>
 
-<div class="prose dark:prose-invert">
-	{@html rendered_html}
-</div>
+<section class="tq-panel tq-panel-body" data-ui="activity-markdown">
+	<div class="prose tq-prose max-w-none">
+		{@html rendered_html}
+	</div>
+</section>

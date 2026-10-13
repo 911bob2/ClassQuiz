@@ -19,8 +19,6 @@ SPDX-License-Identifier: MPL-2.0
 	});
 </script>
 
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	{@render children?.()}
 </article>

@@ -1,24 +1,22 @@
-<!--
-SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
-
-SPDX-License-Identifier: MPL-2.0
--->
-
+<!-- SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
+SPDX-License-Identifier: MPL-2.0 -->
 <script lang="ts">
 	interface Props {
 		disabled?: boolean;
 		flex?: boolean;
-		href?: undefined | string;
-		target?: undefined | string;
+		href?: string;
+		target?: string;
+		type?: 'button' | 'submit' | 'reset';
 		children?: import('svelte').Snippet;
 		onclick?: (event: MouseEvent) => void;
 	}
-
+	// Preserve the native submit default used by existing forms.
 	let {
 		disabled = false,
 		flex = false,
-		href = undefined,
+		href,
 		target = '_self',
+		type = 'submit',
 		children,
 		onclick
 	}: Props = $props();
@@ -26,24 +24,17 @@ SPDX-License-Identifier: MPL-2.0
 
 {#if href}
 	<a
-		{href}
+		href={disabled ? undefined : href}
 		{target}
-		class="w-full px-4 py-2 leading-5 text-black dark:text-white transition-colors duration-200 transform bg-gray-50 dark:bg-gray-700 rounded-sm text-center hover:bg-gray-300 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-600"
+		aria-disabled={disabled || undefined}
+		tabindex={disabled ? -1 : undefined}
+		class="tq-button w-full"
 		{onclick}
-		class:flex
-		class:block={!flex}
-		class:justify-center={flex}
 	>
 		{@render children?.()}
 	</a>
 {:else}
-	<button
-		{disabled}
-		class="w-full px-4 py-2 leading-5 text-black dark:text-white transition-colors duration-200 transform bg-gray-50 dark:bg-gray-700 rounded-sm text-center hover:bg-gray-300 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-600"
-		{onclick}
-		class:flex
-		class:justify-center={flex}
-	>
+	<button {disabled} {type} class="tq-button w-full" {onclick}>
 		{@render children?.()}
 	</button>
 {/if}

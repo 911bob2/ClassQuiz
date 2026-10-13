@@ -5,9 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import { navbarVisible} from '$lib/stores.svelte.ts';
+	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import { page } from '$app/state';
 	import { getLocalization } from '$lib/i18n';
+	import Footer from '$lib/footer.svelte';
 
 	navbarVisible.visible = true;
 	let status = page.status;
@@ -15,28 +16,43 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 <svelte:head>
-	<title>{$t('words.error')} - {status}</title>
+	<title>{$t('words.error')} {status} · Telekom Quiz</title>
 </svelte:head>
-<h1 class="text-6xl text-center">{status}</h1>
 
-{#if status === 404}
-	<p class="text-center">
-		{$t('error_page.404_text')}
-	</p>
-{:else if status === 410}
-	<p class="text-center">
-		{$t('quiztivity.share_expired')}
-	</p>
-{:else}
-	<p class="text-center">
-		{$t('error_page.unknown_error_text')}
-	</p>
-{/if}
+<main class="tq-page tq-page-narrow">
+	<section class="tq-panel tq-panel-body tq-stack error-panel" role="alert" data-ui="error-page">
+		<span class="tq-badge self-start">{status}</span>
+		<h1 class="tq-page-title">
+			{#if status === 404}
+				{$t('telekom.activity_not_found', { defaultValue: 'Activity not found' })}
+			{:else if status === 410}
+				{$t('quiztivity.share_expired')}
+			{:else}
+				{$t('words.error')}
+			{/if}
+		</h1>
+		{#if status !== 404 && status !== 410}
+			<p class="tq-muted">
+				{page.error?.message ??
+					$t('telekom.unexpected_error', {
+						defaultValue: 'An unexpected error occurred.'
+					})}
+			</p>
+		{/if}
+		<div class="tq-toolbar">
+			<a class="tq-button tq-button-primary" href="/">
+				{$t('telekom.home', { defaultValue: 'Home' })}
+			</a>
+			<a class="tq-button" href="/dashboard">
+				{$t('telekom.library', { defaultValue: 'Quiz library' })}
+			</a>
+		</div>
+	</section>
+</main>
+<Footer />
 
-<div class="flex justify-center mt-8">
-	<img
-		class="rounded-lg"
-		src="https://http.cat/{status}"
-		alt="Cat representing the {status}-http error code"
-	/>
-</div>
+<style>
+	.error-panel {
+		gap: 16px;
+	}
+</style>

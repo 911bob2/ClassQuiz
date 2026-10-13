@@ -6,9 +6,8 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import { QuizQuestionType } from '$lib/quiz_types';
-	import type { QuizData } from '$lib/quiz_types';
-	import { get_foreground_color } from '$lib/helpers.js';
-	import { kahoot_icons } from '$lib/play/kahoot_mode_assets/kahoot_icons.js';
+	import type { Answer, QuizData } from '$lib/quiz_types';
+	import AnswerTile from '$lib/play/answer_tile.svelte';
 	import CircularTimer from '$lib/play/circular_progress.svelte';
 	import MediaComponent from '$lib/editor/MediaComponent.svelte';
 	import { getLocalization } from '$lib/i18n';
@@ -31,6 +30,16 @@ SPDX-License-Identifier: MPL-2.0
 
 	const { t } = getLocalization();
 
+	let question = $derived(quiz_data.questions[selected_question]);
+	// The answers of a question are a union that depends on its type.
+	let choices = $derived(question.answers as Answer[]);
+	let revealed = $derived(timer_res === '0');
+	let has_choices = $derived(
+		question.type === QuizQuestionType.ABCD ||
+			question.type === QuizQuestionType.VOTING ||
+			question.type === QuizQuestionType.CHECK
+	);
+
 	let circular_progress = $derived.by(() => {
 		try {
 			return (
@@ -43,72 +52,142 @@ SPDX-License-Identifier: MPL-2.0
 			return 0;
 		}
 	});
+
+	// Wrong answers are marked once the solutions are shown; votes have no right answer.
+	const answer_status = (right: boolean): 'correct' | 'incorrect' | undefined => {
+		if (!revealed || question.type === QuizQuestionType.VOTING) {
+			return undefined;
+		}
+		return right ? 'correct' : 'incorrect';
+	};
 </script>
 
-<div class="flex flex-col justify-center w-screen h-1/6">
-	<h1 class="text-6xl text-center">
-		{@html quiz_data.questions[selected_question].question}
-	</h1>
-	<!--			<span class='text-center py-2 text-lg'>{$t('admin_page.time_left')}: {timer_res}</span>-->
-	<div class="grid grid-cols-3 my-2">
-		<span></span>
-		<div class="m-auto">
-			<CircularTimer text={timer_res} progress={circular_progress} color="#ef4444" />
+<section class="tq-page host-question" data-ui="host-question">
+	<header class="host-head">
+		<h1 class="host-title">{@html question.question}</h1>
+		<div class="host-status tq-panel">
+			<CircularTimer text={timer_res} progress={circular_progress} size={96} />
+			<p class="host-count">
+				{$t('admin_page.answers_submitted', { answer_count: answer_count })}
+			</p>
 		</div>
-		<p class="m-auto text-3xl">
-			{$t('admin_page.answers_submitted', { answer_count: answer_count })}
-		</p>
-	</div>
-</div>
-{#if quiz_data.questions[selected_question].image !== null}
-	<div class="flex w-full">
-		<MediaComponent
-			src={quiz_data.questions[selected_question].image}
-			muted={false}
-			css_classes="max-h-[20vh] object-cover mx-auto mb-8 w-auto"
-		/>
-	</div>
-{/if}
-{#if quiz_data.questions[selected_question].type === QuizQuestionType.ABCD || quiz_data.questions[selected_question].type === QuizQuestionType.VOTING || quiz_data.questions[selected_question].type === QuizQuestionType.CHECK}
-	<div class="grid grid-rows-2 grid-flow-col auto-cols-auto gap-2 w-full p-4">
-		{#each quiz_data.questions[selected_question].answers as answer, i}
-			<div
-				class="rounded-lg h-fit flex border-2 border-black"
-				style="background-color: {answer.color ?? default_colors[i]};"
-				class:opacity-50={!answer.right &&
-					timer_res === '0' &&
-					quiz_data.questions[selected_question].type === QuizQuestionType.ABCD}
-			>
-				<img
-					class="w-14 inline-block pl-4"
-					alt="icon"
-					style="color: {get_foreground_color(answer.color ?? default_colors[i])}"
-					src={kahoot_icons[i]}
-				/>
-				<span
-					class="text-center text-2xl px-2 py-4 w-full"
-					style="color: {get_foreground_color(answer.color ?? default_colors[i])}"
-					>{answer.answer}</span
-				>
-				<span class="pl-4 w-10"></span>
-			</div>
-		{/each}
-	</div>
-{:else if quiz_data.questions[selected_question].type === QuizQuestionType.TEXT}
-	{#if timer_res === '0'}
-		<div class="grid grid-cols-2 gap-2 w-full p-4">
-			{#each quiz_data.questions[selected_question].answers as answer, i}
-				<div class="rounded-lg h-fit flex bg-[#B07156]">
-					<span class="text-center text-2xl px-2 py-4 w-full text-black"
-						>{answer.answer}</span
-					>
-					<span class="pl-4 w-10"></span>
-				</div>
-			{/each}
-		</div>
-	{:else}
-		<div class="flex justify-center">
-			<p class="text-2xl">{$t('admin_page.enter_answer_into_field')}</p>
+	</header>
+
+	{#if question.image !== null}
+		<div class="host-media">
+			<MediaComponent
+				src={question.image}
+				muted={false}
+				css_classes="max-h-[28vh] object-contain mx-auto w-auto rounded-lg"
+			/>
 		</div>
 	{/if}
-{/if}
+
+	{#if has_choices}
+		<div class="host-answers">
+			{#each choices as answer, i}
+				<AnswerTile
+					size="host"
+					index={i}
+					label={answer.answer}
+					color={answer.color}
+					status={answer_status(answer.right)}
+					dimmed={revealed &&
+						!answer.right &&
+						(question.type === QuizQuestionType.ABCD ||
+							question.type === QuizQuestionType.CHECK)}
+				/>
+			{/each}
+		</div>
+	{:else if question.type === QuizQuestionType.TEXT}
+		{#if revealed}
+			<div class="host-answers">
+				{#each choices as answer}
+					<AnswerTile size="host" label={answer.answer} color={answer.color} />
+				{/each}
+			</div>
+		{:else}
+			<p class="tq-panel tq-panel-body host-instruction">
+				{$t('admin_page.enter_answer_into_field')}
+			</p>
+		{/if}
+	{/if}
+</section>
+
+<style>
+	.host-question {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		padding-block-start: 32px;
+	}
+
+	.host-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 24px;
+	}
+
+	.host-title {
+		flex: 1;
+		min-width: 0;
+		font-size: clamp(28px, 3.6vw, 56px);
+		font-weight: 700;
+		line-height: 1.15;
+		overflow-wrap: anywhere;
+	}
+
+	.host-title :global(p) {
+		margin: 0;
+	}
+
+	.host-status {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+		min-width: 180px;
+		padding: 16px 20px;
+		text-align: center;
+	}
+
+	.host-count {
+		font-size: 18px;
+		font-weight: 700;
+	}
+
+	.host-media {
+		display: flex;
+		justify-content: center;
+	}
+
+	.host-answers {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+	}
+
+	.host-instruction {
+		font-size: 24px;
+		text-align: center;
+	}
+
+	@media (max-width: 800px) {
+		.host-head {
+			flex-direction: column;
+		}
+
+		.host-status {
+			flex-direction: row;
+			align-self: stretch;
+			justify-content: center;
+			text-align: start;
+		}
+
+		.host-answers {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

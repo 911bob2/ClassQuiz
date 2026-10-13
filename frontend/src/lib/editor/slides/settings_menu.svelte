@@ -6,6 +6,9 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { getLocalization } from '$lib/i18n';
+
+	const { t } = getLocalization();
 
 	let { title = $bindable(), time = $bindable() } = $props();
 	let time_local = $state(120);
@@ -18,24 +21,35 @@ SPDX-License-Identifier: MPL-2.0
 	}
 </script>
 
-<div
-	class="bg-white m-auto rounded-lg shadow-lg p-4 dark:bg-gray-600 h-fit gap-2 w-fit auto-cols-min flex"
-	transition:fade|global={{ duration: 100 }}
->
-	<label class="w-fit">
-		Time
-		<input
-			bind:value={time}
-			type="number"
-			class="w-20 bg-transparent rounded-lg text-lg border-2 border-gray-500 p-1 outline-hidden"
-		/>
+<div class="slide-settings" data-ui="slide-settings" transition:fade|global={{ duration: 100 }}>
+	<label class="field-block">
+		<span class="tq-label">{$t('words.title')}</span>
+		<input type="text" class="tq-field" bind:value={title} />
 	</label>
-	<label class="w-fit">
-		Title
-		<input
-			bind:value={title}
-			type="text"
-			class="bg-transparent rounded-lg text-lg border-2 border-gray-500 p-1 transition outline-hidden"
-		/>
+	<label class="field-block">
+		<span class="tq-label">{$t('editor.time_in_seconds')}</span>
+		<input type="number" min="1" max="999" class="tq-field" bind:value={time} />
 	</label>
 </div>
+
+<style>
+	.slide-settings {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 200px;
+		gap: 16px;
+		margin-top: 16px;
+		padding: 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+	}
+	.field-block {
+		min-width: 0;
+	}
+
+	@media (max-width: 559px) {
+		.slide-settings {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

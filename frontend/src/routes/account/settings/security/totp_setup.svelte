@@ -20,53 +20,72 @@ SPDX-License-Identifier: MPL-2.0
 	const get_image_url = async () => {
 		return await QRCode.toDataURL(totp_data.url);
 	};
+
+	function openDialog(node: HTMLDialogElement) {
+		node.showModal();
+	}
 </script>
 
-<div class="w-screen h-screen fixed top-0 left-0 p-48 z-30 bg-black/50">
-	<div class="w-full h-full">
+<dialog
+	class="tq-dialog dialog"
+	use:openDialog
+	onclose={() => (totp_data = undefined)}
+	aria-labelledby="totp-title"
+	data-ui="totp-dialog"
+>
+	<header class="dialog-header">
+		<h2 id="totp-title" class="tq-section-title">
+			{$t('security_settings.totp_setup.totp_setup')}
+		</h2>
 		<button
-			class="bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded-t-lg hover:bg-gray-300 transition"
-			onclick={() => {
-				totp_data = undefined;
-			}}
-			>{$t('words.close')}
+			type="button"
+			class="tq-button tq-button-ghost"
+			onclick={() => (totp_data = undefined)}
+		>
+			{$t('words.close')}
 		</button>
-		<div class="bg-white dark:bg-gray-700 rounded-b-lg rounded-tr-lg w-full h-full">
-			<div class="grid grid-cols-3 w-full h-full">
-				<div class="flex flex-col justify-center w-full h-5/6">
-					<span class="m-auto"></span>
-					<div class="h-5/6 flex">
-						<p class="my-auto ml-auto">
-							{$t('security_settings.totp_setup.scan_to_set_up')}
-						</p>
-					</div>
-					<div class="flex">
-						<p class="my-auto ml-auto">
-							{$t('security_settings.totp_setup.enter_as_secret_if_no_see_code')}
-						</p>
-					</div>
-				</div>
-				<div class="flex flex-col justify-start w-full h-5/6">
-					<h2 class="text-2xl m-auto">{$t('security_settings.totp_setup.totp_setup')}</h2>
-					{#await get_image_url()}
-						<Spinner my_20={false} />
-					{:then data}
-						<div class="m-auto h-5/6 object-contain w-full">
-							<img
-								src={data}
-								alt="QR-Code for Totp-setup"
-								class="w-full h-full object-contain"
-							/>
-						</div>
-					{/await}
-					<p class="m-auto select-all font-mono">{totp_data.secret}</p>
-				</div>
-				<div class="flex justify-center h-5/6 w-full">
-					<p class="m-auto text-3xl p-4">
-						{$t('security_settings.totp_setup.do_not_forget_backup_code')}
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+	</header>
+	<p>{$t('security_settings.totp_setup.scan_to_set_up')}</p>
+	{#await get_image_url()}
+		<Spinner my_20={false} />
+	{:then data}
+		<img
+			src={data}
+			alt={$t('security_settings.totp_setup.scan_to_set_up')}
+			class="qr"
+			width="224"
+			height="224"
+		/>
+	{/await}
+	<p class="tq-muted text-sm">
+		{$t('security_settings.totp_setup.enter_as_secret_if_no_see_code')}
+	</p>
+	<code class="secret">{totp_data.secret}</code>
+	<p class="tq-alert">{$t('security_settings.totp_setup.do_not_forget_backup_code')}</p>
+</dialog>
+
+<style>
+	.dialog[open] {
+		display: grid;
+		gap: 16px;
+	}
+	.dialog-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+	.qr {
+		justify-self: center;
+		width: 224px;
+		height: 224px;
+	}
+	.secret {
+		padding: 12px 16px;
+		border: 1px solid var(--tq-border);
+		border-radius: 8px;
+		background: var(--tq-surface-subtle);
+		overflow-wrap: anywhere;
+		user-select: all;
+	}
+</style>

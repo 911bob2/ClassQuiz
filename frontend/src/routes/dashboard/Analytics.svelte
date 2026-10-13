@@ -27,72 +27,103 @@ SPDX-License-Identifier: MPL-2.0
 	};
 	onMount(() => {
 		document.body.addEventListener('keydown', close_start_game_if_esc_is_pressed);
+		return () => {
+			document.body.removeEventListener('keydown', close_start_game_if_esc_is_pressed);
+		};
 	});
+
+	const focus_on_mount = (node: HTMLElement) => {
+		node.focus();
+	};
 </script>
 
 {#if quiz}
 	<div
-		class="fixed w-full h-full top-0 flex bg-black/50 z-50 overflow-scroll"
+		class="tq-overlay"
+		role="presentation"
 		onclick={on_parent_click}
 		transition:fade={{ duration: 100 }}
 	>
 		<div
-			class="m-auto bg-white dark:bg-gray-600 rounded-sm shadow-2xl flex p-4 flex-col lg:w-2/3 w-11/12 h-5/6"
+			class="tq-dialog tq-stack stack-5"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="analytics-title"
+			data-ui="analytics-dialog"
+			tabindex="-1"
+			use:focus_on_mount
 		>
-			<h1 class="text-center text-5xl">{$t('words.analytics')}</h1>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('words.rating')}</h2>
-				<table class="w-fit mx-auto">
-					<tbody>
-						<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.like', { count: 2 })}</th
-							>
-							<th class="p-1 mx-auto">{$t('words.dislike', { count: 2 })}</th>
-						</tr>
-						<tr class="text-left">
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{quiz.likes}</td
-							>
-							<td class="mx-auto p-1">{quiz.dislikes}</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('dashboard.views_n_plays')}</h2>
-				<table class="w-fit mx-auto">
-					<thead>
-						<tr class="border-b-2 dark:border-gray-500 text-left border-gray-300">
-							<th class="border-r dark:border-gray-500 p-1 mx-auto border-gray-300"
-								>{$t('words.view', { count: 2 })}</th
-							>
-							<th class="p-1 mx-auto">{$t('words.play', { count: 2 })}</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="text-left">
-							<td class="border-r dark:border-gray-500 p-1 border-gray-300"
-								>{quiz.views}</td
-							>
-							<td class="mx-auto p-1">{quiz.plays}</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-			<section class="flex flex-col gap-2 mt-8">
-				<h2 class="mx-auto text-2xl">{$t('words.info')}</h2>
-				<p class="mx-auto max-w-[70%] text-center">
-					{$t('dashboard.info_analytics')}
-				</p>
-			</section>
-			<section class="mt-auto">
-				<p class="mt-6 mx-auto max-w-[70%] text-sm dark:text-gray-200 text-center">
-					Since there's still some space left down here, I guess that I take this
-					opportunity to thank You for using ClassQuiz! Have a great day and continue
-					using ClassQuiz ;)
-				</p>
+			<header class="tq-page-heading flush">
+				<div>
+					<h2 class="tq-section-title" id="analytics-title">{$t('words.analytics')}</h2>
+					<p class="tq-muted text-sm">{@html quiz.title}</p>
+				</div>
+				<button
+					type="button"
+					class="tq-button tq-button-ghost"
+					onclick={() => (quiz = undefined)}
+				>
+					{$t('words.close')}
+				</button>
+			</header>
+
+			<dl class="stat-grid">
+				<div class="tq-panel stat">
+					<dt>{$t('words.like_plural')}</dt>
+					<dd>{quiz.likes}</dd>
+				</div>
+				<div class="tq-panel stat">
+					<dt>{$t('words.dislike_plural')}</dt>
+					<dd>{quiz.dislikes}</dd>
+				</div>
+				<div class="tq-panel stat">
+					<dt>{$t('words.view_plural')}</dt>
+					<dd>{quiz.views}</dd>
+				</div>
+				<div class="tq-panel stat">
+					<dt>{$t('words.play_plural')}</dt>
+					<dd>{quiz.plays}</dd>
+				</div>
+			</dl>
+
+			<section class="tq-stack stack-2">
+				<h3 class="tq-label flush">{$t('words.info')}</h3>
+				<p class="tq-muted text-sm">{$t('dashboard.info_analytics')}</p>
 			</section>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.tq-dialog:focus-visible {
+		outline: none;
+	}
+	.stack-2 {
+		gap: 8px;
+	}
+	.stack-5 {
+		gap: 20px;
+	}
+	.flush {
+		margin-bottom: 0;
+	}
+	.stat-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+		margin: 0;
+	}
+	.stat {
+		padding: 16px;
+	}
+	.stat dt {
+		color: var(--tq-muted);
+		font-size: 14px;
+	}
+	.stat dd {
+		margin: 4px 0 0;
+		font-size: 28px;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+</style>

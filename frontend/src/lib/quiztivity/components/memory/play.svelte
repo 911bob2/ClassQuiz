@@ -15,7 +15,7 @@ SPDX-License-Identifier: MPL-2.0
 
 	let { data }: Props = $props();
 
-	const shuffle = <Type>(a: Array<Type>): Array<Type> => {
+	const shuffle = <Type,>(a: Array<Type>): Array<Type> => {
 		for (let i = a.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
 			[a[i], a[j]] = [a[j], a[i]];
@@ -81,26 +81,73 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div>
-	<p class="text-center">{$t('quiztivity.play.memory.try_count', { try_count })}</p>
-	<div class="grid lg:grid-cols-6 grid-cols-2 gap-2 m-4">
+<section class="tq-panel tq-panel-body tq-stack" data-ui="activity-memory">
+	<p class="memory-tries tq-badge tq-badge-brand">
+		{$t('quiztivity.play.memory.try_count', { try_count })}
+	</p>
+	<div class="memory-grid">
 		{#each random_card_order as card}
 			<button
-				class="aspect-square flex border-[#B07156] border-2 rounded-sm"
+				type="button"
+				class="tq-answer memory-card"
+				class:memory-card-open={card_opened[card.id]}
+				aria-pressed={card_opened[card.id]}
+				aria-label={card_opened[card.id]
+					? card.text
+					: $t('telekom.reveal_card', { defaultValue: 'Reveal card' })}
 				onclick={() => {
 					flip_card(card.id);
 				}}
 			>
 				{#if card_opened[card.id]}
-					<p class="m-auto transition-all">{card.text}</p>
+					<span class="memory-text">{card.text}</span>
 				{:else}
-					<img
-						src="/android-chrome-512x512.png"
-						alt="ClassQuiz logo"
-						class="m-4 opacity-50 hover:opacity-80 transition-all"
-					/>
+					<img src="/telekom/t-logo.svg" alt="" class="memory-back" />
 				{/if}
 			</button>
 		{/each}
 	</div>
-</div>
+</section>
+
+<style>
+	.memory-tries {
+		align-self: flex-start;
+		margin: 0;
+		font-size: 14px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.memory-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+		gap: 12px;
+	}
+
+	.memory-card {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		aspect-ratio: 1;
+		min-height: 0;
+		padding: 8px;
+		background: var(--tq-brand);
+		border-color: var(--tq-brand);
+		overflow-wrap: anywhere;
+		text-align: center;
+	}
+
+	.memory-card[aria-pressed='true'] {
+		outline: none;
+	}
+
+	.memory-card-open {
+		background: var(--tq-surface);
+		border-color: var(--tq-border-strong);
+		font-weight: 700;
+	}
+
+	.memory-back {
+		width: 32px;
+		height: auto;
+	}
+</style>

@@ -7,7 +7,8 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import type { Abcd } from '$lib/quiztivity/types';
 	import { getLocalization } from '$lib/i18n';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
+	import CorrectToggle from '$lib/editor/CorrectToggle.svelte';
+	import Icon from '$lib/editor/Icon.svelte';
 
 	interface Props {
 		data: Abcd | undefined;
@@ -25,70 +26,103 @@ SPDX-License-Identifier: MPL-2.0
 	const { t } = getLocalization();
 </script>
 
-<div>
-	<div class="flex justify-center">
+<div class="abcd-editor" data-ui="activity-abcd-editor">
+	<label class="field-block">
+		<span class="tq-label">{$t('words.question')}</span>
 		<input
-			class="bg-transparent outline-hidden text-3xl text-center"
-			placeholder="Enter question here..."
+			class="tq-field question-field"
+			placeholder={$t('words.question')}
 			bind:value={data.question}
 		/>
-	</div>
-	<div class="grid grid-cols-2 m-4 gap-4">
-		{#each data.answers as answer}
-			<div class="rounded-sm p-6 bg-gray-700 flex">
+	</label>
+	<div class="answer-grid">
+		{#each data.answers as answer, index}
+			{@const letter = String.fromCharCode(65 + index)}
+			<div class="answer-card">
+				<span class="answer-badge" aria-hidden="true">{letter}</span>
 				<input
 					bind:value={answer.answer}
-					class="w-full my-auto bg-transparent outline-hidden text-center text-white"
-					placeholder="Enter answer here"
+					class="tq-field"
+					aria-label={$t('telekom.answer_number', {
+						defaultValue: 'Answer {{number}}',
+						number: letter
+					})}
+					placeholder={$t('editor.enter_answer')}
 				/>
-				<button
-					type="button"
-					onclick={() => {
-						answer.correct = !answer.correct;
-					}}
-				>
-					{#if answer.correct}
-						<svg
-							class="w-6 h-6 inline-block text-white"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-					{:else}
-						<svg
-							class="w-6 h-6 inline-block text-white"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-					{/if}
-				</button>
+				<CorrectToggle bind:checked={answer.correct} />
 			</div>
 		{/each}
 		{#if data.answers.length < 4}
-			<div class="rounded-sm p-6 bg-gray-700">
-				<BrownButton
-					onclick={() => {
-						data.answers = [...data.answers, { ...{ answer: '', correct: false } }];
-					}}>{$t('editor_page.add_an_answer')}</BrownButton
-				>
-			</div>
+			<button
+				type="button"
+				class="tq-button add-answer"
+				onclick={() => {
+					data.answers = [...data.answers, { ...{ answer: '', correct: false } }];
+				}}
+			>
+				<Icon name="plus" />
+				{$t('editor_page.add_an_answer')}
+			</button>
 		{/if}
 	</div>
 </div>
+
+<style>
+	.abcd-editor {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.question-field {
+		font-size: 18px;
+	}
+	.answer-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+		align-items: start;
+	}
+	.answer-card {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px;
+		padding: 12px;
+		border: 1px solid var(--tq-border);
+		border-radius: 12px;
+		background: var(--tq-surface-subtle);
+	}
+	.answer-card .tq-field {
+		flex: 1;
+		min-width: 120px;
+		width: auto;
+	}
+	.answer-badge {
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		width: 36px;
+		height: 36px;
+		border-radius: 8px;
+		background: var(--tq-brand-soft);
+		color: var(--tq-accent);
+		font-weight: 700;
+	}
+	.add-answer {
+		min-height: 64px;
+		border-style: dashed;
+		border-radius: 12px;
+		color: var(--tq-muted);
+	}
+	.add-answer:hover {
+		border-color: var(--tq-accent);
+		color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+	}
+
+	@media (max-width: 767px) {
+		.answer-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

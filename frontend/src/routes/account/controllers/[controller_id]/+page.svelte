@@ -11,7 +11,8 @@ SPDX-License-Identifier: MPL-2.0
 	import Spinner from '$lib/Spinner.svelte';
 	import Cookies from 'js-cookie';
 	import { browser } from '$app/environment';
-	import BrownButton from '$lib/components/buttons/brown.svelte';
+	import Footer from '$lib/footer.svelte';
+	import SettingsNav from '../../SettingsNav.svelte';
 	import { getLocalization } from '$lib/i18n';
 
 	const { t } = getLocalization();
@@ -92,35 +93,56 @@ SPDX-License-Identifier: MPL-2.0
 	};
 </script>
 
-<div>
-	<div class="w-full flex flex-col">
-		<h2 class="text-2xl mx-auto">{$t('controllers.controller_name')}</h2>
-		<div class="mx-auto flex">
-			<input
-				class="rounded-sm p-1 transition-all outline-hidden text-center dark:bg-gray-700"
-				bind:value={controller.name}
-				onkeyup={save_player_name_debounce}
-			/>
+<svelte:head>
+	<title>Telekom Quiz · {$t('telekom.controller', { defaultValue: 'Controller' })}</title>
+</svelte:head>
+
+<main class="tq-page settings-page tq-stack" data-ui="controller-detail">
+	<header class="tq-page-heading flush">
+		<h1 class="tq-page-title">{$t('telekom.controller', { defaultValue: 'Controller' })}</h1>
+		<a class="tq-button" href="/account/controllers">
+			{$t('telekom.controllers', { defaultValue: 'Controllers' })}
+		</a>
+	</header>
+	<SettingsNav current="controllers" />
+
+	<section class="tq-panel tq-panel-body section" aria-labelledby="names-title">
+		<div class="section-heading">
+			<h2 class="tq-section-title" id="names-title">{$t('words.settings')}</h2>
 			<SaveIndicator status={saved_status} />
 		</div>
-	</div>
-	<div class="flex flex-col">
-		<h2 class="mx-auto text-2xl">{$t('controllers.player_name')}</h2>
-		<div class="mx-auto flex">
-			<input
-				class="rounded-sm p-1 transition-all outline-hidden text-center dark:bg-gray-700"
-				bind:value={controller.player_name}
-				onkeyup={save_player_name_debounce}
-			/>
-			<SaveIndicator status={saved_status} />
+		<div class="fields">
+			<div class="tq-field-group">
+				<label class="tq-label" for="controller-name"
+					>{$t('controllers.controller_name')}</label
+				>
+				<input
+					id="controller-name"
+					class="tq-field"
+					bind:value={controller.name}
+					onkeyup={save_player_name_debounce}
+				/>
+			</div>
+			<div class="tq-field-group">
+				<label class="tq-label" for="controller-player-name">
+					{$t('controllers.player_name')}
+				</label>
+				<input
+					id="controller-player-name"
+					class="tq-field"
+					bind:value={controller.player_name}
+					onkeyup={save_player_name_debounce}
+				/>
+			</div>
 		</div>
-	</div>
-	<div class="flex flex-col">
-		<h2 class="mx-auto text-2xl">{$t('words.update')}</h2>
+	</section>
+
+	<section class="tq-panel tq-panel-body section" aria-labelledby="update-title">
+		<h2 class="tq-section-title" id="update-title">{$t('words.update')}</h2>
 		{#await get_latest_version()}
 			<Spinner my_20={false} />
 		{:then _}
-			<p class="mx-auto">
+			<p class="tq-muted">
 				{$t('controllers.version_overview', {
 					newest_version,
 					current_version: controller.os_version
@@ -128,8 +150,11 @@ SPDX-License-Identifier: MPL-2.0
 			</p>
 		{/await}
 		{#if newest_version && controller.os_version}
-			<div class="mx-auto">
-				<BrownButton
+			<div>
+				<button
+					type="button"
+					class="tq-button"
+					data-ui="controller-update"
 					disabled={newest_version === controller.os_version}
 					onclick={allow_update_to_version}
 				>
@@ -143,8 +168,39 @@ SPDX-License-Identifier: MPL-2.0
 							current_version: controller.os_version
 						})}
 					{/if}
-				</BrownButton>
+				</button>
 			</div>
 		{/if}
-	</div>
-</div>
+	</section>
+</main>
+<Footer />
+
+<style>
+	.settings-page {
+		max-width: 960px;
+	}
+	.flush {
+		margin-bottom: 0;
+	}
+	.section {
+		display: grid;
+		gap: 20px;
+	}
+	.section-heading {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.fields {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 20px;
+	}
+	@media (max-width: 767px) {
+		.fields {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

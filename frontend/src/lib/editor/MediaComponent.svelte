@@ -6,8 +6,13 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { getLocalization } from '$lib/i18n';
 	import { fade } from 'svelte/transition';
 	import { thumbHashToDataURL } from 'thumbhash';
+	import Icon from '$lib/editor/Icon.svelte';
+	import { modal } from '$lib/editor/modal';
+
+	const { t } = getLocalization();
 
 	interface Props {
 		src: string;
@@ -40,15 +45,18 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		const res = await fetch(`/api/v1/storage/info/${src}`);
 		const fileType = res.headers.get('Content-Type');
-		if (fileType.includes('video')) {
+		if (fileType?.includes('video')) {
 			type = 'video';
 		} else {
 			type = 'img';
-			thumbhash_data = thumbHashToDataURL(base64ToBytes(res.headers.get('x-thumbhash')));
+			const thumbhash = res.headers.get('x-thumbhash');
+			thumbhash_data = thumbhash ? thumbHashToDataURL(base64ToBytes(thumbhash)) : undefined;
 			const data = await fetch(`/api/v1/storage/download/${src}`);
 			img_data = {
 				data: URL.createObjectURL(await data.blob()),
-				alt_text: new TextDecoder().decode(base64ToBytes(res.headers.get('X-Alt-Text')))
+				alt_text: res.headers.get('X-Alt-Text')
+					? new TextDecoder().decode(base64ToBytes(res.headers.get('X-Alt-Text')))
+					: ''
 			};
 			thumbhash_data = undefined;
 		}
@@ -66,15 +74,26 @@ SPDX-License-Identifier: MPL-2.0
 </script>
 
 {#await media}
-	<img src={thumbhash_data} class={`${css_classes} ${added_thumbhash_classes}`} />
+	{#if thumbhash_data}
+		<img src={thumbhash_data} alt="" class={`${css_classes} ${added_thumbhash_classes}`} />
+	{/if}
 {:then data}
 	{#if type === 'img'}
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<img
 			in:fade|global={{ duration: 300 }}
 			src={img_data.data}
-			alt={img_data.alt_text ?? 'Not available'}
+			alt={img_data.alt_text ?? $t('file_dashboard.not_available')}
 			class={css_classes}
 			onclick={() => open_fullscreen()}
+			role={allow_fullscreen ? 'button' : undefined}
+			tabindex={allow_fullscreen ? 0 : undefined}
+			onkeydown={(e) => {
+				if (allow_fullscreen && (e.key === 'Enter' || e.key === ' ')) {
+					e.preventDefault();
+					open_fullscreen();
+				}
+			}}
 		/>
 	{:else if type === 'video'}
 		<video
@@ -90,20 +109,48 @@ SPDX-License-Identifier: MPL-2.0
 			<source src="/api/v1/storage/download/{src}" />
 		</video>
 	{:else}
-		<p>Unknown media type</p>
+		<p>{$t('telekom.media_unavailable', { defaultValue: 'Media unavailable' })}</p>
 	{/if}
 {/await}
 
 {#if fullscreen_open}
 	<div
-		class="fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 fle p-2"
+		class="tq-overlay media-fullscreen"
+		role="presentation"
+		use:modal={{ onclose: () => (fullscreen_open = false) }}
 		transition:fade|global={{ duration: 80 }}
 		onclick={() => (fullscreen_open = false)}
 	>
+		<button
+			type="button"
+			class="tq-icon-button media-fullscreen-close"
+			aria-label={$t('words.close')}
+			onclick={() => (fullscreen_open = false)}
+		>
+			<Icon name="close" />
+		</button>
 		<img
 			src={img_data.data}
-			alt={img_data.alt_text ?? 'Not available'}
-			class="object-cover rounded-sm m-auto max-h-full max-w-full"
+			alt={img_data.alt_text ?? $t('file_dashboard.not_available')}
+			class="media-fullscreen-image"
 		/>
 	</div>
 {/if}
+
+<style>
+	.media-fullscreen {
+		z-index: 80;
+	}
+	.media-fullscreen-close {
+		position: absolute;
+		inset-block-start: 16px;
+		inset-inline-end: 16px;
+	}
+	.media-fullscreen-image {
+		max-width: 100%;
+		max-height: 100%;
+		margin: auto;
+		border-radius: 8px;
+		object-fit: contain;
+	}
+</style>

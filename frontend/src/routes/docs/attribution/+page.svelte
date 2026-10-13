@@ -5,12 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <svelte:head>
-	<title>ClassQuiz/docs - Attribution</title>
+	<title>Telekom Quiz · Docs · Attribution</title>
 	<meta name="description" content="People who helped making with ClassQuiz." />
 </svelte:head>
-<article
-	class="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto mt-10 prose-slate px-4 dark:prose-invert"
->
+<article class="prose tq-prose">
 	<h1>People</h1>
 	<h2>Contributors</h2>
 	<p>People who contributed to the code on GitHub directly</p>
@@ -57,12 +55,4 @@ SPDX-License-Identifier: MPL-2.0
 			<a href="https://github.com/Miniontoby">Miniontoby</a> (Dutch)
 		</li>
 	</ul>
-
-	<p><i>...Maybe you?</i></p>
-
-	<h1>Rules</h1>
-	<p>
-		If you are listed once here, you're a part of ClassQuiz, forever! <br />
-		You can also be listed in more categories.
-	</p>
 </article>

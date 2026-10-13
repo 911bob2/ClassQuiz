@@ -7,11 +7,9 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	// import { alertModal } from '$lib/stores';
 	import { captcha_enabled } from '$lib/config';
-	import StartGameBackground from './start_game_background.svg';
 	import { fade } from 'svelte/transition';
 	import Spinner from '$lib/Spinner.svelte';
 	import { onMount } from 'svelte';
-	import { createTippy } from 'svelte-tippy';
 	import { getLocalization } from '$lib/i18n';
 
 	const { t } = getLocalization();
@@ -22,13 +20,6 @@ SPDX-License-Identifier: MPL-2.0
 	let custom_field = $state('');
 	let cqcs_enabled = $state(false);
 	let randomized_answers = $state(false);
-
-	const tippy = createTippy({
-		arrow: true,
-		animation: 'perspective-subtle',
-		placement: 'top-start',
-		allowHTML: true
-	});
 
 	onMount(() => {
 		const ls_data = localStorage.getItem('custom_field');
@@ -88,169 +79,185 @@ SPDX-License-Identifier: MPL-2.0
 	};
 	onMount(() => {
 		document.body.addEventListener('keydown', close_start_game_if_esc_is_pressed);
+		return () => {
+			document.body.removeEventListener('keydown', close_start_game_if_esc_is_pressed);
+		};
 	});
+
+	const focus_on_mount = (node: HTMLElement) => {
+		node.focus();
+	};
 </script>
 
 <div
-	class="fixed top-0 left-0 flex justify-center w-screen h-screen bg-black/60 z-50 text-black"
-	transition:fade|global={{ duration: 100 }}
+	class="tq-overlay"
+	role="presentation"
 	onclick={on_parent_click}
+	transition:fade|global={{ duration: 100 }}
 >
 	<div
-		class="w-5/6 h-5/6 bg-black m-auto rounded-lg shadow-lg p-4 flex flex-col"
-		style="background-image: url({StartGameBackground}); background-color: #DFDBE5;"
+		class="tq-dialog tq-stack stack-5"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="start-title"
+		data-ui="start-game-dialog"
+		tabindex="-1"
+		use:focus_on_mount
 	>
-		<div class="flex justify-center w-full">
-			<label
-				for="large-toggle"
-				class="inline-flex relative items-center cursor-pointer"
-				class:pointer-events-none={!captcha_enabled}
-				class:opacity-50={!captcha_enabled}
+		<header class="tq-page-heading flush">
+			<h2 class="tq-section-title" id="start-title">{$t('start_game.start_game')}</h2>
+			<button
+				type="button"
+				class="tq-button tq-button-ghost"
+				data-ui="start-game-close"
+				onclick={() => (quiz_id = null)}
 			>
-				<input
-					type="checkbox"
-					bind:checked={captcha_selected}
-					id="large-toggle"
-					class="sr-only peer"
-				/>
-				<span
-					class="w-14 h-7 bg-gray-200 rounded-full
-					peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300
-					dark:peer-focus:ring-blue-800 dark:bg-gray-700
-					peer-checked:bg-blue-600
-					relative
-					after:content-['']
-					after:absolute after:top-0.5 after:start-[4px]
-					after:bg-white after:border-gray-300 after:border
-					after:rounded-full after:h-6 after:w-6
-					after:transition-all
-					peer-checked:after:translate-x-full
-					rtl:peer-checked:after:-translate-x-full"
-				></span>
-				<span class="ms-3 text-sm font-medium text-gray-900"
-					>Captcha {captcha_selected ? 'enabled' : 'disabled'}</span
-				>
-			</label>
-		</div>
-		{#if captcha_selected}
-			<div class="flex justify-center mt-2" in:fade|global>
-				<p class="w-1/3">
-					{$t('start_game.captcha_message')}
-				</p>
-				<!-- Todo: Add translation  -->
-			</div>
-		{/if}
+				{$t('words.close')}
+			</button>
+		</header>
 
-		<div class="grid grid-cols-2 gap-8 my-auto">
-			<div
-				class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
-				class:opacity-50={selected_game_mode !== 'kahoot'}
-				onclick={() => {
-					selected_game_mode = 'kahoot';
-				}}
+		<fieldset class="mode-group">
+			<legend class="tq-label"
+				>{$t('telekom.game_mode', { defaultValue: 'Game mode' })}</legend
 			>
-				<h2 class="text-center text-2xl">{$t('words.normal')}</h2>
-				<p>
-					{$t('start_game.normal_mode_description')}
-				</p>
-			</div>
-			<div
-				class="rounded-lg bg-white shadow-lg cursor-pointer transition-all p-2"
-				class:opacity-50={selected_game_mode !== 'normal'}
-				onclick={() => {
-					selected_game_mode = 'normal';
-				}}
+			<label
+				class="tq-panel mode-option"
+				class:mode-selected={selected_game_mode === 'kahoot'}
 			>
-				<h2 class="text-center text-2xl">{$t('start_game.old_school_mode')}</h2>
-				<p>
-					{$t('start_game.old_school_mode_description')}
-				</p>
-			</div>
-		</div>
-		<div class="flex justify-center items-center my-auto">
-			<label class="mr-4">{$t('result_page.custom_field')}</label>
+				<input type="radio" bind:group={selected_game_mode} value="kahoot" />
+				<span>
+					<strong>{$t('words.normal')}</strong>
+					<span class="tq-muted mode-description">
+						{$t('start_game.normal_mode_description')}
+					</span>
+				</span>
+			</label>
+			<label
+				class="tq-panel mode-option"
+				class:mode-selected={selected_game_mode === 'normal'}
+			>
+				<input type="radio" bind:group={selected_game_mode} value="normal" />
+				<span>
+					<strong>{$t('start_game.old_school_mode')}</strong>
+					<span class="tq-muted mode-description">
+						{$t('start_game.old_school_mode_description')}
+					</span>
+				</span>
+			</label>
+		</fieldset>
+
+		<div class="tq-field-group">
+			<label class="tq-label" for="custom-field">{$t('result_page.custom_field')}</label>
 			<input
+				id="custom-field"
+				data-ui="start-game-custom-field"
+				class="tq-field"
 				bind:value={custom_field}
-				class="rounded-lg p-2 outline-hidden placeholder:italic"
-				placeholder="Phone Number or Email"
+				placeholder={$t('telekom.custom_field_placeholder', {
+					defaultValue: 'Phone number or email'
+				})}
 			/>
 		</div>
-		<div class="flex justify-center w-full my-auto">
-			<label for="cqc-toggle" class="inline-flex relative items-center cursor-pointer">
+
+		<fieldset class="option-group">
+			<legend class="tq-label">{$t('telekom.options', { defaultValue: 'Options' })}</legend>
+			<label class="option-row">
 				<input
 					type="checkbox"
-					bind:checked={cqcs_enabled}
-					id="cqc-toggle"
-					class="sr-only peer"
+					disabled={!captcha_enabled}
+					bind:checked={captcha_selected}
 				/>
-				<span
-					class="w-14 h-7 bg-gray-200 rounded-full
-					peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300
-					dark:peer-focus:ring-blue-800 dark:bg-gray-700
-					peer-checked:bg-blue-600
-					relative
-					after:content-['']
-					after:absolute after:top-0.5 after:start-[4px]
-					after:bg-white after:border-gray-300 after:border
-					after:rounded-full after:h-6 after:w-6
-					after:transition-all
-					peer-checked:after:translate-x-full
-					rtl:peer-checked:after:-translate-x-full"
-				></span>
-				<span class="ms-3 text-sm font-medium text-gray-900"
-					><a
-						href="/controller"
-						target="_blank"
-						use:tippy={{
-							content:
-								'ClassQuizControllers are small physical devices to play ClassQuiz. Click to learn more.'
-						}}
-						class="decoration-dashed underline cursor-help">ClassQuizControllers</a
-					>
-					are {cqcs_enabled ? 'enabled' : 'disabled'}</span
+				<span>Captcha</span>
+			</label>
+			{#if captcha_selected}
+				<p class="tq-muted text-sm option-note">{$t('start_game.captcha_message')}</p>
+			{/if}
+			<label class="option-row">
+				<input type="checkbox" bind:checked={cqcs_enabled} />
+				<span>{$t('telekom.controllers', { defaultValue: 'Controllers' })}</span>
+				<a class="tq-link text-sm" href="/controller" target="_blank" rel="noreferrer">
+					{$t('telekom.learn_more', { defaultValue: 'Learn more' })}
+				</a>
+			</label>
+			<label class="option-row">
+				<input type="checkbox" bind:checked={randomized_answers} />
+				<span>{$t('telekom.randomize_answers', { defaultValue: 'Randomize answers' })}</span
 				>
 			</label>
-		</div>
-		<div class="flex justify-center w-full my-auto">
-			<label
-				for="randomized-answers-toggle"
-				class="inline-flex relative items-center cursor-pointer"
-			>
-				<input
-					type="checkbox"
-					bind:checked={randomized_answers}
-					id="randomized-answers-toggle"
-					class="sr-only peer"
-				/>
-				<span
-					class="w-14 h-7 bg-gray-200 rounded-full
-					peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-blue-300
-					dark:peer-focus:ring-blue-800 dark:bg-gray-700
-					peer-checked:bg-blue-600
-					relative
-					after:content-['']
-					after:absolute after:top-0.5 after:start-[4px]
-					after:bg-white after:border-gray-300 after:border
-					after:rounded-full after:h-6 after:w-6
-					after:transition-all
-					peer-checked:after:translate-x-full
-					rtl:peer-checked:after:-translate-x-full"
-				></span>
-				<span class="ms-3 text-sm font-medium text-gray-900"> Randomize answers</span>
-			</label>
-		</div>
+		</fieldset>
 
-		<button
-			class="mt-auto mx-auto bg-green-500 p-4 rounded-lg shadow-lg hover:bg-green-400 transition-all marck-script text-2xl"
-			onclick={() => {
-				start_game(quiz_id);
-			}}
-		>
-			{#if loading}
-				<Spinner my_20={false} />
-			{:else}
-				{$t('start_game.start_game')}
-			{/if}
-		</button>
+		<div class="tq-toolbar dialog-actions">
+			<button
+				type="button"
+				class="tq-button tq-button-primary"
+				data-ui="start-game-submit"
+				disabled={loading}
+				onclick={() => start_game(quiz_id)}
+			>
+				{#if loading}
+					<Spinner my_20={false} />
+				{:else}
+					{$t('start_game.start_game')}
+				{/if}
+			</button>
+		</div>
 	</div>
 </div>
+
+<style>
+	.tq-dialog:focus-visible {
+		outline: none;
+	}
+	.stack-5 {
+		gap: 20px;
+	}
+	.flush {
+		margin-bottom: 0;
+	}
+	.mode-group,
+	.option-group {
+		display: grid;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+	.mode-group legend,
+	.option-group legend {
+		margin-bottom: 6px;
+		padding: 0;
+	}
+	.mode-option {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 12px 16px;
+		cursor: pointer;
+	}
+	.mode-option input {
+		margin-top: 3px;
+		flex-shrink: 0;
+	}
+	.mode-selected {
+		border-color: var(--tq-accent);
+		background: var(--tq-brand-soft);
+	}
+	.mode-description {
+		display: block;
+		font-size: 14px;
+	}
+	.option-row {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 44px;
+	}
+	.option-note {
+		margin: 0;
+		padding-inline-start: 30px;
+	}
+	.dialog-actions {
+		justify-content: flex-end;
+	}
+</style>

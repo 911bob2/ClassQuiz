@@ -8,6 +8,7 @@ SPDX-License-Identifier: MPL-2.0
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<script>try { document.documentElement.classList.toggle("dark", localStorage.theme === "dark" || (!localStorage.theme && matchMedia("(prefers-color-scheme: dark)").matches)); } catch {}</script>
 		<meta name="description" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script>
@@ -23,22 +24,13 @@ SPDX-License-Identifier: MPL-2.0
 			sizes="180x180"
 			href="%sveltekit.assets%/apple-touch-icon.png"
 		/>
-		<link
-			rel="icon"
-			type="image/png"
-			sizes="32x32"
-			href="%sveltekit.assets%/favicon-32x32.png"
-		/>
-		<link
-			rel="icon"
-			type="image/png"
-			sizes="16x16"
-			href="%sveltekit.assets%/favicon-16x16.png"
-		/>
+		
+		
+		<link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/telekom/app-icon.svg" />
 		<link rel="manifest" href="%sveltekit.assets%/site.webmanifest" />
-		<meta name="apple-mobile-web-app-title" content="ClassQuiz" />
-		<meta name="application-name" content="ClassQuiz" />
-		<meta name="msapplication-TileColor" content="#00a300" />
+		<meta name="apple-mobile-web-app-title" content="Telekom Quiz" />
+		<meta name="application-name" content="Telekom Quiz" />
+		<meta name="msapplication-TileColor" content="#e20074" />
 		<meta name="theme-color" content="#ffffff" />
 		%sveltekit.head%
 	</head>
