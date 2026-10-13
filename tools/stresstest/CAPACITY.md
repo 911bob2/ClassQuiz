@@ -1,20 +1,21 @@
 # ClassQuiz capacity assessment
 
-Inspected on **2026-10-13** through `ssh my-vm`. No ClassQuiz settings, database
-records or deployment services were changed, and no live quiz was load-tested.
+Inspected on **2026-10-13** through `ssh my-vm`, followed by a user-hosted live
+100-player test. No ClassQuiz settings or deployment services were changed.
+The live test created normal player and answer records through gameplay.
 
 ## Expected capacity of the current deployment
 
-**Start by testing 100 players, then 200 and 300.** A provisional performance
-estimate is 100–300 active players in one lobby with spread answers and little
-media. This is an inference from the implementation and deployment, not a
-measured guarantee. Burst answers can expose silent answer loss at much smaller
-counts. Connected sockets alone are not proof that gameplay works correctly.
+**The live 100-player test sustained all connections but lost 16.7% of answers.**
+The earlier 100–300-player performance hypothesis is not a reliable gameplay
+capacity estimate. Fix answer storage before increasing player counts: even
+spread answers already exposed silent loss at 100 players. Connected sockets
+alone are not proof that gameplay works correctly.
 
 | Requested players | Current expectation |
 | --- | --- |
 | 10 | Likely comfortable for ordinary gameplay; verify results in burst mode too. |
-| 100 | Plausible; a useful baseline for latency and answer integrity. |
+| 100 | Measured: responsive delivery and no disconnects, but 167 of 1,000 submitted answers were absent from final results. |
 | 1,000 | Not a dependable target as deployed. The API is near its file limit before CPU and gameplay hot paths are considered. |
 | 10,000 | Cannot all remain connected to the current API worker. Its file limit is an order of magnitude lower. |
 
@@ -22,6 +23,47 @@ There is no defensible media capacity number without knowing asset sizes and VM
 network throughput. For example, 1,000 cold players each downloading a 1 MiB
 image require about 1 GiB of outgoing data for that display. The VM also hosts
 other applications, including Authentik, and shares its resources with them.
+
+## Live 100-player measurement
+
+Room 280514 ran for 3 minutes 12 seconds with ten questions, a 30-second join
+ramp, random answers delayed 0.5–5 seconds, media downloads and automatic
+transport selection. All 100 bots received each question and completed an
+answer transport write. Final results retained only 833 of 1,000 answers;
+individual questions retained 74–93. A read-only Redis check during the run
+confirmed the same counts for the first five questions. There were no unexpected
+disconnects, rejoins or reported connection failures. This is consistent with
+the non-atomic answer-list updates described below.
+
+| Metric | Observed result |
+| --- | --- |
+| Connection setup | Median 123 ms; p95 199 ms; maximum 1.14 seconds. |
+| Lobby join after connection | Median 27 ms; p95 39 ms. |
+| Question receipt spread | All 100 bots received each question within 21–39 ms of the first bot. This is not host-click-to-player latency. |
+| API CPU | Sample average 25.7% of one core; sampled peak 104.5% of one core. |
+| API memory | Sampled peak 219.7 MiB. |
+| Whole VM CPU excluding steal | Sample average 22.6%; sampled peak 40.3% across four vCPUs, including other applications. |
+| VM CPU steal | Sample average 9.1%; sampled peak 19.0%. Hypervisor contention consumes potential CPU time. |
+| VM available RAM | Minimum 11.77 GiB. |
+| API open files | Sampled peak 123; soft limit 1,024. |
+| Generator CPU | Sample average 1.5% of one core; sampled peak 6.9%. |
+| Generator memory | Sampled peak RSS 106.1 MiB; Go heap 47.1 MiB. |
+| Generator answer scheduling | p95 delay 0.72 ms; maximum 2.05 ms beyond the chosen response delay. |
+
+There were 38 server samples at approximately five-second intervals; shorter
+CPU and memory spikes may be missed. Docker CPU uses one core as 100%. The JSON
+monitor's `vm_cpu_percent` includes steal time (31.7% average, 49.8% peak);
+the table subtracts the steal reading from each sample to describe executing
+CPU work. VM figures include other services and monitoring overhead.
+
+Media mode downloaded 29.74 MiB across 100 requests. This was Kahoot mode, whose
+player screen does not display question media; this test does not establish
+capacity for image/video-heavy classic gameplay. Gameplay payload traffic was
+13.78 MiB received and 0.11 MiB sent by the generator, excluding framing/TLS.
+
+Local run artifacts are saved under `tools/stresstest/reports/` (ignored):
+`vm-280514-100-realistic.json` and its readable Markdown summary. The tool exited
+with status 1 because final-result verification detected missing answers.
 
 ## Facts observed on the VM
 
@@ -169,5 +211,5 @@ These are recommendations only; none were applied:
   rooms. Shared Redis game records do not solve room delivery. Polling across
   workers also needs session affinity.
 
-After those changes, repeat the same tests; the present 100–300 estimate would no
-longer describe the modified implementation.
+After those changes, repeat the same tests. A dependable player capacity has
+not yet been established for either the current or a modified implementation.
