@@ -2,6 +2,34 @@
 
 Public URL: https://quiz.911bob.dev
 
+## Current deployment (since 2026-09-17)
+
+The VM's services were migrated to `/srv/services`. The live stack is
+`/srv/services/classquiz/compose.yaml` (Compose project `svc-classquiz`), with source in
+`/srv/services/classquiz/src`, secrets in `secrets/` and data in `data/`. The original
+`/opt/classquiz` project below is stopped and kept only as a rollback boundary; do not
+start it. Read `/srv/services/OPERATIONS.md` and `/srv/services/classquiz/README.md` on
+the VM before changing anything.
+
+To ship a frontend change, upload the committed source and build it under a new tag; never
+overwrite a `migration-*` tag:
+
+```sh
+# Locally
+git archive --format=tar.gz -o frontend.tar.gz master frontend
+scp frontend.tar.gz my-vm:/tmp/
+# On the VM: unpack to src/frontend, then
+docker build -t vm-services/classquiz-frontend:<tag> -f src/deploy/Dockerfile.frontend src/frontend
+```
+
+Point the `frontend` image in `compose.yaml` and the `classquiz/frontend` record in
+`/srv/services/ops/catalog.json` (`image`, `image_id`) at the new tag, then run
+`/srv/services/ops/service.sh classquiz up`. The gateway config is
+`/srv/services/classquiz/config/nginx.conf`, a single-file bind mount: overwrite it in place
+(`cat new > nginx.conf`) and run `nginx -s reload` in the proxy container.
+
+The sections below describe the original `/opt/classquiz` installation.
+
 Local source: `C:\Users\Denis\Documents\AntiGravity\ClassQuiz`
 
 Remote source and Compose project: `/opt/classquiz` on `ssh my-vm`.

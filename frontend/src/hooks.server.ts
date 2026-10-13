@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import * as jose from 'jose';
 
 /** @type {import('@sveltejs/kit').Handle} */
-export const handle: Handle = async ({ event, resolve }) => {
+const authenticate: Handle = async ({ event, resolve }) => {
 	const access_token = event.cookies.get('access_token');
 	if (!access_token) {
 		event.locals.email = null;
@@ -40,3 +41,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.email = jwt.sub;
 	return resolve(event);
 };
+
+// SvelteKit repeats every preloaded CSS and JS file in a `link` response header. On larger
+// pages (e.g. /play) it exceeds the default 4 KB proxy header buffer and nginx answers 502.
+// The same preloads are already in the HTML <head>, so the header is dropped.
+const dropLinkHeader: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+	try {
+		response.headers.delete('link');
+	} catch {
+		/* immutable headers, e.g. a proxied fetch response */
+	}
+	return response;
+};
+
+export const handle = sequence(dropLinkHeader, authenticate);
