@@ -12,6 +12,11 @@ capacity estimate. Fix answer storage before increasing player counts: even
 spread answers already exposed silent loss at 100 players. Connected sockets
 alone are not proof that gameplay works correctly.
 
+Update 2026-10-14: answers are now appended atomically (mawoka-myblock/ClassQuiz#570,
+deployed as backend image `telekom-75ca9652`). On the VM, 100 players answering within
+0.2 s kept all 300 of 300 answers. The other limits below are unchanged; repeat the
+capacity runs before relying on larger player counts.
+
 | Requested players | Current expectation |
 | --- | --- |
 | 10 | Likely comfortable for ordinary gameplay; verify results in burst mode too. |

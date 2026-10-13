@@ -28,6 +28,17 @@ Point the `frontend` image in `compose.yaml` and the `classquiz/frontend` record
 `/srv/services/classquiz/config/nginx.conf`, a single-file bind mount: overwrite it in place
 (`cat new > nginx.conf`) and run `nginx -s reload` in the proxy container.
 
+A backend change works the same way. Copy the changed files into `src/`
+(`git archive master <paths> | ssh my-vm 'tar -x -C /srv/services/classquiz/src'`), build
+`docker build -t vm-services/classquiz-api:<tag> ./src` in `/srv/services/classquiz`, tag the
+same image as `vm-services/classquiz-worker:<tag>`, and point both `image` lines in
+`compose.yaml` and the `classquiz/api` and `classquiz/worker` catalog records at it before
+`service.sh classquiz up`. The backend runs `telekom-75ca9652` (answer storage fix) since
+2026-10-14; `migration-bf7768ea4d9b` is kept for rollback.
+
+`/srv/services/ops/backup.sh` stops every application on the VM while it copies, not only
+ClassQuiz, so schedule it rather than running it as part of a deploy.
+
 The sections below describe the original `/opt/classquiz` installation.
 
 Local source: `C:\Users\Denis\Documents\AntiGravity\ClassQuiz`
