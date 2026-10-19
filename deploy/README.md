@@ -33,8 +33,19 @@ A backend change works the same way. Copy the changed files into `src/`
 `docker build -t vm-services/classquiz-api:<tag> ./src` in `/srv/services/classquiz`, tag the
 same image as `vm-services/classquiz-worker:<tag>`, and point both `image` lines in
 `compose.yaml` and the `classquiz/api` and `classquiz/worker` catalog records at it before
-`service.sh classquiz up`. The backend runs `telekom-75ca9652` (answer storage fix) since
-2026-10-14; `migration-bf7768ea4d9b` is kept for rollback.
+`service.sh classquiz up`. Since 2026-10-19 the api, worker and frontend run `telekom-cd032590`
+(large-audience mode and the experimental Rust engine). The previous tags `telekom-75ca9652`
+(backend) and `telekom-d73455b9` (frontend) are kept for rollback, as is `migration-bf7768ea4d9b`.
+
+That release added a `realtime` service (the api image running `realtime_process.py`, with
+`secrets/realtime.env` holding `REDIS`, `CLASSQUIZ_ORIGIN` and `RUST_REALTIME_THREADS`),
+`RUST_REALTIME_URL=http://realtime:81` in `secrets/api.env` and `secrets/worker.env`, the
+`/socket.io-rust/` gateway location, and `config/nginx-main.conf` (32,768 worker connections)
+mounted into the proxy. Every file it changed has a `.before-realtime-20261019` copy next to it,
+and `src.before-realtime-20261019.tar.gz` holds the previous source. To roll back, restore those
+copies (`catalog.json` too), then run `service.sh classquiz up` and remove the realtime container.
+The outer Nginx Proxy Manager keeps its own connection limits; check them before a 10,000-player
+event. CAPTCHA is not configured on the VM.
 
 `/srv/services/ops/backup.sh` stops every application on the VM while it copies, not only
 ClassQuiz, so schedule it rather than running it as part of a deploy.
