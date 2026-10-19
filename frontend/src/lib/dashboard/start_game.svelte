@@ -231,7 +231,7 @@ SPDX-License-Identifier: MPL-2.0
 				/>
 				<span
 					>{$t('telekom.large_audience', {
-						defaultValue: 'Huge publicum optimization (300+ players)'
+						defaultValue: 'Large audience optimization (300+ players)'
 					})}</span
 				>
 			</label>

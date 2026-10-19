@@ -1,17 +1,33 @@
 //! Redis owns room state. Every mutation checks the native process lease.
 use crate::grading::Answer;
 use anyhow::{Result, ensure};
-use redis::{AsyncCommands, aio::MultiplexedConnection};
+use redis::{
+    AsyncCommands,
+    aio::{ConnectionManager, ConnectionManagerConfig},
+};
 use serde_json::Value;
-use std::sync::{
-    Arc,
-    atomic::{AtomicUsize, Ordering},
+use std::{
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    },
+    time::Duration,
 };
 
 pub const OWNER_KEY: &str = "classquiz:rust:owner:v1";
+/// Result of a lease renewal that reached Redis.
+pub enum Lease {
+    /// Still ours; expiry extended.
+    Held,
+    /// Absent or held by another process. In-memory room state may be stale
+    /// (someone else could have changed Redis meanwhile), so the caller exits.
+    Lost,
+}
 #[derive(Clone)]
 pub struct Store {
-    connections: Arc<Vec<MultiplexedConnection>>,
+    // ConnectionManager reconnects with backoff after a Redis restart or a
+    // dropped connection; a plain multiplexed connection stays dead forever.
+    connections: Arc<Vec<ConnectionManager>>,
     next: Arc<AtomicUsize>,
     owner: String,
     script: redis::Script,
@@ -19,9 +35,15 @@ pub struct Store {
 impl Store {
     pub async fn new(url: &str, count: usize) -> Result<Self> {
         let client = redis::Client::open(url)?;
+        let config = ConnectionManagerConfig::new()
+            .set_connection_timeout(Duration::from_secs(3))
+            .set_response_timeout(Duration::from_secs(20))
+            .set_number_of_retries(4)
+            .set_max_delay(2000);
         let mut connections = Vec::new();
         for _ in 0..count {
-            connections.push(client.get_multiplexed_async_connection().await?);
+            connections
+                .push(ConnectionManager::new_with_config(client.clone(), config.clone()).await?);
         }
         let owner = uuid::Uuid::new_v4().to_string();
         let mut acquired = false;
@@ -61,14 +83,24 @@ impl Store {
             script,
         })
     }
-    pub fn connection(&self) -> MultiplexedConnection {
+    pub fn connection(&self) -> ConnectionManager {
         self.connections[self.next.fetch_add(1, Ordering::Relaxed) % self.connections.len()].clone()
     }
-    pub async fn renew(&self) -> Result<()> {
-        let ok:i64=redis::Script::new("if redis.call('GET',KEYS[1]) ~= ARGV[1] then return 0 end; return redis.call('EXPIRE',KEYS[1],15)")
-            .key(OWNER_KEY).arg(&self.owner).invoke_async(&mut self.connection()).await?;
-        ensure!(ok == 1, "lost native ownership lease");
-        Ok(())
+    pub async fn renew(&self) -> Result<Lease> {
+        let code: i64 = redis::Script::new(
+            r#"
+            if redis.call('GET',KEYS[1]) ~= ARGV[1] then return 0 end
+            return redis.call('EXPIRE',KEYS[1],15)
+        "#,
+        )
+        .key(OWNER_KEY)
+        .arg(&self.owner)
+        .invoke_async(&mut self.connection())
+        .await?;
+        Ok(match code {
+            1 => Lease::Held,
+            _ => Lease::Lost,
+        })
     }
     pub async fn release(&self) {
         let _:redis::RedisResult<i64>=redis::Script::new("if redis.call('GET',KEYS[1]) == ARGV[1] then return redis.call('DEL',KEYS[1]) end; return 0")
@@ -176,23 +208,36 @@ impl Store {
         // Fresh generation: purge only this PIN's stale keys, atomically fenced
         // against room replacement. Startup's global lease prevents two owners.
         let mut keys = vec![format!("game_session:{pin}")];
-        for pattern in [format!("game_session:{pin}:*"), format!("game:{pin}:*")] {
-            let mut cursor = 0u64;
-            loop {
-                let (next, found): (u64, Vec<String>) = redis::cmd("SCAN")
-                    .arg(cursor)
-                    .arg("MATCH")
-                    .arg(&pattern)
-                    .arg("COUNT")
-                    .arg(500)
-                    .query_async(&mut self.connection())
-                    .await?;
-                keys.extend(found);
-                cursor = next;
-                if cursor == 0 {
-                    break;
+        // Every key a previous native generation created is listed in its
+        // registry set, so a reused PIN needs no keyspace scan. Only a PIN with
+        // no registry (first native use, or leftovers of a Python game) falls
+        // back to SCAN, whose cost grows with the whole Redis keyspace; this
+        // runs under the PIN's own gate, never the global room table.
+        let registered: Vec<String> = self
+            .connection()
+            .smembers(format!("game:{pin}:rust_keys"))
+            .await?;
+        if registered.is_empty() {
+            for pattern in [format!("game_session:{pin}:*"), format!("game:{pin}:*")] {
+                let mut cursor = 0u64;
+                loop {
+                    let (next, found): (u64, Vec<String>) = redis::cmd("SCAN")
+                        .arg(cursor)
+                        .arg("MATCH")
+                        .arg(&pattern)
+                        .arg("COUNT")
+                        .arg(1000)
+                        .query_async(&mut self.connection())
+                        .await?;
+                    keys.extend(found);
+                    cursor = next;
+                    if cursor == 0 {
+                        break;
+                    }
                 }
             }
+        } else {
+            keys.extend(registered);
         }
         let script = redis::Script::new(
             r#"
@@ -253,7 +298,8 @@ impl Store {
             .arg(serde_json::to_string(row)?)
             .arg(row.score)
             .arg(7200)
-            .arg(1000)
+            // Same in-flight grace as classquiz/socket_server/answers.py.
+            .arg(5000)
             .arg(&self.owner)
             .invoke_async(&mut self.connection())
             .await?)

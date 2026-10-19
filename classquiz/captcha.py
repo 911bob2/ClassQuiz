@@ -98,7 +98,11 @@ class CaptchaVerifier:
             body = dict(secret=self.secret, response=token)
             if self.policy["provider"] == "hcaptcha":
                 body["sitekey"] = self.policy["site_key"]
-            async with self.session.post(endpoint, data=body, allow_redirects=False) as response:
+            # Decompression is off so the size cap applies to the wire bytes; ask
+            # the provider not to compress, or the JSON parse below would fail.
+            async with self.session.post(
+                endpoint, data=body, headers={"Accept-Encoding": "identity"}, allow_redirects=False
+            ) as response:
                 if response.status != 200:
                     return "captcha_unavailable"
                 raw = bytearray()

@@ -22,6 +22,8 @@ and frontend images. The lab is bound to `127.0.0.1:18088` and is not public.
 docker compose -f tools/stresstest/lab/compose.yaml stop api
 ./tools/realtime-rust/build.ps1
 ./tools/realtime-rust/build.ps1 -Test
+# Optional: keep the build off the CPUs a benchmark uses (or set RUST_BUILD_CPUSET).
+./tools/realtime-rust/build.ps1 -CpuSet 8-15
 docker compose -f tools/stresstest/lab/compose.yaml -f tools/stresstest/lab/compose.rust.yaml up -d
 # If frontend sources changed:
 docker compose -f tools/stresstest/lab/compose.yaml build frontend
@@ -92,7 +94,11 @@ finally:
 
 - One random process token owns a Redis lease, renewed every 3 seconds with a
   15-second expiry. Native writes check ownership inside Redis. A stale process
-  cannot write after replacement; lease/Redis failure closes sockets and exits.
+  cannot write after replacement. A single failed or slow renewal is tolerated;
+  the process closes sockets and exits when the last success is older than 10 s
+  or another process owns the lease. Redis connections reconnect automatically
+  (a Redis restart or short outage does not need a native restart); health is
+  503 while renewals fail.
 - Redis stores phase, generation, question token, original deadline, roster,
   stable resume credentials, answers and scores. The in-memory round and result
   projections are rebuilt lazily. No timer restarts and no answer is admitted
@@ -108,7 +114,8 @@ finally:
   a still-valid unanswered round. The same host tab can replace a stale socket.
 - Admissions are bounded at 256 concurrent operations and use a shared read lock;
   host state transitions use the write lock. Answer submissions do not take that
-  lock. Room-scoped key registries refresh dependent TTLs without scanning all
+  lock. A connection may run one admission at a time (a second is rejected before
+  it can take a slot). Room-scoped key registries refresh dependent TTLs without scanning all
   Redis keys every minute. Expired and unreferenced cached rooms are removed.
 - New PIN generations discard stale state. Final state is terminal. Repeating
   the same active-question command does not reset its token or clock.
@@ -134,8 +141,11 @@ paths instead of broadcasting megabytes of history to the host browser.
 
 Admission defaults: 30,000 registered players per room, 40,000 native connections
 per process, 256 cached rooms, 64 KiB incoming packets, 128 queued outgoing events
-per connection, 128 submissions/second per connection, bounded answer lengths
-and 65,536 concurrent answer commits. These caps are not a whole-server capacity
+per connection, 128 events/second per connection of any type (burst 256; a
+connection that grossly exceeds it is disconnected), bounded answer lengths and
+65,536 concurrent answer commits. Sockets that neither join nor register within
+30 seconds are disconnected, and the deployed proxy allows 2,000 concurrent
+realtime requests per client address. These caps are not a whole-server capacity
 guarantee. The CLI can lower per-room player capacity. Questions last 1–3,600
 seconds; completed questions cannot be reopened for a second scoring pass.
 
@@ -158,10 +168,13 @@ docker compose -f tools/stresstest/lab/compose.yaml exec -T -e RUST_FIXTURE_OUTP
 ./tools/realtime-rust/build.ps1 -Test
 docker compose -f tools/stresstest/lab/compose.yaml exec -T api python /rust-source/test_protocol.py
 docker compose -f tools/stresstest/lab/compose.yaml exec -T api python /rust-source/test_integration.py
+docker compose -f tools/stresstest/lab/compose.yaml exec -T api python /rust-source/test_limits.py
 node tools/realtime-rust/test_browser.mjs
 docker compose -f tools/stresstest/lab/compose.yaml exec -T api python /rust-source/test_recovery.py
 docker compose -f tools/stresstest/lab/compose.yaml -f tools/stresstest/lab/compose.rust.yaml run --rm --no-deps -v "${PWD}/tools/realtime-rust:/rust-source:ro" --entrypoint python runner /rust-source/test_reconnect_load.py --users 1000
 node tools/realtime-rust/test_browser.mjs --polling
+# Destructive to the lab Redis connection (stalls it for up to 14 s); run last:
+docker compose -f tools/stresstest/lab/compose.yaml exec -T api python /rust-source/test_redis_outage.py
 ```
 
 The fixture generator compares real Python grading rules and canonical Lua.

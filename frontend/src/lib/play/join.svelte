@@ -145,12 +145,6 @@ SPDX-License-Identifier: MPL-2.0
 				previous.resume_token
 					? previous.resume_token
 					: crypto.randomUUID() + crypto.randomUUID();
-			if (metadata.realtime_engine === 'rust')
-				Cookies.set(
-					'joined_game',
-					JSON.stringify({ username, game_pin, resume_token, pending: true }),
-					{ expires: 1, sameSite: 'lax' }
-				);
 			if (Cookies.get('kicked')) throw new Error('You have been removed from this quiz.');
 			let captcha: string | undefined;
 			if (captcha_enabled) {
@@ -158,6 +152,13 @@ SPDX-License-Identifier: MPL-2.0
 					throw new Error('Verification is not configured. Please contact the host.');
 				captcha = await verifier.token(captcha_policy, captcha_element);
 			}
+			// Written only once verification passed, so a reload can resume the join.
+			if (metadata.realtime_engine === 'rust')
+				Cookies.set(
+					'joined_game',
+					JSON.stringify({ username, game_pin, resume_token, pending: true }),
+					{ expires: 1, sameSite: 'lax' }
+				);
 			socket.emit('join_game', {
 				username,
 				game_pin,
@@ -261,8 +262,8 @@ SPDX-License-Identifier: MPL-2.0
 				>
 					{joining
 						? captcha_enabled
-							? 'Verifying�'
-							: 'Joining�'
+							? 'Verifying…'
+							: 'Joining…'
 						: $t('telekom.join_game', { defaultValue: 'Join game' })}
 				</button>
 				{#if join_error}<p role="alert" data-ui="captcha-error" class="tq-muted">
@@ -280,7 +281,7 @@ SPDX-License-Identifier: MPL-2.0
 							target="_blank"
 							rel="noreferrer">Privacy</a
 						>
-						�
+						·
 						<a
 							href={captcha_policy.provider === 'hcaptcha'
 								? 'https://www.hcaptcha.com/terms'

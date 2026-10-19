@@ -16,6 +16,8 @@
     local count = redis.call('RPUSH', KEYS[3], ARGV[7])
     redis.call('HINCRBY', KEYS[4], ARGV[1], ARGV[8])
     for i = 1, 4 do redis.call('EXPIRE', KEYS[i], ARGV[9]) end
+    -- Long games must not outlive the player's membership.
+    redis.call('EXPIRE', KEYS[6], ARGV[9])
     local players = redis.call('SCARD', KEYS[5])
     if count == players then
         redis.call('HSET', KEYS[1], 'open', '0')

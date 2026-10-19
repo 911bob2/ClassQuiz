@@ -84,6 +84,11 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	};
 	listen('everyone_answered', everyone_answered);
+	// The server closed the question before this answer arrived.
+	let rejected = $state(false);
+	listen('question_not_active', () => {
+		if (submitted) rejected = true;
+	});
 	onDestroy(() => {
 		clearInterval(timer_interval);
 		socket.off('everyone_answered', everyone_answered);
@@ -182,7 +187,13 @@ SPDX-License-Identifier: MPL-2.0
 						})}
 					{/if}
 				</p>
-				{#if submitted && timer_res !== '0'}
+				{#if rejected}
+					<p class="play-status" role="status">
+						{$t('telekom.answer_too_late', {
+							defaultValue: 'Too late: this answer was not counted'
+						})}
+					</p>
+				{:else if submitted && timer_res !== '0'}
 					<p class="play-status" role="status">
 						{$t('telekom.answer_submitted', { defaultValue: 'Answer submitted' })}
 					</p>

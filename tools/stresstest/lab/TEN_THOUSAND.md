@@ -135,7 +135,7 @@ can be the first implementation behind that same boundary; replacing it with
 Go later need not change the normal engine. The current separate
 `large_audience.py` module handles result delivery, not transport ownership.
 
-## Trade-offs I would accept for the single Huge publicum toggle
+## Trade-offs I would accept for the single large-audience toggle
 
 - Keep all question types, immediate atomic answer storage, own result/score,
   exact rank, host moderation and connection heartbeats.

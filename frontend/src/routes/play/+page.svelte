@@ -110,6 +110,7 @@ SPDX-License-Identifier: MPL-2.0
 			connection_error = '';
 		} catch (error) {
 			connection_error = error.message;
+			if (error.message === 'Room expired or PIN not found') Cookies.remove('joined_game');
 		} finally {
 			restoring = false;
 		}
@@ -120,7 +121,8 @@ SPDX-License-Identifier: MPL-2.0
 	};
 	listen('disconnect', disconnected);
 	onMount(() => {
-		if (socket.connected) restorePlayer();
+		// The socket is not connected yet; restoring selects the room's engine and connects.
+		restorePlayer();
 	});
 	onDestroy(() => {
 		socket.off('connect', restorePlayer);

@@ -143,6 +143,9 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	};
 	const reconnectHost = () => {
+		// Python keeps the host registered across a reconnect and would answer a
+		// second registration with already_registered_as_admin.
+		if (success && game_state.quiz_data?.realtime_engine !== 'rust') return;
 		if (success || auto_connect) connect();
 	};
 	listen('host_replaced', () => {

@@ -101,6 +101,46 @@ Compact evidence is in `hardened-measurements.json`. Detailed raw reports,
 logs, spreadsheet/browser fixtures and generated binaries remain in ignored
 `../stresstest/lab/results/`. See [README.md](README.md) for reproduction commands.
 
+## Review follow-ups
+
+A later code review led to these changes (no deployment; local checks only):
+
+- **Admission fairness.** `join` and `register_as_admin` take the per-connection
+  lock first and reject (rather than queue) a second concurrent attempt, then
+  take one of the 256 global slots with a 20 s bound. A socket can therefore
+  hold at most one slot. Every event type passes a per-connection token bucket
+  (128 events/s sustained, burst 256) that runs before socketioxide spawns a
+  task; a connection whose refusals outnumber its grants by 1,024 is
+  disconnected. `/__rust/metrics` counts `throttled_events` and `flood_disconnects`.
+- **TEXT answers are no longer sent to players.** For TEXT questions the stored
+  answers are the accepted solutions. `set_question_number` and the `room_state`
+  snapshot now carry `"answers": []`; the full question is sent only by the
+  host-triggered `solutions` event.
+- **Lease patience.** A failed or slow renewal no longer exits the process. It
+  exits when the last success is older than 10 s, or at once if another process
+  owns the lease or the key is gone (state may have changed under us, so the
+  process restarts instead of trusting its caches). Redis connections are `ConnectionManager`s and reconnect by themselves, so a
+  Redis restart no longer needs a native restart; a Redis outage longer than
+  about 10 s still ends with an exit and a supervisor restart. During a failed
+  renewal `/health` is 503 until the next success. Rooms are no longer evicted
+  because a Redis read failed, only when the game is gone or was replaced.
+- **Idle and per-address limits.** A socket that has not joined or registered
+  within 30 s is disconnected. The deployed proxy limits `/socket.io-rust/` to
+  2,000 concurrent requests per client address (taken from the last
+  `X-Forwarded-For` element; one WebSocket is one request, HTTP polling up to two).
+- **Room construction** no longer holds the global room table across Redis I/O:
+  a per-PIN gate builds each room once. A reused PIN purges its stale keys from
+  the room's key registry; only a PIN without a registry still SCANs the keyspace.
+- **Smaller items.** Clients get `{"message":"request_failed"}` instead of
+  internal error text; log lines from client-triggerable paths are sampled and
+  socketioxide's per-event extraction error is muted. SIGTERM releases the lease
+  like SIGINT. Scores use Python's expression order (`(t - z) / t * 1000`), which
+  differs by one point from `1000 * (1 - z / t)` for some inputs.
+
+New checks: `test_limits.py` (flood, register flood, idle limit) and
+`test_redis_outage.py` (5 s stall, dropped connections, 14 s outage); both run
+in the lab API container like `test_protocol.py`.
+
 ## Boundaries of the claim
 
 This is a production-integrated **experimental** option, not an active-active or
@@ -110,8 +150,9 @@ measured trial. The clock keeps running, so unanswered players may miss a round.
 Accepted-in-Redis is not an fsync-per-answer guarantee: default AOF every-second
 fsync has a different VM/storage failure loss window.
 
-Captcha, controllers, old-school presentation, remote host control and the legacy
-live-data API are unsupported for native rooms. Live counts lag up to 250 ms;
+Controllers, old-school presentation, remote host control and the legacy
+live-data API are unsupported for native rooms. hCaptcha and reCAPTCHA v3 are
+supported on initial admission (see [CAPTCHA.md](CAPTCHA.md)). Live counts lag up to 250 ms;
 compression is absent; host viewing is paged. Full history and personal ranks
 are retained. Default player/connection/cache caps are resource guards, not
 aggregate capacity promises. Media/TLS/uplink limits, many simultaneous rooms,

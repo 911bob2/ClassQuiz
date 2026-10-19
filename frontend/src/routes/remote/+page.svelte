@@ -41,6 +41,7 @@ SPDX-License-Identifier: MPL-2.0
 	if (!data.game_id || !data.game_pin) {
 		console.log('Error!');
 	} else {
+		if (!socket.connected) socket.connect();
 		socket.emit('register_as_remote', data);
 	}
 

@@ -84,7 +84,7 @@ network shared with `stack-npm-1`. Do not enter `localhost` or `127.0.0.1` in NP
 
 After HTTPS is enabled, open `/account/register` and create your account.
 Email verification is skipped as requested. SMTP, password-reset delivery,
-external OAuth, CAPTCHA, Pixabay, Sentry, and telemetry are not configured.
+external OAuth, CAPTCHA (optional, see below), Pixabay, Sentry, and telemetry are not configured.
 No third-party API keys are required for normal quiz creation and play.
 
 ## Credentials
@@ -180,7 +180,7 @@ this recovery does not replace Redis persistence or backups. The supplied AOF
 configuration can lose roughly the last second of writes on a storage/VM crash.
 
 Monitor `docker compose --env-file deploy/.env -f deploy/compose.yaml logs realtime`
-and its container health. `/health` and `/metrics` are internal native endpoints;
+and its container health. `/health` and `/__rust/metrics` are internal native endpoints;
 do not publish port 81 directly. Before an upgrade, let native quizzes finish,
 then rebuild the backend and recreate `api`, `worker` and `realtime` together.
 Updating the frontend/proxy configuration is also required when enabling this

@@ -10,9 +10,11 @@ from classquiz.config import redis
 from classquiz.db.models import AnswerData, PlayGame, QuizQuestion, QuizQuestionType
 
 TTL = 7200
-# Range questions auto-submit at the phone's timer boundary. Allow a bounded
-# in-flight window; an explicit host reveal/close still rejects immediately.
-ANSWER_GRACE_MS = 1000
+# Phones auto-submit at their own timer boundary, which starts when the question
+# reaches them, not when the host opened it. Allow for slow networks and large
+# broadcasts; late answers already score 0 and an explicit host reveal/close
+# still rejects immediately.
+ANSWER_GRACE_MS = 5000
 
 
 @dataclass(frozen=True)
@@ -60,6 +62,8 @@ _commit = redis.register_script("""
     local count = redis.call('RPUSH', KEYS[3], ARGV[7])
     redis.call('HINCRBY', KEYS[4], ARGV[1], ARGV[8])
     for i = 1, 4 do redis.call('EXPIRE', KEYS[i], ARGV[9]) end
+    -- Long games must not outlive the player's membership.
+    redis.call('EXPIRE', KEYS[6], ARGV[9])
     local players = redis.call('SCARD', KEYS[5])
     if count == players then
         redis.call('HSET', KEYS[1], 'open', '0')

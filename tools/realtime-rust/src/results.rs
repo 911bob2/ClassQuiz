@@ -192,7 +192,12 @@ fn host_page(cache: &ResultCache, page: usize) -> Value {
 pub struct Page {
     page: usize,
 }
-pub async fn page(socket: SocketRef, Data(data): Data<Page>, State(app): State<Arc<App>>) {
+pub async fn page(
+    _: Throttle,
+    socket: SocketRef,
+    Data(data): Data<Page>,
+    State(app): State<Arc<App>>,
+) {
     let result: Result<()> = async {
         let session = host(&socket)?;
         let _guard = session.room.control.read().await;
@@ -231,6 +236,7 @@ async fn publish(app: &App, room: &Room) -> Result<()> {
     Ok(())
 }
 pub async fn reveal(
+    _: Throttle,
     socket: SocketRef,
     Data(data): Data<QuestionResults>,
     ack: AckSender,
@@ -261,7 +267,7 @@ pub async fn reveal(
         Err(error) => failure(&app, &socket, error),
     }
 }
-pub async fn finals(socket: SocketRef, State(app): State<Arc<App>>) {
+pub async fn finals(_: Throttle, socket: SocketRef, State(app): State<Arc<App>>) {
     let result: Result<()> = async {
         let session = host(&socket)?;
         let room = &session.room;
@@ -279,7 +285,7 @@ pub async fn finals(socket: SocketRef, State(app): State<Arc<App>>) {
         failure(&app, &socket, error);
     }
 }
-pub async fn export(socket: SocketRef, State(app): State<Arc<App>>) {
+pub async fn export(_: Throttle, socket: SocketRef, State(app): State<Arc<App>>) {
     let result: Result<()> = async {
         let session = host(&socket)?;
         let room = &session.room;
@@ -305,7 +311,12 @@ pub async fn export(socket: SocketRef, State(app): State<Arc<App>>) {
         failure(&app, &socket, error);
     }
 }
-pub async fn kick(socket: SocketRef, Data(data): Data<Value>, State(app): State<Arc<App>>) {
+pub async fn kick(
+    _: Throttle,
+    socket: SocketRef,
+    Data(data): Data<Value>,
+    State(app): State<Arc<App>>,
+) {
     let result: Result<()> = async {
         let session = host(&socket)?;
         let room = &session.room;

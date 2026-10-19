@@ -9,6 +9,9 @@ import redis.asyncio as redis
 import socketio
 
 
+HOST_CLIENT = "protocol-test-host-client"
+
+
 class Client:
     def __init__(self):
         self.io = socketio.AsyncClient(reconnection=False)
@@ -78,8 +81,9 @@ async def main():
     try:
         host = await client()
         await host.io.emit("register_as_admin", dict(game_pin=pin, game_id="incorrect"))
-        await host.wait("error")
-        await host.io.emit("register_as_admin", dict(game_pin=pin, game_id=game_id))
+        # Clients learn that the request failed, never why (no internal error text).
+        assert await host.wait("error") == {"message": "request_failed"}
+        await host.io.emit("register_as_admin", dict(game_pin=pin, game_id=game_id, client_id=HOST_CLIENT))
         await host.wait("registered_as_admin")
         passed.append("host secret checked before registration")
         a, b = await client(), await client()
@@ -92,7 +96,7 @@ async def main():
         await duplicate.wait("username_already_exists")
         passed.append("duplicate names rejected")
         await a.io.emit("start_game", {})
-        await a.wait("error")
+        assert await a.wait("error") == {"message": "request_failed"}
         await host.io.emit("start_game", {})
         await host.wait("start_game")
         passed.append("players cannot start or control the room")
@@ -111,6 +115,18 @@ async def main():
             public = q["question"]["answers"]
             if kind == "RANGE":
                 assert "min_correct" not in public and "max_correct" not in public
+            elif kind == "TEXT":
+                # The stored answers are the accepted solutions: never sent before `solutions`.
+                assert public == [], public
+                # A replacement host's snapshot is built by the same code path.
+                replacement = await client()
+                await replacement.io.emit(
+                    "register_as_admin", dict(game_pin=pin, game_id=game_id, client_id=HOST_CLIENT)
+                )
+                await replacement.wait("registered_as_admin")
+                snapshot = await replacement.wait("room_state")
+                assert snapshot["question"]["answers"] == [], snapshot["question"]
+                host = replacement
             else:
                 assert all("right" not in row and "case_sensitive" not in row for row in public)
             data = dict(question_index=i, question_token=q["question_token"], answer=answer, complex_answer=order)
@@ -156,7 +172,7 @@ async def main():
         await rejoined.wait("kick")
         assert await db.get(f"game_session:{pin}:players:alpha") is None
         passed.append("kick removes authoritative membership")
-        await db.hset(f"game:{pin}:answer_state", "deadline_ms", time.time() * 1000 - 2000)
+        await db.hset(f"game:{pin}:answer_state", "deadline_ms", time.time() * 1000 - 7000)
         await b.io.emit("submit_answer", dict(question_index=6, question_token=q["question_token"], answer="A"))
         await b.wait("question_not_active")
         assert await db.llen(f"game_session:{pin}:6") == 0

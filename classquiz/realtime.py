@@ -51,7 +51,11 @@ async def native_host(pin, token):
     if not raw:
         raise HTTPException(404, "Room expired")
     game = PlayGame.model_validate_json(raw)
-    if not token or not secrets.compare_digest(str(game.game_id), token) or game.realtime_engine != "rust":
+    if (
+        not token
+        or not secrets.compare_digest(str(game.game_id).encode(), token.encode())
+        or game.realtime_engine != "rust"
+    ):
         raise HTTPException(403, "Host token required")
     return game
 

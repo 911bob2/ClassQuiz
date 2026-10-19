@@ -283,12 +283,16 @@ async def set_question_number(sid: str, data: str):
     temp_return["type"] = game_data.questions[int(float(data))].type
     if temp_return["type"] == QuizQuestionType.ORDER:
         random.shuffle(temp_return["answers"])
+    question = ReturnQuestion(**temp_return).model_dump()
+    if temp_return["type"] == QuizQuestionType.TEXT:
+        # The answers of a TEXT question are its accepted solutions.
+        question["answers"] = []
     await sio.emit(
         "set_question_number",
         {
             "question_index": int(float(data)),
             "question_token": question_token,
-            "question": ReturnQuestion(**temp_return).model_dump(),
+            "question": question,
         },
         room=game_pin,
     )
@@ -416,6 +420,9 @@ async def kick_player(sid: str, data: dict):
         GamePlayer(username=data.username, sid=None if controller else player_sid).model_dump_json(),
     )
     await redis.delete(f"game_session:{session['game_pin']}:players:{data.username}")
+    if controller:
+        # Stops the controller's websocket from re-registering the player.
+        await redis.set(f"game_session:{session['game_pin']}:kicked:{data.username}", "1", ex=18000)
     if player_sid is not None and not controller:
         await sio.leave_room(player_sid, session["game_pin"])
         await sio.emit("kick", room=player_sid)
@@ -469,6 +476,8 @@ async def set_control_visibility(sid: str, data: dict):
         print(e)
         return
     session: dict = await get_session(sid, sio)
+    if not session.get("admin"):
+        return
     await sio.emit(
         "control_visibility",
         {"visible": data.visible},

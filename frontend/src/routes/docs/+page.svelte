@@ -19,6 +19,8 @@ SPDX-License-Identifier: MPL-2.0
 		</li>
 		<li>
 			<a href="/docs/features">Features</a>
+		</li>
+		<li>
 			<a href="/docs/large-audiences">Large audiences &amp; the Rust engine</a>
 		</li>
 		<li>

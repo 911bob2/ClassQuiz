@@ -110,6 +110,10 @@ async def websocket_endpoint(ws: WebSocket, game_id: str):
             await ws.close(code=status.WS_1008_POLICY_VIOLATION)
             wss_clients.pop(game_id, None)
             return
+        if await redis.exists(f"game_session:{game_pin}:kicked:{username}"):
+            await ws.close(code=status.WS_1008_POLICY_VIOLATION)
+            wss_clients.pop(game_id, None)
+            return
         membership = f"game_session:{game_pin}:players:{username}"
         owner = f"controller:{player_id}"
         if not await redis.set(membership, owner, nx=True, ex=7200) and await redis.get(membership) != owner:

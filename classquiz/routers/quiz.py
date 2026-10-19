@@ -81,7 +81,7 @@ async def get_public_quiz(quiz_id: uuid.UUID):
 async def start_quiz(
     quiz_id: str,
     game_mode: str,
-    captcha_enabled: bool = True,
+    captcha_enabled: bool = False,
     custom_field: str | None = None,
     cqcs_enabled: bool = False,
     randomize_answers: bool = False,

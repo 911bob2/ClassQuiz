@@ -107,18 +107,28 @@ pub fn grade(question: &Value, data: &Submission) -> Result<(bool, String)> {
     Ok((right, answer))
 }
 
+/// Same expression order as Python's `calculate_score`:
+/// `t = int(time) * 1000; int((t - z) / t * 1000)`, clamped to 0..=1000.
+/// `1000 * (1 - z / t)` is mathematically equal but rounds differently
+/// (for example z=5500 ms, t=10 s gives 450 here and 449 that way).
 pub fn score(right: bool, elapsed_ms: f64, duration_secs: f64) -> i64 {
-    if !right || duration_secs <= 0.0 {
+    let t = duration_secs.trunc() * 1000.0;
+    if !right || t <= 0.0 {
         return 0;
     }
-    ((1000.0 * (1.0 - elapsed_ms.max(0.0) / (duration_secs.trunc() * 1000.0))) as i64)
-        .clamp(0, 1000)
+    let z = elapsed_ms.max(0.0);
+    // `as i64` truncates toward zero like Python's int().
+    (((t - z) / t * 1000.0) as i64).clamp(0, 1000)
 }
 
 pub fn public_question(question: &Value) -> Value {
     let mut q = question.clone();
     if q["type"] == "RANGE" {
         q["answers"] = json!({"min":q["answers"]["min"], "max":q["answers"]["max"]});
+    } else if q["type"] == "TEXT" {
+        // The stored answers of a TEXT question are the accepted solutions.
+        // Players only need the input field; solutions follow in `solutions`.
+        q["answers"] = json!([]);
     } else if let Some(rows) = q["answers"].as_array_mut() {
         let voting = question["type"] == "VOTING";
         for row in rows.iter_mut() {
@@ -164,9 +174,39 @@ mod tests {
         }
     }
     #[test]
-    fn score_bounds_and_public_secrets() {
+    fn score_bounds() {
         assert_eq!(score(true, -20.0, 30.0), 1000);
         assert_eq!(score(true, 100000.0, 30.0), 0);
+        assert_eq!(score(false, 0.0, 30.0), 0);
+        assert_eq!(score(true, 10.0, 0.5), 0, "int(0.5) is a zero-length round");
+    }
+    #[test]
+    fn score_matches_python_expression_order() {
+        // Values from Python: int(((t - z) / t) * 1000) with t = seconds * 1000.
+        for (elapsed, seconds, expected) in [
+            (5500.0, 10.0, 450),
+            (10840.0, 20.0, 458),
+            (4665.0, 5.0, 67),
+            (4655.0, 5.0, 69),
+            (0.0, 20.0, 1000),
+            (1234.5, 20.0, 938),
+        ] {
+            assert_eq!(
+                score(true, elapsed, seconds),
+                expected,
+                "{elapsed} ms / {seconds} s"
+            );
+        }
+    }
+    #[test]
+    fn text_answers_are_never_sent_to_players() {
+        let text = json!({"type":"TEXT","question":"?","answers":[{"answer":"Paris","case_sensitive":false}]});
+        assert_eq!(public_question(&text)["answers"], json!([]));
+        // The stored question is untouched: grading and `solutions` still use it.
+        assert_eq!(text["answers"][0]["answer"], "Paris");
+    }
+    #[test]
+    fn public_secrets() {
         let q =
             json!({"type":"RANGE","answers":{"min":0,"max":10,"min_correct":5,"max_correct":6}});
         assert!(public_question(&q)["answers"].get("min_correct").is_none());

@@ -4,20 +4,40 @@
 
 import { io } from 'socket.io-client';
 
-export const socket = io();
+// Connected by connectRoom (or the page) once the room's engine is known, so a
+// player bound for the Rust engine never opens a Python socket first.
+export const socket = io({ autoConnect: false });
 
 let selectedPath = '/socket.io';
 let selecting: Promise<any> | undefined;
 let nativeRoom = false;
 let roomPin = '';
 let replaced = false;
+let refused = false;
+let serverDisconnects = 0;
 socket.on('host_replaced', () => {
 	replaced = true;
 	socket.disconnect();
 });
+// The room turned the player away; reconnecting would only repeat that.
+for (const event of ['room_full', 'game_already_started', 'kick'])
+	socket.on(event, () => {
+		refused = true;
+	});
+socket.on('connect', () => {
+	serverDisconnects = 0;
+});
 socket.on('disconnect', (reason) => {
-	if (nativeRoom && !replaced && reason === 'io server disconnect')
-		setTimeout(() => socket.connect(), 1000);
+	if (
+		nativeRoom &&
+		!replaced &&
+		!refused &&
+		reason === 'io server disconnect' &&
+		serverDisconnects < 10
+	) {
+		serverDisconnects += 1;
+		setTimeout(() => socket.connect(), 1000 * serverDisconnects);
+	}
 });
 
 /** Select before admission; never send a native room to the Python fallback. */
@@ -36,7 +56,10 @@ export function connectRoom(pin: string): Promise<any> {
 		const metadata = await response.json();
 		const path = metadata.socket_path === '/socket.io-rust' ? '/socket.io-rust' : '/socket.io';
 		const changingRoom = roomPin !== '' && roomPin !== pin;
-		if (changingRoom) replaced = false;
+		if (changingRoom) {
+			replaced = false;
+			refused = false;
+		}
 		nativeRoom = metadata.realtime_engine === 'rust';
 		roomPin = pin;
 		if (path !== selectedPath || changingRoom) {
@@ -74,19 +97,26 @@ export function sendAnswer(data: any) {
 	socket.emit('submit_answer', data);
 }
 
+function readPending(key: string): any {
+	try {
+		return JSON.parse(sessionStorage.getItem(key) || 'null');
+	} catch {
+		sessionStorage.removeItem(key);
+		return null;
+	}
+}
+
 socket.on('answer_committed', (data) => {
 	const key = `quiz-pending:${roomPin}`;
-	const pending = sessionStorage.getItem(key);
-	if (pending && JSON.parse(pending).question_index == data.question_index)
-		sessionStorage.removeItem(key);
+	const pending = readPending(key);
+	if (pending && pending.question_index == data.question_index) sessionStorage.removeItem(key);
 });
 socket.on('personal_final_results', () => sessionStorage.removeItem(`quiz-pending:${roomPin}`));
 socket.on('room_state', (data) => {
 	if (!nativeRoom) return;
 	const key = `quiz-pending:${roomPin}`;
-	const raw = sessionStorage.getItem(key);
-	if (!raw) return;
-	const pending = JSON.parse(raw);
+	const pending = readPending(key);
+	if (!pending) return;
 	if (
 		data.answered ||
 		pending.question_token !== data.question_token ||

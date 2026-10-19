@@ -117,7 +117,7 @@ answer storage/deduplication, sensible descriptor limits and avoiding hidden
 DOM rows. There is no useful small-room feature to preserve by keeping those
 defects behind a checkbox.
 
-**Large audience / “Huge publicum optimization (100+ players)”** should keep
+**Large audience / “Large audience optimization (100+ players)”** should keep
 scoring, time sync, reconnects, heartbeats, all question types, personal results,
 rank, charts and exports. Use compact result messages and virtualized standings;
 batch count/roster presentation to roughly 4 Hz if needed. There is no need to

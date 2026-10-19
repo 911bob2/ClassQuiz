@@ -6,8 +6,8 @@ Implemented in `codex/load-bottleneck-analysis`, based on `50c6dd16`. Measured
 Follow-up: [10,000-player profiling and experimental runtime](TEN_THOUSAND.md)
 preserves these recommendations and measures the next capacity limits.
 
-**Recommendation: use normal mode for roughly 300 players, and enable “Huge
-publicum optimization (300+ players)” for larger rooms. The conservative local
+**Recommendation: use normal mode for roughly 300 players, and enable “Large
+audience optimization (300+ players)” for larger rooms. The conservative local
 target with the toggle is 1,000 players for short quizzes, or around 750 when
 100 questions are loaded.** These are practical targets for the tested media-free
 quiz and aggressive submission wave, not VM guarantees.

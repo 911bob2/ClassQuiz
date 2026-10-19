@@ -33,20 +33,54 @@ pub async fn health(HttpState(app): HttpState<Arc<App>>) -> axum::http::StatusCo
         axum::http::StatusCode::SERVICE_UNAVAILABLE
     }
 }
+/// The lease lasts 15 s and is renewed every 3 s. One slow or failed renewal
+/// (a Redis blip, a GC-like stall, a failover) must not kill live rooms, so the
+/// process only gives up when the last success is older than this, which still
+/// leaves several seconds before the lease can expire under a replacement.
+const LEASE_PATIENCE: Duration = Duration::from_secs(10);
+async fn give_up(app: &App, reason: &str) -> ! {
+    app.healthy.store(false, Ordering::Relaxed);
+    tracing::error!("{reason}; closing native connections and exiting");
+    let _ = tokio::time::timeout(Duration::from_secs(1), app.io.close()).await;
+    std::process::exit(2);
+}
 pub fn maintain(app: Arc<App>) {
     let expiry = app.clone();
     tokio::spawn(async move {
-        let mut tick = tokio::time::interval(Duration::from_secs(3));
+        let mut last_ok = Instant::now();
+        let mut delay = Duration::from_secs(3);
         loop {
-            tick.tick().await;
-            if !matches!(
-                tokio::time::timeout(Duration::from_secs(2), app.store.renew()).await,
-                Ok(Ok(()))
-            ) {
-                app.healthy.store(false, Ordering::Relaxed);
-                tracing::error!("Redis ownership lost; closing native connections and exiting");
-                let _ = tokio::time::timeout(Duration::from_secs(1), app.io.close()).await;
-                std::process::exit(2);
+            tokio::time::sleep(delay).await;
+            match tokio::time::timeout(Duration::from_secs(2), app.store.renew()).await {
+                Ok(Ok(Lease::Held)) => {
+                    last_ok = Instant::now();
+                    delay = Duration::from_secs(3);
+                    app.healthy.store(true, Ordering::Relaxed);
+                }
+                Ok(Ok(Lease::Lost)) => {
+                    give_up(&app, "Redis lease is absent or belongs to another process").await
+                }
+                failed => {
+                    let stale = last_ok.elapsed();
+                    if stale >= LEASE_PATIENCE {
+                        give_up(
+                            &app,
+                            &format!("lease not renewed for {:.1} s", stale.as_secs_f64()),
+                        )
+                        .await;
+                    }
+                    app.healthy.store(false, Ordering::Relaxed);
+                    if log_allowed() {
+                        match failed {
+                            Ok(Err(error)) => {
+                                tracing::warn!(%error, "lease renewal failed; retrying")
+                            }
+                            _ => tracing::warn!("lease renewal timed out; retrying"),
+                        }
+                    }
+                    // Retry sooner so a short outage recovers well inside the lease.
+                    delay = Duration::from_secs(1);
+                }
             }
         }
     });
@@ -56,7 +90,7 @@ pub fn maintain(app: Arc<App>) {
         let mut tick = tokio::time::interval(Duration::from_secs(60));
         loop {
             tick.tick().await;
-            let rooms: Vec<_> = app.rooms.lock().await.values().cloned().collect();
+            let rooms: Vec<_> = app.rooms.lock().values().cloned().collect();
             for room in rooms {
                 match app.store.game(&room.pin).await {
                     Ok(game) if game["game_id"] == room.game_id => {
@@ -64,21 +98,33 @@ pub fn maintain(app: Arc<App>) {
                             .refresh_expiry(&room.pin, &room.game_id)
                             .await
                             .ok();
-                        let mut rooms = app.rooms.lock().await;
-                        if rooms.get(&room.pin).is_some_and(|cached| {
-                            Arc::ptr_eq(cached, &room) && Arc::strong_count(cached) == 2
-                        }) {
-                            rooms.remove(&room.pin);
+                        // Unreferenced: only the cache and this loop hold it.
+                        // Check and removal share one lock so a concurrent
+                        // admission cannot be handed a room that is dropped.
+                        let unused = {
+                            let mut rooms = app.rooms.lock();
+                            let unused = rooms.get(&room.pin).is_some_and(|cached| {
+                                Arc::ptr_eq(cached, &room) && Arc::strong_count(cached) == 2
+                            });
+                            if unused {
+                                rooms.remove(&room.pin);
+                            }
+                            unused
+                        };
+                        if unused {
+                            app.forget(&room);
+                        }
+                    }
+                    // A missing key can also be a Redis error; only a definite
+                    // replacement or expiry evicts the room.
+                    Err(error) if !error.to_string().contains("game_not_found") => {
+                        if log_allowed() {
+                            tracing::warn!(%error, pin=%room.pin, "room check failed; keeping room");
                         }
                     }
                     _ => {
-                        for p in room.players.iter() {
-                            p.socket.clone().disconnect().ok();
-                        }
-                        if let Some(host) = room.host.lock().take() {
-                            host.disconnect().ok();
-                        }
-                        app.rooms.lock().await.remove(&room.pin);
+                        app.evict(&room);
+                        app.forget(&room);
                     }
                 }
             }
@@ -159,7 +205,7 @@ pub async fn snapshot(app: &App, socket: &SocketRef) -> Result<()> {
     }
     Ok(())
 }
-pub async fn solutions(socket: SocketRef, State(app): State<Arc<App>>) {
+pub async fn solutions(_: Throttle, socket: SocketRef, State(app): State<Arc<App>>) {
     let result: Result<()> = async {
         let session = host(&socket)?;
         let room = &session.room;

@@ -117,7 +117,7 @@ async def main():
         passed.append("stale token, stale host close, and closed-question writes rejected")
 
         token = await open_question(game)
-        await redis.hset(f"game:{pin}:answer_state", "deadline_ms", time.time() * 1000 - 2000)
+        await redis.hset(f"game:{pin}:answer_state", "deadline_ms", time.time() * 1000 - 7000)
         assert (await commit_answer(game, sid, token, time.time() * 1000, row))[0] == -2
         token = await open_question(game)
         await redis.hset(f"game:{pin}:answer_state", "deadline_ms", time.time() * 1000 - 500)

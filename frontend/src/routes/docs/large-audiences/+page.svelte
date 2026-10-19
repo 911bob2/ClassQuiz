@@ -15,7 +15,7 @@
 			is about 300 players.
 		</li>
 		<li>
-			<strong>Huge publicum optimization:</strong> players receive their own score and exact rank,
+			<strong>Large audience optimization:</strong> players receive their own score and exact rank,
 			with the top 10 at the end. The local target is about 1,000 players for short quizzes, or
 			750 with 100 questions loaded.
 		</li>

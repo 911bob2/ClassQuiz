@@ -4,6 +4,7 @@ Creates temporary data and removes only that data in finally. Does not send emai
 """
 import asyncio
 import io
+import json
 import secrets
 import uuid
 from urllib.parse import urlsplit
@@ -28,12 +29,46 @@ def checked(response, *statuses):
     return response
 
 
+async def play_native(game, clients):
+    events = {}
+
+    def recorder(client, *names):
+        for name in names:
+            future = events[name] = asyncio.get_running_loop().create_future()
+            client.on(name, lambda data=None, f=future: f.done() or f.set_result(data))
+
+    async def wait(name):
+        return await asyncio.wait_for(events[name], 10)
+
+    host, player = socketio.AsyncClient(), socketio.AsyncClient()
+    clients.extend([host, player])
+    recorder(host, "registered_as_admin", "final_results")
+    recorder(player, "joined_game", "start_game", "set_question_number", "answer_committed")
+    for client in (host, player):
+        await client.connect(BASE, headers=HEADERS, transports=["websocket"], socketio_path="socket.io-rust")
+    pin = game["game_pin"]
+    await host.emit("register_as_admin", {"game_pin": pin, "game_id": game["game_id"], "client_id": uuid.uuid4().hex})
+    await wait("registered_as_admin")
+    await player.emit("join_game", {"game_pin": pin, "username": "SmokePlayer"})
+    await wait("joined_game")
+    await host.emit("start_game", "")
+    await wait("start_game")
+    await host.emit("set_question_number", "0")
+    asked = await wait("set_question_number")
+    await player.emit("submit_answer", {"question_index": 0, "question_token": asked["question_token"],
+                                        "answer": "Yes"})
+    await wait("answer_committed")
+    await host.emit("get_final_results", {})
+    await wait("final_results")
+
+
 async def main():
     suffix = secrets.token_hex(6)
     username = f"cq-smoke-{suffix}"
     email = f"cq-smoke-{suffix}@gmail.com"
     password = secrets.token_urlsafe(32)
-    user_id = quiz_id = game_pin = None
+    user_id = quiz_id = None
+    game_pins = []
     image_ids = []
     direct_keys = [uuid.uuid4().hex, uuid.uuid4().hex]
     clients = []
@@ -103,6 +138,7 @@ async def main():
                 "game_mode": "classic", "captcha_enabled": "false",
             })).json()
             game_pin = game["game_pin"]
+            game_pins.append(game_pin)
             print("PASS quiz creation, persistence, search and game lobby", flush=True)
 
             admin = socketio.AsyncClient()
@@ -114,6 +150,10 @@ async def main():
             admin.on("registered_as_admin", lambda data: admin_ready.set())
             player.on("joined_game", lambda data: player_ready.set())
             player.on("start_game", lambda: game_started.set())
+            question = asyncio.get_running_loop().create_future()
+            answered = asyncio.Event()
+            player.on("set_question_number", lambda data: question.done() or question.set_result(data))
+            admin.on("player_answer", lambda data: answered.set())
             for client in clients:
                 await client.connect(BASE, headers=HEADERS, transports=["websocket"])
             await admin.emit("register_as_admin", {"game_pin": game_pin, "game_id": game["game_id"]})
@@ -123,7 +163,26 @@ async def main():
             await asyncio.wait_for(player_ready.wait(), 10)
             await admin.emit("start_game", {})
             await asyncio.wait_for(game_started.wait(), 10)
-            print("PASS WebSocket admin registration, player join and live game start", flush=True)
+            await admin.emit("set_question_number", "0")
+            asked = await asyncio.wait_for(question, 10)
+            await player.emit("submit_answer", {"question_index": 0, "question_token": asked["question_token"],
+                                                "answer": "Yes"})
+            await asyncio.wait_for(answered.wait(), 10)
+            stored = json.loads((await redis.lrange(f"game_session:{game_pin}:0", 0, -1))[0])
+            assert stored["right"] is True and stored["score"] > 0, stored
+            print("PASS WebSocket admin registration, player join, live game and scored answer", flush=True)
+
+            capabilities = checked(await http.get("/api/v1/quiz/realtime/capabilities")).json()
+            if capabilities.get("configured"):
+                assert capabilities["rust"], capabilities
+                native = checked(await http.post(f"/api/v1/quiz/start/{quiz_id}", params={
+                    "game_mode": "kahoot", "captcha_enabled": "false", "rust_experimental": "true",
+                })).json()
+                game_pins.append(native["game_pin"])
+                meta = checked(await http.get(f"/api/v1/quiz/play/check_captcha/{native['game_pin']}")).json()
+                assert meta["socket_path"] == "/socket.io-rust", meta
+                await play_native(native, clients)
+                print("PASS experimental Rust room: host, join, scored answer and final results", flush=True)
 
             # Both a normal UI deletion and multi-object cleanup must work.
             for key in direct_keys:
@@ -152,7 +211,7 @@ async def main():
                 keys = [key async for key in redis.scan_iter(match=pattern)]
                 if keys:
                     await redis.delete(*keys)
-        if game_pin:
+        for game_pin in game_pins:
             for pattern in (f"game:{game_pin}*", f"game_session:{game_pin}*"):
                 keys = [key async for key in redis.scan_iter(match=pattern)]
                 if keys:
