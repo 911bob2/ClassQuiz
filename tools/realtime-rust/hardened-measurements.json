@@ -1,0 +1,571 @@
+{
+  "date": "2026-10-15",
+  "server_cpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "generator_cpus": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "api_plus_rust_gib": 2,
+  "proxy_gib": 2,
+  "generator_gib": 4,
+  "notes": [
+    "Short local tests; no VM deployment. Other PC workloads varied.",
+    "Four Tokio workers, one Python API worker, Redis AOF, heartbeats retained, no WebSocket compression.",
+    "250ms live counts and 50-row host pages; full stored records and exports retained.",
+    "All-stored includes 0-500ms per-player think time; ~50ms polling resolution.",
+    "Runtime CPU includes Python plus Rust, excludes Redis/proxy; all share four server CPUs.",
+    "Independent fixed-rate HTTP probes; one ten-round run per size."
+  ],
+  "clean_answer_total": 400000,
+  "runs": [
+    {
+      "label": "rust-10000-hardened",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 10000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 60.03677286900347,
+      "stored_median_ms": 688.3934595025494,
+      "stored_p95_ms": 730.0109019997763,
+      "stored_max_ms": 730.0109019997763,
+      "all_question_results_p95_ms": 123.06427955627441,
+      "all_question_results_max_ms": 123.06427955627441,
+      "all_final_results_ms": 231.86683654785156,
+      "http_p95_ms": 47.934982998413034,
+      "http_max_ms": 139.79441199626308,
+      "api_peak_fds": 38,
+      "rx_mib": 69.88553810119629,
+      "generator_peak_cpu": 59.60635869905458,
+      "generator_peak_rss_mib": 352.08984375,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 100000,
+      "final_receipts": 10000,
+      "comfortable": true,
+      "python_cpu_percent_one_core": 2.44435083201363,
+      "python_peak_rss_mib": 193.31640625,
+      "rust_cpu_percent_one_core": 57.18718212208755,
+      "combined_runtime_cpu_percent_one_core": 59.63153295410118,
+      "rust_peak_rss_mib": 433.17578125,
+      "rust_peak_fds": 10023,
+      "rust": {
+        "accepted": 100000,
+        "commit_latency_ms": {
+          "count": 100000,
+          "max": 77.439,
+          "p50": 0.305,
+          "p95": 8.735,
+          "p99": 19.503
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 10000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-10000-hardened",
+        "ramp": 60.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "spread",
+        "round_pause": 1,
+        "mixed": false,
+        "rust": true
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8,
+          "binary_sha256": "7443ee3719e16ea2fbcde6fdb9e8fd8d8083f310c2062459fd516cd9ce6d59c8"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 3.0121169984340668,
+      "rust_http_max_ms": 17.921257996931672,
+      "answer_http_p95_ms": 56.780604005325586,
+      "independent_http": {
+        "python": {
+          "p95_ms": 43.79471098945942,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 2.37639200349804,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "comfortable_host_observed": true,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 57.24099000508431,
+          "all_stored_ms": 730.0109019997763,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 348.932902890625,
+            "p95": 587.28756803125,
+            "max": 675.787680953125
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 16.33323800342623,
+          "all_stored_ms": 685.0707580015296,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 321.22501657812495,
+            "p95": 553.45350171875,
+            "max": 648.399118234375
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 28.60270299424883,
+          "all_stored_ms": 692.0777799969073,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 330.513606421875,
+            "p95": 566.626716546875,
+            "max": 651.4021004375
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 21.27086400287226,
+          "all_stored_ms": 681.7823790042894,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 337.7983300859375,
+            "p95": 566.962843609375,
+            "max": 648.2292624375
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 12.547053003800102,
+          "all_stored_ms": 650.6276349973632,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 325.480198828125,
+            "p95": 554.321031265625,
+            "max": 636.9402850625
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 23.831965008866973,
+          "all_stored_ms": 646.1004160082666,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 331.84196535937497,
+            "p95": 562.894057796875,
+            "max": 633.589378328125
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 30.689117993460968,
+          "all_stored_ms": 691.7161610035691,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 335.51586847656245,
+            "p95": 567.008101046875,
+            "max": 655.424088078125
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 20.07446800416801,
+          "all_stored_ms": 680.9986110019963,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 341.41176441406253,
+            "p95": 572.6298731875,
+            "max": 644.912758015625
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 27.98778100986965,
+          "all_stored_ms": 694.7007039998425,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 332.36922937500003,
+            "p95": 563.9754855625,
+            "max": 651.21247890625
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 28.814121993491426,
+          "all_stored_ms": 694.2878059926443,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 332.1435441875,
+            "p95": 567.06839628125,
+            "max": 644.152371625
+          }
+        }
+      ],
+      "source_binary_sha256": "7443ee3719e16ea2fbcde6fdb9e8fd8d8083f310c2062459fd516cd9ce6d59c8"
+    },
+    {
+      "label": "rust-30000-hardened",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 30000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 120.06664906699734,
+      "stored_median_ms": 1149.151438003173,
+      "stored_p95_ms": 1262.583771997015,
+      "stored_max_ms": 1262.583771997015,
+      "all_question_results_p95_ms": 403.6421775817871,
+      "all_question_results_max_ms": 403.6421775817871,
+      "all_final_results_ms": 550.2126216888428,
+      "http_p95_ms": 184.34929999057204,
+      "http_max_ms": 386.9365150021622,
+      "api_peak_fds": 50,
+      "rx_mib": 209.99562072753906,
+      "generator_peak_cpu": 119.3991131272675,
+      "generator_peak_rss_mib": 1066.109375,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 300000,
+      "final_receipts": 30000,
+      "comfortable": false,
+      "python_cpu_percent_one_core": 3.4399146498466693,
+      "python_peak_rss_mib": 194.67578125,
+      "rust_cpu_percent_one_core": 113.37685085369905,
+      "combined_runtime_cpu_percent_one_core": 116.81676550354572,
+      "rust_peak_rss_mib": 1308.9921875,
+      "rust_peak_fds": 30023,
+      "rust": {
+        "accepted": 300000,
+        "commit_latency_ms": {
+          "count": 300000,
+          "max": 501.247,
+          "p50": 118.271,
+          "p95": 331.263,
+          "p99": 383.487
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 30000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 30000,
+        "questions": 10,
+        "label": "rust-30000-hardened",
+        "ramp": 120.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "spread",
+        "round_pause": 1,
+        "mixed": false,
+        "rust": true
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8,
+          "binary_sha256": "7443ee3719e16ea2fbcde6fdb9e8fd8d8083f310c2062459fd516cd9ce6d59c8"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 11.91442899289541,
+      "rust_http_max_ms": 277.01587999763433,
+      "answer_http_p95_ms": 239.08027599100024,
+      "independent_http": {
+        "python": {
+          "p95_ms": 280.25457900366746,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 13.687800004845485,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "comfortable_host_observed": false,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 440.2331590099493,
+          "all_stored_ms": 1144.271965007647,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 540.7300644921875,
+            "p95": 883.270062296875,
+            "max": 1098.907449890625
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 69.74196300143376,
+          "all_stored_ms": 1154.0309109986993,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 577.1932111796875,
+            "p95": 954.73903090625,
+            "max": 1130.36769790625
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 35.35575600108132,
+          "all_stored_ms": 1262.583771997015,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 583.0748861015625,
+            "p95": 1002.594196765625,
+            "max": 1220.87718775
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 40.40446398721542,
+          "all_stored_ms": 1202.1946419990854,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 600.5326158515625,
+            "p95": 914.340895265625,
+            "max": 1173.9971665625
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 57.3838369891746,
+          "all_stored_ms": 1133.5826669965172,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 607.2627140625,
+            "p95": 922.22047078125,
+            "max": 1038.32069996875
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 55.079589001252316,
+          "all_stored_ms": 1058.9496150059858,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 617.1238045625,
+            "p95": 960.606531453125,
+            "max": 1026.23822378125
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 67.42432199825998,
+          "all_stored_ms": 1154.6894569910364,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 622.370551953125,
+            "p95": 939.041746984375,
+            "max": 1118.34301353125
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 63.42829500499647,
+          "all_stored_ms": 1173.972030999721,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 655.2948532656251,
+            "p95": 1001.412243125,
+            "max": 1128.862130921875
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 50.35533600312192,
+          "all_stored_ms": 1057.154736990924,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 610.4293900234375,
+            "p95": 921.332675109375,
+            "max": 1046.749938734375
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 43.33274799864739,
+          "all_stored_ms": 1099.613883998245,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 605.5438388203124,
+            "p95": 818.292428921875,
+            "max": 1075.399258234375
+          }
+        }
+      ],
+      "source_binary_sha256": "7443ee3719e16ea2fbcde6fdb9e8fd8d8083f310c2062459fd516cd9ce6d59c8"
+    }
+  ],
+  "recovery": {
+    "passed": [
+      "host refresh restores lobby roster without duplicate admission",
+      "SIGKILL preserves committed answer, identity, original token/deadline and deduplication",
+      "generation fence rejects stale admission before state/cache replacement",
+      "lease replacement fences old writes; watchdog exits and supervisor recovers",
+      "results and personal rank reconstruct after SIGKILL",
+      "finals, bounded host pages and full export recover after SIGKILL",
+      "expired room cannot be resurrected by a cached host command",
+      "PIN reuse drops old cached connections and clears old-generation membership/results",
+      "old export remains a frozen snapshot after PIN reuse, with no new-room data"
+    ],
+    "restarts_seconds": [
+      12.653,
+      3.572,
+      14.925,
+      15.234
+    ]
+  },
+  "reconnect": {
+    "users": 1000,
+    "native_ready_seconds": 13.067,
+    "all_identities_rejoined_seconds": 20.187,
+    "answers_verified": 1000,
+    "final_receipts": 1000,
+    "rejoins": 1000,
+    "expected_transport_disconnects": 1000,
+    "expected_attempt_failures": [
+      {
+        "phase": "read",
+        "reason": "network/protocol error",
+        "count": 1000,
+        "samples": [
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF",
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF",
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF"
+        ]
+      },
+      {
+        "phase": "transport",
+        "reason": "HTTP 502",
+        "count": 3726,
+        "samples": [
+          "transport: polling GET HTTP 502",
+          "transport: polling GET HTTP 502",
+          "transport: polling GET HTTP 502"
+        ]
+      }
+    ],
+    "note": "Deliberate SIGKILL in lobby; transient connection failures are expected. Every identity and result must recover."
+  },
+  "integration": {
+    "passed": [
+      "authenticated creation rejects unsupported captcha/controller/old-school combinations",
+      "same host tab replaces its stale socket; other active host tabs are rejected",
+      "metadata selects native route; Python rejects native room admission and control",
+      "host solutions, numeric reveal, full database save and idempotent save retries",
+      "actual XLSX download contains answers; export tokens reject other room PINs",
+      "missing export media does not discard answer data",
+      "normal Python room still uses its original endpoint alongside Rust"
+    ],
+    "quiz_id": "011877bb-6096-4e11-90b9-0f94c582b632"
+  },
+  "browser": {
+    "passed": [
+      "mobile hosting setting enables optimized results and links to built-in docs",
+      "real browser creates native room and joins through the selected endpoint",
+      "SIGKILL automatically reconnects both browsers and restores host controls and submitted state",
+      "finals, save, export and final-screen refresh work in the real host UI",
+      "built-in docs render within their normal navigation with no browser runtime errors"
+    ]
+  },
+  "browser_polling": {
+    "passed": [
+      "mobile hosting setting enables optimized results and links to built-in docs",
+      "real browser creates native room and joins through the selected endpoint",
+      "SIGKILL automatically reconnects both browsers and restores host controls and submitted state",
+      "finals, save, export and final-screen refresh work in the real host UI",
+      "built-in docs render within their normal navigation with no browser runtime errors",
+      "entire flow and final-screen recovery pass without WebSockets"
+    ]
+  }
+}

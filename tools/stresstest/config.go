@@ -30,7 +30,10 @@ type config struct {
 	Verbosity       int           `json:"verbosity"`
 	Seed            uint64        `json:"seed"`
 	CustomField     string        `json:"custom_field,omitempty"`
+	WaitAllResults  bool          `json:"wait_all_results"`
+	LabCaptcha      bool          `json:"lab_captcha"`
 	base            *url.URL
+	socketPath      string
 }
 
 func parseConfig(args []string, out io.Writer) (config, error) {
@@ -54,6 +57,8 @@ func parseConfig(args []string, out io.Writer) (config, error) {
 	f.IntVar(&c.Verbosity, "verbosity", 1, "0 summary, 1 progress, 2 connections, 3 events, 4 packet traces")
 	f.Uint64Var(&c.Seed, "seed", 0, "random seed; 0 generates a seed")
 	f.StringVar(&c.CustomField, "custom-field", "", "value for the lobby's optional custom player field")
+	f.BoolVar(&c.WaitAllResults, "wait-all-results", false, "wait until every requested player has drained final results")
+	f.BoolVar(&c.LabCaptcha, "lab-captcha", false, "send synthetic tokens only to rooms marked as a local captcha lab")
 	f.Usage = func() {
 		fmt.Fprintln(out, "Usage: stresstest --target https://quiz.911bob.dev --users 1000 --code 123456 [flags]")
 		fmt.Fprintln(out, "You host the quiz normally. Stop with Ctrl+C or reveal final results.")

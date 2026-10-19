@@ -5,19 +5,22 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import { roomEvents } from '$lib/room-socket';
+	const listen = roomEvents();
 	import { getLocalization } from '$lib/i18n';
 	import { socket } from './socket';
 	import { QuizQuestionType } from '$lib/quiz_types';
 	import Spinner from '$lib/Spinner.svelte';
 	import Controls from '$lib/play/admin/controls.svelte';
 	import Question from '$lib/play/admin/question.svelte';
+	import NativeResults from '$lib/play/admin/native_results.svelte';
 	import { SocketGameControls } from '$lib/play/admin/socket_game_controls.ts';
 	import type { IGameState } from '$lib/play/admin/game_state.ts';
+	import { onMount, onDestroy } from 'svelte';
 
 	const { t } = getLocalization();
 	const default_colors: string[] = [];
 
-	let final_results_clicked = $state(false);
 	let timer_interval: NodeJS.Timeout;
 
 	interface Props {
@@ -27,47 +30,59 @@ SPDX-License-Identifier: MPL-2.0
 	}
 
 	let { game_token, bg_color, game_state = $bindable() }: Props = $props();
+	let final_results_clicked = $derived(
+		JSON.stringify(game_state.final_results) !== JSON.stringify([null])
+	);
 
-	socket.on('get_question_results', () => {
+	listen('get_question_results', () => {
 		console.log('get_question_results');
 	});
-	socket.on('set_question_number', (data) => {
+	listen('set_question_number', (data) => {
 		game_state.timer_res = '0';
 		game_state.question_results = null;
 		game_state.shown_question_now = data.question_index;
 		game_state.timer_res = game_state.quiz_data.questions[data.question_index].time;
-		game_state.selected_question = game_state.selected_question + 1;
+		game_state.selected_question = data.question_index;
 		game_state.answer_count = 0;
 
 		clearInterval(timer_interval);
 		timer(game_state.timer_res);
 	});
 
-	socket.on('solutions', (_) => {
+	listen('solutions', (_) => {
 		game_state.timer_res = '0';
 		clearInterval(timer_interval);
 	});
 
-	socket.on('final_results', (data) => {
-		final_results_clicked = true;
+	listen('final_results', (data) => {
 		game_state.timer_res = '0';
 		game_state.final_results = data;
 	});
 
-	socket.on('everyone_answered', (_) => {
-		game_state.timer_res = '0';
+	listen('everyone_answered', (data) => {
+		if (
+			data?.question_index === undefined ||
+			data.question_index === game_state.shown_question_now
+		) {
+			game_state.timer_res = '0';
+		}
 	});
 
-	socket.on('question_results', (data) => {
+	listen('question_results', (data) => {
 		game_state.question_results = data;
 		game_state.timer_res = '0';
 	});
 
-	socket.on('player_answer', (_) => {
-		game_state.answer_count += 1;
+	listen('player_answer', (data) => {
+		if (data.question_index === undefined) {
+			game_state.answer_count += 1;
+		} else if (data.question_index === game_state.shown_question_now) {
+			game_state.answer_count = Math.max(game_state.answer_count, data.count);
+		}
 	});
 
 	const timer = (time: string) => {
+		clearInterval(timer_interval);
 		let seconds = Number(time);
 		timer_interval = setInterval(() => {
 			if (game_state.timer_res === '0') {
@@ -80,6 +95,17 @@ SPDX-License-Identifier: MPL-2.0
 			game_state.timer_res = seconds.toString();
 		}, 1000);
 	};
+	const restoredClock = (data) => {
+		if (data.question_index >= 0) timer(String(Math.ceil(data.remaining_ms / 1000)));
+	};
+	listen('room_state', restoredClock);
+	onMount(() => {
+		if (game_state.timer_res && game_state.timer_res !== '0') timer(game_state.timer_res);
+	});
+	onDestroy(() => {
+		clearInterval(timer_interval);
+		socket.off('room_state', restoredClock);
+	});
 
 	const socket_game_controls: SocketGameControls = new SocketGameControls(socket);
 </script>
@@ -125,6 +151,8 @@ SPDX-License-Identifier: MPL-2.0
 					<p class="tq-panel tq-panel-body host-empty">{$t('admin_page.no_answers')}</p>
 				</div>
 			{/if}
+		{:else if game_state.question_results?.native_summary}
+			<NativeResults summary={game_state.question_results} />
 		{:else if game_state.quiz_data.questions[game_state.selected_question].type === QuizQuestionType.VOTING}
 			{#await import('$lib/play/admin/voting_results.svelte')}
 				<Spinner />

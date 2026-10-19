@@ -56,6 +56,7 @@ class SubmitAnswerDataOrderType(BaseModel):
 
 class SubmitAnswerData(BaseModel):
     question_index: int
+    question_token: str | None = None
     answer: str | int
     complex_answer: list[SubmitAnswerDataOrderType] | None = None
 

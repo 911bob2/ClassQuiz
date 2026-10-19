@@ -5,13 +5,14 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import { socket } from '$lib/socket';
+	import { roomEvents } from '$lib/room-socket';
+	const listen = roomEvents();
+	import { socket, connectRoom } from '$lib/socket';
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import * as Sentry from '@sentry/browser';
 	import { getLocalization } from '$lib/i18n';
 	import Cookies from 'js-cookie';
-	import { hcaptcha_site_key, recaptcha_key, sentry_dsn } from '$lib/config';
+	import { captchaWidget, captchaMessage, type CaptchaPolicy } from '$lib/captcha';
 
 	const { t } = getLocalization();
 
@@ -28,39 +29,42 @@ SPDX-License-Identifier: MPL-2.0
 	}: Props = $props();
 	let custom_field = $state();
 	let custom_field_value = $state();
-	let captcha_enabled = $state();
-
-	let hcaptchaSitekey = hcaptcha_site_key;
-
-	let hcaptcha = {
-		execute: async (_a, _b) => ({ response: '' }), // eslint-disable-line @typescript-eslint/no-unused-vars
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		render: (_a, _b) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
-	};
-	let hcaptchaWidgetID;
-
+	let captcha_enabled = $state(false);
+	let captcha_policy: CaptchaPolicy | null = $state(null);
+	let captcha_element: HTMLDivElement;
+	let joining = $state(false);
+	let join_error = $state('');
+	let join_timeout: ReturnType<typeof setTimeout>;
+	const verifier = captchaWidget();
 	onMount(() => {
-		if (browser) {
-			prefetch_username();
-			hcaptcha = (window as any).hcaptcha;
-			if (hcaptcha.render) {
-				hcaptchaWidgetID = hcaptcha.render('hcaptcha', {
-					sitekey: hcaptchaSitekey,
-					size: 'invisible',
-					theme: 'dark'
-				});
-			}
-		}
+		prefetch_username();
 	});
-
 	onDestroy(() => {
-		if (browser) {
-			hcaptcha = {
-				execute: async () => ({ response: '' }),
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				render: () => {}
-			};
-		}
+		clearTimeout(join_timeout);
+		verifier.destroy();
+	});
+	const done = () => {
+		joining = false;
+		clearTimeout(join_timeout);
+	};
+	listen('captcha_error', (data) => {
+		done();
+		join_error = captchaMessage(data.code);
+		verifier.reset();
+	});
+	for (const event of [
+		'joined_game',
+		'rejoined_game',
+		'error',
+		'disconnect',
+		'room_full',
+		'game_already_started',
+		'game_not_found'
+	])
+		listen(event, done);
+	listen('username_already_exists', () => {
+		done();
+		join_error = 'That name is already in use. Please choose another.';
 	});
 
 	const prefetch_username = async () => {
@@ -87,6 +91,7 @@ SPDX-License-Identifier: MPL-2.0
 		game_mode = json.game_mode;
 		if (res.status === 200) {
 			captcha_enabled = json.enabled;
+			captcha_policy = json.captcha_policy;
 			custom_field = json.custom_field;
 		}
 		if (res.status === 404) {
@@ -120,66 +125,57 @@ SPDX-License-Identifier: MPL-2.0
 
 	const setUsername = async (e: Event) => {
 		e.preventDefault();
-		if (username.length <= 3) {
-			return;
-		}
-		let captcha_resp: string;
-		if (Cookies.get('kicked')) {
-			console.log("%cYou're Banned!", 'font-size:6rem');
-			return;
-		}
-
-		if (captcha_enabled) {
-			if (hcaptchaSitekey) {
-				try {
-					const { response } = await hcaptcha.execute(hcaptchaWidgetID, {
-						async: true
-					});
-					captcha_resp = response;
-					socket.emit('join_game', {
-						username: username,
-						game_pin: game_pin,
-						captcha: captcha_resp,
-						custom_field: custom_field ? custom_field_value : undefined
-					});
-				} catch (e) {
-					if (sentry_dsn !== null) {
-						Sentry.captureException(e);
-					}
-					/*					alertModal.set({
-                        open: true,
-                        body: "The captcha failed, which is normal, but most of the time it's fixed by reloading!",
-                        title: 'Captcha failed'
-                    });*/
-					alert('Captcha failed!');
-					window.location.reload();
-				}
-			} else if (recaptcha_key) {
-				// eslint-disable-next-line no-undef
-				(window as any).grecaptcha.ready(() => {
-					// eslint-disable-next-line no-undef
-					(window as any).grecaptcha
-						.execute(recaptcha_key, { action: 'submit' })
-						.then(function (token) {
-							socket.emit('join_game', {
-								username: username,
-								game_pin: game_pin,
-								captcha: token,
-								custom_field: custom_field ? custom_field_value : undefined
-							});
-						});
-				});
+		if (username.length <= 3 || joining) return;
+		joining = true;
+		join_error = '';
+		try {
+			const metadata = await connectRoom(game_pin);
+			captcha_enabled = metadata.enabled;
+			captcha_policy = metadata.captcha_policy;
+			let previous: any = {};
+			try {
+				previous = JSON.parse(Cookies.get('joined_game') || '{}');
+			} catch {
+				/* replace an invalid cookie */
 			}
-		} else {
+			const resume_token =
+				previous.username === username &&
+				previous.game_pin === game_pin &&
+				previous.pending &&
+				previous.resume_token
+					? previous.resume_token
+					: crypto.randomUUID() + crypto.randomUUID();
+			if (metadata.realtime_engine === 'rust')
+				Cookies.set(
+					'joined_game',
+					JSON.stringify({ username, game_pin, resume_token, pending: true }),
+					{ expires: 1, sameSite: 'lax' }
+				);
+			if (Cookies.get('kicked')) throw new Error('You have been removed from this quiz.');
+			let captcha: string | undefined;
+			if (captcha_enabled) {
+				if (!captcha_policy)
+					throw new Error('Verification is not configured. Please contact the host.');
+				captcha = await verifier.token(captcha_policy, captcha_element);
+			}
 			socket.emit('join_game', {
-				username: username,
-				game_pin: game_pin,
-				captcha: undefined,
-				custom_field: custom_field ? custom_field_value : undefined
+				username,
+				game_pin,
+				captcha,
+				custom_field: custom_field ? custom_field_value : undefined,
+				resume_token
 			});
+			join_timeout = setTimeout(() => {
+				done();
+				join_error = 'Joining timed out. Please retry.';
+			}, 15000);
+		} catch (error) {
+			done();
+			join_error =
+				error instanceof Error ? error.message : 'Verification failed. Please retry.';
 		}
 	};
-	socket.on('game_not_found', () => {
+	listen('game_not_found', () => {
 		game_pin = '';
 		if (browser) {
 			alert('Game not found');
@@ -193,15 +189,6 @@ SPDX-License-Identifier: MPL-2.0
 		game_pin = cleaned;
 	});
 </script>
-
-<svelte:head>
-	{#if captcha_enabled && hcaptchaSitekey}
-		<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-	{/if}
-	{#if recaptcha_key && captcha_enabled}
-		<script src="https://www.google.com/recaptcha/api.js?render={recaptcha_key}"></script>
-	{/if}
-</svelte:head>
 
 <main class="join-screen">
 	<div class="join-card tq-panel">
@@ -270,21 +257,44 @@ SPDX-License-Identifier: MPL-2.0
 				<button
 					type="submit"
 					class="tq-button tq-button-primary join-submit"
-					disabled={username.length <= 3}
+					disabled={username.length <= 3 || joining}
 				>
-					{$t('telekom.join_game', { defaultValue: 'Join game' })}
+					{joining
+						? captcha_enabled
+							? 'Verifying�'
+							: 'Joining�'
+						: $t('telekom.join_game', { defaultValue: 'Join game' })}
 				</button>
+				{#if join_error}<p role="alert" data-ui="captcha-error" class="tq-muted">
+						{join_error}
+					</p>{/if}
+				{#if captcha_enabled && captcha_policy}
+					<p class="tq-muted text-sm">
+						Protected by {captcha_policy.provider === 'hcaptcha'
+							? 'hCaptcha'
+							: 'reCAPTCHA'}.
+						<a
+							href={captcha_policy.provider === 'hcaptcha'
+								? 'https://www.hcaptcha.com/privacy'
+								: 'https://policies.google.com/privacy'}
+							target="_blank"
+							rel="noreferrer">Privacy</a
+						>
+						�
+						<a
+							href={captcha_policy.provider === 'hcaptcha'
+								? 'https://www.hcaptcha.com/terms'
+								: 'https://policies.google.com/terms'}
+							target="_blank"
+							rel="noreferrer">Terms</a
+						>
+					</p>
+				{/if}
 			</form>
 		{/if}
 	</div>
 </main>
-<div
-	id="hcaptcha"
-	class="h-captcha"
-	data-sitekey={hcaptchaSitekey}
-	data-size="invisible"
-	data-theme="dark"
-></div>
+<div bind:this={captcha_element} data-ui="captcha-widget"></div>
 
 <style>
 	.join-screen {

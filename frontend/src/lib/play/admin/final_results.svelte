@@ -24,11 +24,14 @@ SPDX-License-Identifier: MPL-2.0
 		Object.keys(data).sort((a, b) => {
 			const scoreA = parseFloat(data[a]) || 0;
 			const scoreB = parseFloat(data[b]) || 0;
-			return scoreB - scoreA;
+			return scoreB - scoreA || (a < b ? -1 : a > b ? 1 : 0);
 		})
 	);
 
 	let own_rank = $derived(username ? player_names.indexOf(username) + 1 : 0);
+	let page = $state(0);
+	let last_page = $derived(Math.max(0, Math.ceil(player_names.length / 50) - 1));
+	let current_page = $derived(Math.min(page, last_page));
 </script>
 
 {#if show_final_results}
@@ -73,9 +76,9 @@ SPDX-License-Identifier: MPL-2.0
 					</tr>
 				</thead>
 				<tbody>
-					{#each player_names as player, i}
+					{#each player_names.slice(current_page * 50, (current_page + 1) * 50) as player, i (player)}
 						<tr class:own-result={player === username}>
-							<td class="final-rank">{i + 1}</td>
+							<td class="final-rank">{current_page * 50 + i + 1}</td>
 							<td>{player}</td>
 							<td class="final-points"><strong>{data[player]}</strong></td>
 						</tr>
@@ -86,6 +89,26 @@ SPDX-License-Identifier: MPL-2.0
 				<p class="tq-empty">{$t('admin_page.no_answers')}</p>
 			{/if}
 		</div>
+		{#if last_page > 0}
+			<nav
+				class="tq-toolbar"
+				aria-label={$t('telekom.leaderboard', { defaultValue: 'Leaderboard' })}
+			>
+				<button
+					class="tq-button"
+					disabled={current_page === 0}
+					onclick={() => (page = current_page - 1)}
+					>{$t('telekom.previous', { defaultValue: 'Previous' })}</button
+				>
+				<span>{current_page + 1} / {last_page + 1}</span>
+				<button
+					class="tq-button"
+					disabled={current_page === last_page}
+					onclick={() => (page = current_page + 1)}
+					>{$t('telekom.next', { defaultValue: 'Next' })}</button
+				>
+			</nav>
+		{/if}
 	</main>
 {/if}
 

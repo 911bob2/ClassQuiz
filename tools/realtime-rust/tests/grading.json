@@ -1,0 +1,915 @@
+[
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ABCD",
+      "answers": [
+        {
+          "right": true,
+          "answer": "A",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "B",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "A",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "A"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ABCD",
+      "answers": [
+        {
+          "right": true,
+          "answer": "A",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "B",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "B",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "B"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ABCD",
+      "answers": [
+        {
+          "right": true,
+          "answer": "A",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "B",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "C",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "C"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ABCD",
+      "answers": [
+        {
+          "right": true,
+          "answer": "A",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "B",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "a",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "a"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ABCD",
+      "answers": [
+        {
+          "right": true,
+          "answer": "A",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "B",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "0",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "0"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "CHECK",
+      "answers": [
+        {
+          "right": true,
+          "answer": "a",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "b",
+          "color": null
+        },
+        {
+          "right": true,
+          "answer": "c",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "02",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "02"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "CHECK",
+      "answers": [
+        {
+          "right": true,
+          "answer": "a",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "b",
+          "color": null
+        },
+        {
+          "right": true,
+          "answer": "c",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "20",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "20"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "CHECK",
+      "answers": [
+        {
+          "right": true,
+          "answer": "a",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "b",
+          "color": null
+        },
+        {
+          "right": true,
+          "answer": "c",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "0",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "0"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "CHECK",
+      "answers": [
+        {
+          "right": true,
+          "answer": "a",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "b",
+          "color": null
+        },
+        {
+          "right": true,
+          "answer": "c",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "012",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "012"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "CHECK",
+      "answers": [
+        {
+          "right": true,
+          "answer": "a",
+          "color": null
+        },
+        {
+          "right": false,
+          "answer": "b",
+          "color": null
+        },
+        {
+          "right": true,
+          "answer": "c",
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      ""
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "-2.9",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "-2.9"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "2.9",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "2.9"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "3",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "3"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "-3",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "-3"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "0.5",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "0.5"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "2e0",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "2e0"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "nan",
+      "complex_answer": null
+    },
+    "error": true
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "inf",
+      "complex_answer": null
+    },
+    "error": true
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "RANGE",
+      "answers": {
+        "min": -10,
+        "max": 10,
+        "min_correct": -2,
+        "max_correct": 2
+      },
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "bad",
+      "complex_answer": null
+    },
+    "error": true
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "TEXT",
+      "answers": [
+        {
+          "answer": "İΣ",
+          "case_sensitive": false
+        },
+        {
+          "answer": "Exact",
+          "case_sensitive": true
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "İΣ",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "İΣ"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "TEXT",
+      "answers": [
+        {
+          "answer": "İΣ",
+          "case_sensitive": false
+        },
+        {
+          "answer": "Exact",
+          "case_sensitive": true
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "i̇ς",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "i̇ς"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "TEXT",
+      "answers": [
+        {
+          "answer": "İΣ",
+          "case_sensitive": false
+        },
+        {
+          "answer": "Exact",
+          "case_sensitive": true
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "Exact",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      true,
+      "Exact"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "TEXT",
+      "answers": [
+        {
+          "answer": "İΣ",
+          "case_sensitive": false
+        },
+        {
+          "answer": "Exact",
+          "case_sensitive": true
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "exact",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "exact"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "TEXT",
+      "answers": [
+        {
+          "answer": "İΣ",
+          "case_sensitive": false
+        },
+        {
+          "answer": "Exact",
+          "case_sensitive": true
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "wrong",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "wrong"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "VOTING",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "A",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "A"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "VOTING",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "B",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "B"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ORDER",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        },
+        {
+          "answer": "B",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "a",
+      "complex_answer": null
+    },
+    "error": false,
+    "expected": [
+      false,
+      "a"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ORDER",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        },
+        {
+          "answer": "B",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "a",
+      "complex_answer": [
+        {
+          "answer": "A"
+        },
+        {
+          "answer": "B"
+        }
+      ]
+    },
+    "error": false,
+    "expected": [
+      true,
+      "A, B"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ORDER",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        },
+        {
+          "answer": "B",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "a",
+      "complex_answer": [
+        {
+          "answer": "B"
+        },
+        {
+          "answer": "A"
+        }
+      ]
+    },
+    "error": false,
+    "expected": [
+      false,
+      "B, A"
+    ]
+  },
+  {
+    "question": {
+      "question": "fixture",
+      "time": "30",
+      "type": "ORDER",
+      "answers": [
+        {
+          "answer": "A",
+          "image": null,
+          "color": null
+        },
+        {
+          "answer": "B",
+          "image": null,
+          "color": null
+        }
+      ],
+      "image": null,
+      "hide_results": false
+    },
+    "submission": {
+      "question_index": 0,
+      "question_token": "fixture",
+      "answer": "a",
+      "complex_answer": []
+    },
+    "error": false,
+    "expected": [
+      false,
+      ""
+    ]
+  }
+]

@@ -85,7 +85,7 @@ function uipResolver(FRONTEND_SRC, UIP_ROOT) {
     load(id) {
       // Any import of frontend/src/lib/socket.ts ($lib/socket, ./socket, ...) gets the mock
       if (toPosix(id.split("?")[0]) === socketReal) {
-        return `export { socket } from '${shimDir}/socket.ts';`;
+        return `export { socket, connectRoom, sendAnswer } from '${shimDir}/socket.ts';`;
       }
       return null;
     },

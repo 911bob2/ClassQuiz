@@ -242,6 +242,23 @@ const scenarios: Scenario[] = [
     "routes/dashboard/Analytics.svelte",
     { quiz },
   ),
+  component(
+    3005,
+    "dashboard.start-game-captcha",
+    "Start a game with configured captcha",
+    "lib/dashboard/start_game.svelte",
+    { quiz_id: quiz.id },
+    {
+      fetch: {
+        "GET /api/v1/quiz/realtime/capabilities": {
+          rust: true,
+          configured: true,
+          captcha: { provider: "hcaptcha", site_key: "preview-only" },
+          rust_captcha: { provider: "hcaptcha", site_key: "preview-only" },
+        },
+      },
+    },
+  ),
   page(
     3010,
     "files",
@@ -521,6 +538,7 @@ const play = (id: number, slug: string, title: string, run?: Scenario["run"]) =>
     },
   );
 scenarios.push(
+  page(1060, "docs.large-audiences", "Large audiences & Rust", "/docs/large-audiences", {}, {layouts: [loader("routes/docs/+layout.svelte")]}),
   play(5001, "play.join", "Join a game"),
   play(5002, "play.title", "Waiting for the host", (ctx) => joinPlayer(ctx)),
 );
@@ -555,6 +573,20 @@ scenarios.push(
     ctx.socket.fire("question_results", clone(questionResults));
     await ctx.tick();
     ctx.socket.fire("final_results", [questionResults]);
+  }),
+  play(5022, "play.large-results", "Large audience · personal result", async (ctx) => {
+    await joinPlayer(ctx, questions[0]);
+    ctx.socket.fire("personal_question_results", {
+      version: 1, question_index: 0, username: "Alex", score: 4200, rank: 128,
+      player_count: 1500, answer: { username: "Alex", right: true, score: 900 },
+    });
+  }),
+  play(5031, "play.large-final", "Large audience · top 10 and personal rank", async (ctx) => {
+    await joinPlayer(ctx, questions[0]);
+    ctx.socket.fire("personal_final_results", {
+      version: 1, username: "Alex", score: 4200, rank: 128, player_count: 1500,
+      leaderboard: Array.from({ length: 10 }, (_, i) => ({ username: `Player ${i+1}`, score: 9000-i*100, rank: i+1 })),
+    });
   }),
 );
 
@@ -617,6 +649,12 @@ scenarios.push(
   host(6002, "host.lobby.players", "A classroom is joining", undefined, 24),
   host(6003, "host.lobby.full", "A busy classroom", undefined, 60),
 );
+const largeLobby = host(6004, "host.lobby.large", "Large audience · paged roster", undefined, 0);
+scenarios.push({ ...largeLobby, run: async (ctx) => {
+  await largeLobby.run?.(ctx);
+  for (let i = 1; i <= 2000; i++) ctx.socket.fire("player_joined", { username: `Guest ${i}`, sid: `guest-${i}` });
+  await ctx.tick();
+}});
 questions.forEach((q, i) =>
   scenarios.push({
     ...host(

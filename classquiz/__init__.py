@@ -67,6 +67,9 @@ async def startup() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
+    from classquiz.captcha import close_verifier
+
+    await close_verifier()
     database_ = app.state.database
     if database_.is_connected:
         await database_.disconnect()

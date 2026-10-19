@@ -11,6 +11,7 @@ export enum ElementTypes {
 }
 
 export interface QuizData {
+	realtime_engine?: 'python' | 'rust';
 	title: string;
 	description: string;
 	quiz_id: string;
@@ -65,7 +66,12 @@ export interface Question {
 }
 
 export type Answers =
-	Answer[] | RangeQuizAnswer | VotingAnswer[] | string | TextQuizAnswer[] | OrderQuizAnswer[];
+	| Answer[]
+	| RangeQuizAnswer
+	| VotingAnswer[]
+	| string
+	| TextQuizAnswer[]
+	| OrderQuizAnswer[];
 
 export interface Answer {
 	right: boolean;

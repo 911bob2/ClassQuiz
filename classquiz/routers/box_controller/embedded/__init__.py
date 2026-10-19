@@ -36,6 +36,8 @@ async def join_game(data: JoinGameInput) -> JoinGameResponse:
         raise HTTPException(status_code=404, detail="Game not found")
     game = await redis.get(f"game:{game_pin}")
     game = PlayGame.model_validate_json(game)
+    if game.realtime_engine == "rust":
+        raise HTTPException(status_code=409, detail="Controllers are unavailable for Rust rooms")
     # Check if game is already running
     if game.started:
         raise HTTPException(status_code=400, detail="Game started already")

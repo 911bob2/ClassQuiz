@@ -244,6 +244,8 @@ class PlayGame(BaseModel):
     game_pin: str
     started: bool = False
     captcha_enabled: bool = False
+    captcha_policy: dict | None = None
+    captcha_lab: bool = False
     cover_image: str | None = None
     game_mode: str | None = None
     current_question: int = -1
@@ -251,6 +253,9 @@ class PlayGame(BaseModel):
     background_image: str | None = None
     custom_field: str | None = None
     question_show: bool = False
+    large_audience: bool = False
+    realtime_engine: str = "python"
+    realtime_phase: str = "lobby"
 
     @classmethod
     async def get_from_redis(self, game_pin: str) -> Self:
@@ -264,7 +269,7 @@ class PlayGame(BaseModel):
     def to_player_data(self) -> dict:
         return (
             {
-                **json.loads(self.model_dump_json(exclude={"quiz_id", "questions", "user_id"})),
+                **json.loads(self.model_dump_json(exclude={"quiz_id", "questions", "user_id", "game_id"})),
                 "question_count": len(self.questions),
             },
         )

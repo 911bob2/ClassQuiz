@@ -1,0 +1,21 @@
+# Explicit lab override. The Python API launches the binary in its own container,
+# sharing the same four server CPUs and 2 GiB cap; normal deployments are untouched.
+services:
+  api:
+    environment:
+      LAB_RUST_BINARY: /results/classquiz-realtime
+      RUST_REALTIME_URL: http://api:81
+      LAB_RUST_THREADS: ${LAB_RUST_THREADS:-4}
+      LAB_RUST_REDIS_CONNECTIONS: ${LAB_RUST_REDIS_CONNECTIONS:-8}
+    volumes:
+      - ../../../tools/realtime-rust:/rust-source:ro
+  proxy:
+    mem_limit: 2g
+    sysctls:
+      net.ipv4.ip_local_port_range: "1024 65535"
+    volumes:
+      - ./nginx.rust.conf:/etc/nginx/nginx.conf:ro
+  runner:
+    mem_limit: 4g
+    sysctls:
+      net.ipv4.ip_local_port_range: "1024 65535"

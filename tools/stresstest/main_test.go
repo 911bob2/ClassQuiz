@@ -40,6 +40,22 @@ func TestConfiguration(t *testing.T) {
 		}
 	}
 }
+func TestCaptchaLabGuard(t *testing.T) {
+	for _, labFlag := range []bool{false, true} {
+		for _, labMetadata := range []bool{false, true} {
+			s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				json.NewEncoder(w).Encode(map[string]any{"enabled": true, "captcha_lab": labMetadata})
+			}))
+			c := testConfig(t, s.URL, 1)
+			c.LabCaptcha = labFlag
+			_, err := fetchLobby(context.Background(), c, s.Client())
+			s.Close()
+			if (err == nil) != (labFlag && labMetadata) {
+				t.Fatalf("captcha lab flag=%v metadata=%v error=%v", labFlag, labMetadata, err)
+			}
+		}
+	}
+}
 func TestAnswers(t *testing.T) {
 	r := rand.New(rand.NewPCG(42, 17))
 	choices := json.RawMessage(`[{"answer":"A"},{"answer":"B"},{"answer":"C"}]`)
@@ -144,6 +160,44 @@ func TestResultReconciliation(t *testing.T) {
 	r = m.snapshot(config{}, "test", 0)
 	if *r.Questions[0].Missing != 0 {
 		t.Fatal("partial stream replaced complete snapshot")
+	}
+}
+
+func TestPersonalResultsAndWaitForAll(t *testing.T) {
+	m := newMetrics(2)
+	m.names = map[string]int{"one": 0, "two": 1}
+	l := newLogger(0, io.Discard)
+	defer l.close()
+	finished := 0
+	bots := []*bot{
+		{id: 0, name: "one", m: m, log: l, c: config{WaitAllResults: true}, finish: func() { finished++ }},
+		{id: 1, name: "two", m: m, log: l, c: config{WaitAllResults: true}, finish: func() { finished++ }},
+	}
+	for id, b := range bots {
+		m.answerSent(0, id)
+		err := b.handle(context.Background(), nil, '2', strings.NewReader(fmt.Sprintf(
+			`["personal_question_results",{"version":1,"username":%q,"question_index":0,"score":900,"rank":1,"answer":{"username":%q,"score":900}}]`, b.name, b.name)))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := bots[0].handle(context.Background(), nil, '2', strings.NewReader(
+		`["personal_final_results",{"version":1,"username":"one","score":800,"rank":1,"question_scores":{"0":800}}]`)); err == nil {
+		t.Fatal("accepted changed score")
+	}
+	for id, b := range bots {
+		err := b.handle(context.Background(), nil, '2', strings.NewReader(fmt.Sprintf(
+			`["personal_final_results",{"version":1,"username":%q,"score":900,"rank":1,"question_scores":{"0":900}}]`, b.name)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if id == 0 && finished != 0 {
+			t.Fatal("stopped before every player got final results")
+		}
+	}
+	r := m.snapshot(config{}, "test", 0)
+	if finished != 1 || r.FinalReceipts != 2 || r.Questions[0].ResultReceipts != 2 || *r.Questions[0].Missing != 0 {
+		t.Fatal(finished, r.FinalReceipts, r.Questions)
 	}
 }
 func TestMediaCachingRangeAndRedirects(t *testing.T) {

@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	cryptorand "crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,8 +19,10 @@ import (
 
 type lobby struct {
 	Enabled     bool    `json:"enabled"`
+	CaptchaLab  bool    `json:"captcha_lab"`
 	GameMode    string  `json:"game_mode"`
 	CustomField *string `json:"custom_field"`
+	SocketPath  string  `json:"socket_path"`
 }
 type terminalError struct{ reason string }
 
@@ -38,6 +41,7 @@ type submission struct {
 	Index   int      `json:"question_index"`
 	Answer  any      `json:"answer"`
 	Complex []choice `json:"complex_answer,omitempty"`
+	Token   string   `json:"question_token,omitempty"`
 }
 
 func randomAnswer(q question, index int, r *rand.Rand) (submission, error) {
@@ -123,7 +127,7 @@ func fetchLobby(ctx context.Context, c config, hc *http.Client) (lobby, error) {
 	if err = json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&meta); err != nil {
 		return meta, fmt.Errorf("invalid lobby metadata: %w", err)
 	}
-	if meta.Enabled {
+	if meta.Enabled && !(c.LabCaptcha && meta.CaptchaLab) {
 		return meta, &terminalError{"room has CAPTCHA enabled"}
 	}
 	return meta, nil
@@ -141,6 +145,7 @@ type bot struct {
 	mu               sync.Mutex
 	w                *wire
 	oldSID, sid      string
+	resumeToken      string
 	joined           bool
 	everJoined       bool
 	accepted         *atomic.Bool
@@ -153,6 +158,7 @@ type bot struct {
 	questionDeadline time.Time
 	meta             lobby
 	media            *mediaPlayer
+	personalScores   map[int]int
 }
 
 func (b *bot) run(ctx context.Context, sem chan struct{}) {
@@ -192,7 +198,11 @@ func (b *bot) run(ctx context.Context, sem chan struct{}) {
 		started := time.Now()
 		var w *wire
 		if err == nil {
-			w, err = openWire(ctx, b.c, b.hc, func(direction, transport, sample string) {
+			connectionConfig := b.c
+			if meta.SocketPath == "/socket.io-rust" {
+				connectionConfig.socketPath = "/socket.io-rust/"
+			}
+			w, err = openWire(ctx, connectionConfig, b.hc, func(direction, transport, sample string) {
 				b.log.log(4, b.id+1, "%s transport=%s %s", direction, transport, traceSample(sample))
 				if direction == "upgrade_failed" {
 					b.log.log(2, b.id+1, "upgrade failed, continuing polling: %s", sample)
@@ -333,12 +343,25 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 		b.sid = data.SID
 		b.joinStart = time.Now()
 		old := b.oldSID
+		resume := b.resumeToken
+		if resume == "" {
+			var identity [32]byte
+			if _, err := cryptorand.Read(identity[:]); err != nil {
+				b.mu.Unlock()
+				return err
+			}
+			resume = fmt.Sprintf("%x", identity)
+			b.resumeToken = resume
+		}
 		meta := b.meta
 		b.mu.Unlock()
 		if old != "" {
-			return w.emit("rejoin_game", map[string]string{"old_sid": old, "game_pin": b.c.Code, "username": b.name}, nil)
+			return w.emit("rejoin_game", map[string]string{"old_sid": old, "game_pin": b.c.Code, "username": b.name, "resume_token": resume}, nil)
 		}
-		dataJoin := map[string]any{"username": b.name, "game_pin": b.c.Code}
+		dataJoin := map[string]any{"username": b.name, "game_pin": b.c.Code, "resume_token": resume}
+		if b.c.LabCaptcha && meta.Enabled && meta.CaptchaLab {
+			dataJoin["captcha"] = fmt.Sprintf("good:%s:%d", resume, time.Now().UnixNano())
+		}
 		if meta.CustomField != nil {
 			value := b.c.CustomField
 			if value == "" {
@@ -365,9 +388,23 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 	}
 	b.log.log(3, b.id+1, "event=%s", event)
 	switch event {
+	case "captcha_error":
+		var data struct {
+			Code string `json:"code"`
+		}
+		if err = d.Decode(&data); err != nil {
+			return err
+		}
+		// A normal stress client must never bypass a protected lobby. The
+		// explicit lab client retries transient overload with its usual backoff.
+		if b.c.LabCaptcha && (data.Code == "captcha_busy" || data.Code == "captcha_unavailable" || data.Code == "captcha_expired") {
+			return fmt.Errorf("captcha admission: %s", data.Code)
+		}
+		return &terminalError{"captcha admission: " + data.Code}
 	case "joined_game", "rejoined_game":
 		var data struct {
-			Cover string `json:"cover_image"`
+			Cover  string `json:"cover_image"`
+			Resume string `json:"resume_token"`
 		}
 		if err = d.Decode(&data); err != nil {
 			return err
@@ -384,6 +421,7 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 			}
 		}
 		b.oldSID = b.sid
+		b.resumeToken = data.Resume
 		b.accepted.Store(true)
 		joinStart := b.joinStart
 		b.mu.Unlock()
@@ -412,6 +450,7 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 		var data struct {
 			Index    int       `json:"question_index"`
 			Question *question `json:"question"`
+			Token    string    `json:"question_token"`
 		}
 		if err = d.Decode(&data); err != nil {
 			return err
@@ -435,6 +474,7 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 			return nil
 		}
 		s, err := randomAnswer(*data.Question, data.Index, b.rng)
+		s.Token = data.Token
 		if err != nil {
 			b.m.error("question", "malformed/unsupported question", err.Error())
 			return nil
@@ -484,6 +524,81 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 				b.m.error("results", "invalid results", err.Error())
 			}
 		}
+		if _, err = io.Copy(io.Discard, io.MultiReader(d.Buffered(), r)); err != nil {
+			return err
+		}
+		if index >= 0 {
+			b.m.resultReceipt(index, b.id)
+		}
+	case "personal_question_results":
+		var data struct {
+			Version  int    `json:"version"`
+			Index    int    `json:"question_index"`
+			Username string `json:"username"`
+			Score    int    `json:"score"`
+			Rank     int    `json:"rank"`
+			Answer   *struct {
+				Username string `json:"username"`
+				Score    int    `json:"score"`
+			} `json:"answer"`
+		}
+		if err = d.Decode(&data); err != nil {
+			return err
+		}
+		if data.Version != 1 || data.Username != b.name || data.Index < 0 || data.Rank < 1 || (data.Answer != nil && data.Answer.Username != b.name) {
+			return errors.New("invalid personal question result")
+		}
+		b.mu.Lock()
+		b.cancelQuestionLocked()
+		if b.personalScores == nil {
+			b.personalScores = make(map[int]int)
+		}
+		if data.Answer != nil {
+			b.personalScores[data.Index] = data.Answer.Score
+		}
+		b.mu.Unlock()
+		b.m.personalResult(data.Index, b.id, data.Answer != nil)
+		b.m.resultReceipt(data.Index, b.id)
+	case "personal_final_results":
+		var data struct {
+			Version        int            `json:"version"`
+			Username       string         `json:"username"`
+			Score          int            `json:"score"`
+			Rank           int            `json:"rank"`
+			QuestionScores map[string]int `json:"question_scores"`
+		}
+		if err = d.Decode(&data); err != nil {
+			return err
+		}
+		b.mu.Lock()
+		b.cancelQuestionLocked()
+		score := 0
+		indices := make([]int, 0, len(data.QuestionScores))
+		for index, points := range data.QuestionScores {
+			q, parseErr := strconv.Atoi(index)
+			if parseErr != nil || q < 0 || points < 0 || points > 1000 {
+				b.mu.Unlock()
+				return errors.New("invalid personal question score")
+			}
+			if previous, ok := b.personalScores[q]; ok && previous != points {
+				b.mu.Unlock()
+				return errors.New("personal final score differs from question result")
+			}
+			indices = append(indices, q)
+			score += points
+		}
+		b.mu.Unlock()
+		if data.Version != 1 || data.Username != b.name || data.Rank < 1 || data.Score != score {
+			return errors.New("invalid personal final score/rank")
+		}
+		for _, index := range indices {
+			b.m.personalResult(index, b.id, true)
+		}
+		b.m.finalizing.Store(true)
+		all := b.m.finalReceipt(b.id)
+		if all || (!b.c.WaitAllResults && b.m.isObserver(b.id)) {
+			b.finish()
+		}
 	case "final_results":
 		b.m.finalizing.Store(true)
 		b.mu.Lock()
@@ -493,6 +608,12 @@ func (b *bot) handle(ctx context.Context, w *wire, typ byte, r io.Reader) error 
 			if err = b.m.verifyFinal(d); err != nil {
 				b.m.error("results", "invalid final results", err.Error())
 			}
+		}
+		if _, err = io.Copy(io.Discard, io.MultiReader(d.Buffered(), r)); err != nil {
+			return err
+		}
+		all := b.m.finalReceipt(b.id)
+		if all || (!b.c.WaitAllResults && b.m.isObserver(b.id)) {
 			b.finish()
 		}
 	case "solutions", "everyone_answered":

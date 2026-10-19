@@ -28,6 +28,17 @@ SPDX-License-Identifier: MPL-2.0
 	let fullscreen_open = $state(false);
 	const { t } = getLocalization();
 	let play_music = $state(false);
+	let search = $state('');
+	let page = $state(0);
+	let matching_players = $derived(
+		search
+			? game_state.players.filter((player) =>
+					player.username.toLowerCase().includes(search.toLowerCase())
+				)
+			: game_state.players
+	);
+	let last_page = $derived(Math.max(0, Math.ceil(matching_players.length / 50) - 1));
+	let current_page = $derived(Math.min(page, last_page));
 	let close_button: HTMLButtonElement | undefined = $state();
 
 	if (cqc_code === 'null') {
@@ -103,8 +114,33 @@ SPDX-License-Identifier: MPL-2.0
 				{$t('telekom.waiting_players', { defaultValue: 'Waiting for players' })}
 			</p>
 		{:else}
+			{#if game_state.players.length > 50}
+				<input
+					class="tq-field"
+					type="search"
+					bind:value={search}
+					oninput={() => (page = 0)}
+					aria-label={$t('telekom.search_players', { defaultValue: 'Search players' })}
+					placeholder={$t('telekom.search_players', { defaultValue: 'Search players' })}
+				/>
+				<div class="tq-toolbar">
+					<button
+						class="tq-button"
+						disabled={current_page === 0}
+						onclick={() => (page = current_page - 1)}
+						>{$t('telekom.previous', { defaultValue: 'Previous' })}</button
+					>
+					<span>{current_page + 1} / {last_page + 1}</span>
+					<button
+						class="tq-button"
+						disabled={current_page === last_page}
+						onclick={() => (page = current_page + 1)}
+						>{$t('telekom.next', { defaultValue: 'Next' })}</button
+					>
+				</div>
+			{/if}
 			<ul class="roster" data-ui="host-roster">
-				{#each game_state.players as player}
+				{#each matching_players.slice(current_page * 50, (current_page + 1) * 50) as player (player.username)}
 					<li>
 						<span class="roster-name">{player.username}</span>
 						<button

@@ -1,0 +1,18 @@
+# Test-only override. Requires a binary built with --features captcha-lab.
+services:
+  api:
+    environment:
+      LAB_RUST_BINARY: /results/classquiz-realtime-captcha-lab
+      CAPTCHA_PROVIDER: ${LAB_CAPTCHA_PROVIDER:-hcaptcha}
+      CAPTCHA_SITE_KEY: lab-site-key
+      CAPTCHA_SECRET_KEY: lab-secret
+      CAPTCHA_ALLOWED_HOSTNAMES: classquiz.test,127.0.0.1,localhost
+      CAPTCHA_TEST_VERIFY_URL: http://captcha-provider:9080/siteverify
+    depends_on:
+      captcha-provider: {condition: service_started}
+  captcha-provider:
+    image: classquiz-bench-api:local
+    cpuset: "4-7"
+    mem_limit: 256m
+    volumes: [../../../tools/realtime-rust:/rust-source:ro]
+    entrypoint: [python, /rust-source/mock_captcha.py]

@@ -1,0 +1,914 @@
+{
+  "date": "2026-10-14",
+  "base_commit": "50c6dd16",
+  "server_cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "runner_cpu_affinity": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "api_workers": 1,
+  "answer_delay_ms": [
+    0,
+    500
+  ],
+  "runs": [
+    {
+      "label": "baseline-300",
+      "users": 300,
+      "completed_questions": 10,
+      "stored": 3000,
+      "unique": 3000,
+      "error": null,
+      "join_s": 15.084,
+      "joined": 300,
+      "bot_exit": 0,
+      "stored_median_ms": 1486.802,
+      "stored_max_ms": 1950.7488140000078,
+      "host_results_median_ms": 628.847,
+      "host_results_max_ms": 1361.936094000157,
+      "host_final_ms": 544.4301170000472,
+      "rx_mib": 98.432,
+      "packets": 955965,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 337,
+      "rss_mib_max": 222.0859375,
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 148,
+          "http_p95_ms": 3.941,
+          "http_max_ms": 17.114723000076992,
+          "lag_p95_ms": 1.833,
+          "lag_max_ms": 43.74360500012698,
+          "sampled_cpu_pct": 16.8
+        },
+        "idle": {
+          "http_samples": 19,
+          "http_p95_ms": 1.84,
+          "http_max_ms": 1.8397450000975368,
+          "lag_p95_ms": 1.273,
+          "lag_max_ms": 65.22461100005785,
+          "sampled_cpu_pct": 1.42
+        },
+        "answer": {
+          "http_samples": 69,
+          "http_p95_ms": 975.148,
+          "http_max_ms": 1541.8697520001388,
+          "lag_p95_ms": 9.603,
+          "lag_max_ms": 75.04968400005964,
+          "sampled_cpu_pct": 99.76
+        },
+        "results": {
+          "http_samples": 97,
+          "http_p95_ms": 1.852,
+          "http_max_ms": 392.69316600007187,
+          "lag_p95_ms": 6.504,
+          "lag_max_ms": 63.22911300001578,
+          "sampled_cpu_pct": 45.65
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 511.631,
+          "http_max_ms": 511.6313989999526,
+          "lag_p95_ms": 519.85,
+          "lag_max_ms": 519.8502749999352,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.769,
+          "http_max_ms": 1.7691870000362542,
+          "lag_p95_ms": 1.213,
+          "lag_max_ms": 2.022760000027119,
+          "sampled_cpu_pct": null
+        }
+      }
+    },
+    {
+      "label": "baseline-1000-three",
+      "users": 1000,
+      "completed_questions": 3,
+      "stored": 3000,
+      "unique": 3000,
+      "error": null,
+      "join_s": 19.822,
+      "joined": 1000,
+      "bot_exit": 0,
+      "stored_median_ms": 3864.187,
+      "stored_max_ms": 4985.475707999967,
+      "host_results_median_ms": 22554.29,
+      "host_results_max_ms": 23947.836167999867,
+      "host_final_ms": 1716.421093000008,
+      "rx_mib": 348.059,
+      "packets": 3517880,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 1038,
+      "rss_mib_max": 295.93359375,
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 80,
+          "http_p95_ms": 786.938,
+          "http_max_ms": 3159.826874000146,
+          "lag_p95_ms": 19.022,
+          "lag_max_ms": 122.04597899993132,
+          "sampled_cpu_pct": 88.99
+        },
+        "idle": {
+          "http_samples": 19,
+          "http_p95_ms": 1.792,
+          "http_max_ms": 1.7921030000707106,
+          "lag_p95_ms": 1.103,
+          "lag_max_ms": 21.359272999898167,
+          "sampled_cpu_pct": 1.76
+        },
+        "answer": {
+          "http_samples": 20,
+          "http_p95_ms": 1048.833,
+          "http_max_ms": 1065.3999930000282,
+          "lag_p95_ms": 32.547,
+          "lag_max_ms": 190.49627000002147,
+          "sampled_cpu_pct": 99.91
+        },
+        "results": {
+          "http_samples": 26,
+          "http_p95_ms": 20027.276,
+          "http_max_ms": 20797.104687999992,
+          "lag_p95_ms": 24.735,
+          "lag_max_ms": 556.1018840000816,
+          "sampled_cpu_pct": 99.2
+        },
+        "final": {
+          "http_samples": 2,
+          "http_p95_ms": 1683.756,
+          "http_max_ms": 1683.7564219999877,
+          "lag_p95_ms": 1699.422,
+          "lag_max_ms": 1699.4217240000853,
+          "sampled_cpu_pct": 99.99
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.748,
+          "http_max_ms": 1.7483760000231996,
+          "lag_p95_ms": 1.265,
+          "lag_max_ms": 46.25126499989164,
+          "sampled_cpu_pct": 1.66
+        }
+      }
+    },
+    {
+      "label": "indexed-1000",
+      "users": 1000,
+      "completed_questions": 3,
+      "stored": 3000,
+      "unique": 3000,
+      "error": null,
+      "join_s": 21.344,
+      "joined": 1000,
+      "bot_exit": 1,
+      "stored_median_ms": 4274.612,
+      "stored_max_ms": 4593.545366999933,
+      "host_results_median_ms": 26297.951,
+      "host_results_max_ms": 26306.315112999982,
+      "host_final_ms": 1752.2678529999212,
+      "rx_mib": 347.612,
+      "packets": 3518356,
+      "disconnects": 0,
+      "failures": [
+        {
+          "phase": "results",
+          "reason": "invalid final results",
+          "count": 1,
+          "samples": [
+            "read tcp 172.20.0.8:53762->172.20.0.7:8080: use of closed network connection"
+          ]
+        }
+      ],
+      "fds_max": 1040,
+      "rss_mib_max": 296.2265625,
+      "environment": {
+        "patches": [
+          "indexed"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 72,
+          "http_p95_ms": 1192.927,
+          "http_max_ms": 4181.325965000042,
+          "lag_p95_ms": 22.837,
+          "lag_max_ms": 186.90718700006983,
+          "sampled_cpu_pct": 91.24
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 1.826,
+          "http_max_ms": 1.8920520001302066,
+          "lag_p95_ms": 1.32,
+          "lag_max_ms": 17.221586999976353,
+          "sampled_cpu_pct": 1.9
+        },
+        "answer": {
+          "http_samples": 20,
+          "http_p95_ms": 1086.637,
+          "http_max_ms": 1166.8276950001655,
+          "lag_p95_ms": 44.04,
+          "lag_max_ms": 187.17450000006465,
+          "sampled_cpu_pct": 99.56
+        },
+        "results": {
+          "http_samples": 26,
+          "http_p95_ms": 20269.103,
+          "http_max_ms": 20624.918313000082,
+          "lag_p95_ms": 25.756,
+          "lag_max_ms": 683.1303349999689,
+          "sampled_cpu_pct": 98.96
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 1787.405,
+          "http_max_ms": 1787.405370999977,
+          "lag_p95_ms": 1738.549,
+          "lag_max_ms": 1738.5486340001353,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.901,
+          "http_max_ms": 1.901451000094312,
+          "lag_p95_ms": 1.381,
+          "lag_max_ms": 50.69316499996602,
+          "sampled_cpu_pct": 1.62
+        }
+      }
+    },
+    {
+      "label": "scoped-1000",
+      "users": 1000,
+      "completed_questions": 3,
+      "stored": 3000,
+      "unique": 3000,
+      "error": null,
+      "join_s": 15.106,
+      "joined": 1000,
+      "bot_exit": 0,
+      "stored_median_ms": 1335.562,
+      "stored_max_ms": 1449.2730970000594,
+      "host_results_median_ms": 9.675,
+      "host_results_max_ms": 579.2580120000821,
+      "host_final_ms": 1763.5630839999976,
+      "rx_mib": 253.741,
+      "packets": 15027,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 1037,
+      "rss_mib_max": 292.9375,
+      "environment": {
+        "patches": [
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 147,
+          "http_p95_ms": 2.772,
+          "http_max_ms": 44.94148100002349,
+          "lag_p95_ms": 1.13,
+          "lag_max_ms": 98.54459300002418,
+          "sampled_cpu_pct": 32.24
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 1.749,
+          "http_max_ms": 1.8337079998218542,
+          "lag_p95_ms": 1.047,
+          "lag_max_ms": 14.80097399983606,
+          "sampled_cpu_pct": 1.48
+        },
+        "answer": {
+          "http_samples": 22,
+          "http_p95_ms": 242.284,
+          "http_max_ms": 261.68567800004894,
+          "lag_p95_ms": 1.723,
+          "lag_max_ms": 150.57636000004095,
+          "sampled_cpu_pct": 99.08
+        },
+        "results": {
+          "http_samples": 20,
+          "http_p95_ms": 547.247,
+          "http_max_ms": 597.1515599999293,
+          "lag_p95_ms": 1.786,
+          "lag_max_ms": 576.0290890000124,
+          "sampled_cpu_pct": 1.58
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 1747.701,
+          "http_max_ms": 1747.7008299999852,
+          "lag_p95_ms": 1750.601,
+          "lag_max_ms": 1750.6005590000586,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.734,
+          "http_max_ms": 1.7341349998787337,
+          "lag_p95_ms": 1.377,
+          "lag_max_ms": 51.19507799984603,
+          "sampled_cpu_pct": 1.87
+        }
+      }
+    },
+    {
+      "label": "scoped-indexed-300",
+      "users": 300,
+      "completed_questions": 10,
+      "stored": 3000,
+      "unique": 3000,
+      "error": null,
+      "join_s": 15.1,
+      "joined": 300,
+      "bot_exit": 0,
+      "stored_median_ms": 510.411,
+      "stored_max_ms": 560.3235769999628,
+      "host_results_median_ms": 3.928,
+      "host_results_max_ms": 4.532179999841901,
+      "host_final_ms": 555.789014000311,
+      "rx_mib": 76.805,
+      "packets": 10990,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 331,
+      "rss_mib_max": 214.16015625,
+      "environment": {
+        "patches": [
+          "indexed",
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 148,
+          "http_p95_ms": 2.249,
+          "http_max_ms": 21.162135000167837,
+          "lag_p95_ms": 1.359,
+          "lag_max_ms": 30.347715000043536,
+          "sampled_cpu_pct": 10.51
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 1.923,
+          "http_max_ms": 1.9777940001404204,
+          "lag_p95_ms": 1.42,
+          "lag_max_ms": 1.650164999755361,
+          "sampled_cpu_pct": 1.53
+        },
+        "answer": {
+          "http_samples": 69,
+          "http_p95_ms": 2.434,
+          "http_max_ms": 8.986770999854343,
+          "lag_p95_ms": 0.982,
+          "lag_max_ms": 8.906846000154474,
+          "sampled_cpu_pct": 42.66
+        },
+        "results": {
+          "http_samples": 100,
+          "http_p95_ms": 2.049,
+          "http_max_ms": 30.503651999879366,
+          "lag_p95_ms": 1.626,
+          "lag_max_ms": 36.54838400005246,
+          "sampled_cpu_pct": 2.05
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 507.001,
+          "http_max_ms": 507.000534999861,
+          "lag_p95_ms": 539.602,
+          "lag_max_ms": 539.6016089998557,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 2.012,
+          "http_max_ms": 2.0124580000810965,
+          "lag_p95_ms": 1.159,
+          "lag_max_ms": 1.2689220002175712,
+          "sampled_cpu_pct": null
+        }
+      }
+    },
+    {
+      "label": "scoped-indexed-1000",
+      "users": 1000,
+      "completed_questions": 10,
+      "stored": 10000,
+      "unique": 10000,
+      "error": null,
+      "join_s": 15.117,
+      "joined": 1000,
+      "bot_exit": 0,
+      "stored_median_ms": 916.712,
+      "stored_max_ms": 981.952106000108,
+      "host_results_median_ms": 10.342,
+      "host_results_max_ms": 542.8624009998657,
+      "host_final_ms": 5746.523672999956,
+      "rx_mib": 842.146,
+      "packets": 36926,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 1056,
+      "rss_mib_max": 295.1328125,
+      "environment": {
+        "patches": [
+          "indexed",
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 148,
+          "http_p95_ms": 2.382,
+          "http_max_ms": 18.360581000024467,
+          "lag_p95_ms": 1.119,
+          "lag_max_ms": 62.34442999992097,
+          "sampled_cpu_pct": 31.9
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 1.936,
+          "http_max_ms": 1.9437550001839554,
+          "lag_p95_ms": 1.396,
+          "lag_max_ms": 18.12471500009451,
+          "sampled_cpu_pct": 1.65
+        },
+        "answer": {
+          "http_samples": 74,
+          "http_p95_ms": 200.747,
+          "http_max_ms": 213.99873299992578,
+          "lag_p95_ms": 19.463,
+          "lag_max_ms": 168.96178599993618,
+          "sampled_cpu_pct": 95.65
+        },
+        "results": {
+          "http_samples": 55,
+          "http_p95_ms": 520.646,
+          "http_max_ms": 524.1258840001137,
+          "lag_p95_ms": 1.605,
+          "lag_max_ms": 557.9921259997991,
+          "sampled_cpu_pct": 52.01
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 5736.563,
+          "http_max_ms": 5736.5629969999645,
+          "lag_p95_ms": 5682.8,
+          "lag_max_ms": 5682.800018999824,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.902,
+          "http_max_ms": 1.9023229999675095,
+          "lag_p95_ms": 1.206,
+          "lag_max_ms": 1.2898220001989098,
+          "sampled_cpu_pct": 1.61
+        }
+      }
+    },
+    {
+      "label": "scoped-atomic-1000",
+      "users": 1000,
+      "completed_questions": 10,
+      "stored": 10000,
+      "unique": 10000,
+      "error": null,
+      "join_s": 15.103,
+      "joined": 1000,
+      "bot_exit": 0,
+      "stored_median_ms": 679.648,
+      "stored_max_ms": 882.3832040002344,
+      "host_results_median_ms": 10.692,
+      "host_results_max_ms": 544.2046759999357,
+      "host_final_ms": 5628.495292000025,
+      "rx_mib": 842.735,
+      "packets": 36802,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 1049,
+      "rss_mib_max": 274.4609375,
+      "environment": {
+        "patches": [
+          "atomic",
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 147,
+          "http_p95_ms": 3.028,
+          "http_max_ms": 48.527867999837326,
+          "lag_p95_ms": 1.077,
+          "lag_max_ms": 64.28591900019455,
+          "sampled_cpu_pct": 32.68
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 1.967,
+          "http_max_ms": 1.9683479999912379,
+          "lag_p95_ms": 1.116,
+          "lag_max_ms": 10.705350000062026,
+          "sampled_cpu_pct": 1.78
+        },
+        "answer": {
+          "http_samples": 70,
+          "http_p95_ms": 83.499,
+          "http_max_ms": 204.6244170001046,
+          "lag_p95_ms": 15.732,
+          "lag_max_ms": 140.42514300033872,
+          "sampled_cpu_pct": 99.14
+        },
+        "results": {
+          "http_samples": 55,
+          "http_p95_ms": 546.305,
+          "http_max_ms": 646.6290080002182,
+          "lag_p95_ms": 1.915,
+          "lag_max_ms": 668.2855529997869,
+          "sampled_cpu_pct": 1.69
+        },
+        "final": {
+          "http_samples": 1,
+          "http_p95_ms": 5649.55,
+          "http_max_ms": 5649.54991400009,
+          "lag_p95_ms": 5579.176,
+          "lag_max_ms": 5579.176226000054,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 1.729,
+          "http_max_ms": 1.7289879997406388,
+          "lag_p95_ms": 0.666,
+          "lag_max_ms": 1.0193719999551827,
+          "sampled_cpu_pct": 1.51
+        }
+      }
+    },
+    {
+      "label": "compact-1000",
+      "users": 1000,
+      "completed_questions": 10,
+      "stored": 10000,
+      "unique": 10000,
+      "error": null,
+      "join_s": 15.131,
+      "joined": 1000,
+      "bot_exit": 0,
+      "stored_median_ms": 867.781,
+      "stored_max_ms": 950.1069849998203,
+      "host_results_median_ms": 6.752,
+      "host_results_max_ms": 8.328848000019207,
+      "host_final_ms": 45.659618000172486,
+      "rx_mib": 3.398,
+      "packets": 27000,
+      "disconnects": 0,
+      "failures": null,
+      "fds_max": 1058,
+      "rss_mib_max": 295.4375,
+      "environment": {
+        "patches": [
+          "compact",
+          "indexed",
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 147,
+          "http_p95_ms": 2.503,
+          "http_max_ms": 54.6962620001068,
+          "lag_p95_ms": 1.08,
+          "lag_max_ms": 79.54968900001404,
+          "sampled_cpu_pct": 31.13
+        },
+        "idle": {
+          "http_samples": 20,
+          "http_p95_ms": 2.197,
+          "http_max_ms": 2.2422410002036486,
+          "lag_p95_ms": 1.291,
+          "lag_max_ms": 26.17881000012858,
+          "sampled_cpu_pct": 1.8
+        },
+        "answer": {
+          "http_samples": 75,
+          "http_p95_ms": 132.492,
+          "http_max_ms": 220.5466450000131,
+          "lag_p95_ms": 16.026,
+          "lag_max_ms": 149.6301910001239,
+          "sampled_cpu_pct": 97.6
+        },
+        "results": {
+          "http_samples": 100,
+          "http_p95_ms": 1.896,
+          "http_max_ms": 3.37861400021211,
+          "lag_p95_ms": 1.508,
+          "lag_max_ms": 2.022731000106432,
+          "sampled_cpu_pct": 3.19
+        },
+        "final": {
+          "http_samples": 20,
+          "http_p95_ms": 1.769,
+          "http_max_ms": 1.7801760000111244,
+          "lag_p95_ms": 1.813,
+          "lag_max_ms": 47.73180299978775,
+          "sampled_cpu_pct": 6.24
+        },
+        "after": {
+          "http_samples": 10,
+          "http_p95_ms": 81.777,
+          "http_max_ms": 81.77660800038211,
+          "lag_p95_ms": 1.016,
+          "lag_max_ms": 1.196542999859957,
+          "sampled_cpu_pct": 1.41
+        }
+      }
+    },
+    {
+      "label": "fd1024-1000",
+      "users": 1000,
+      "completed_questions": 0,
+      "stored": 0,
+      "unique": 0,
+      "error": "RuntimeError('Not all players joined; gameplay intentionally skipped')",
+      "join_s": 75.007,
+      "joined": 997,
+      "bot_exit": 1,
+      "stored_median_ms": null,
+      "stored_max_ms": null,
+      "host_results_median_ms": null,
+      "host_results_max_ms": null,
+      "host_final_ms": null,
+      "rx_mib": 0.587,
+      "packets": 6978,
+      "disconnects": 0,
+      "failures": [
+        {
+          "phase": "join",
+          "reason": "join confirmation timed out",
+          "count": 3,
+          "samples": [
+            "join: join confirmation timed out",
+            "join: join confirmation timed out",
+            "join: join confirmation timed out"
+          ]
+        }
+      ],
+      "fds_max": 1024,
+      "rss_mib_max": 255.8203125,
+      "environment": {
+        "patches": [
+          "scoped"
+        ],
+        "pid": 10,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          1024,
+          65536
+        ]
+      },
+      "groups": {
+        "joins": {
+          "http_samples": 152,
+          "http_p95_ms": 4.789,
+          "http_max_ms": 20927.177895000113,
+          "lag_p95_ms": 1.058,
+          "lag_max_ms": 335.9738130002188,
+          "sampled_cpu_pct": 32.4
+        },
+        "idle": {
+          "http_samples": 0,
+          "http_p95_ms": null,
+          "http_max_ms": null,
+          "lag_p95_ms": null,
+          "lag_max_ms": null,
+          "sampled_cpu_pct": null
+        },
+        "answer": {
+          "http_samples": 0,
+          "http_p95_ms": null,
+          "http_max_ms": null,
+          "lag_p95_ms": null,
+          "lag_max_ms": null,
+          "sampled_cpu_pct": null
+        },
+        "results": {
+          "http_samples": 0,
+          "http_p95_ms": null,
+          "http_max_ms": null,
+          "lag_p95_ms": null,
+          "lag_max_ms": null,
+          "sampled_cpu_pct": null
+        },
+        "final": {
+          "http_samples": 0,
+          "http_p95_ms": null,
+          "http_max_ms": null,
+          "lag_p95_ms": null,
+          "lag_max_ms": null,
+          "sampled_cpu_pct": null
+        },
+        "after": {
+          "http_samples": 9,
+          "http_p95_ms": 2.02,
+          "http_max_ms": 2.020019000156026,
+          "lag_p95_ms": null,
+          "lag_max_ms": null,
+          "sampled_cpu_pct": null
+        }
+      }
+    }
+  ],
+  "duplicate_probe_baseline": {
+    "pin": "179474",
+    "simultaneous_identical_submissions": 2,
+    "stored_counts": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "total_score": {
+      "duplicate-probe": "19980"
+    }
+  },
+  "duplicate_probe_atomic": {
+    "pin": "819821",
+    "simultaneous_identical_submissions": 2,
+    "stored_counts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "total_score": {
+      "duplicate-probe": "9990"
+    }
+  },
+  "microbench": {
+    "100": {
+      "serial_round_scan_cpu_ms": 7.564480999999956,
+      "parsed_rows": 4950
+    },
+    "300": {
+      "serial_round_scan_cpu_ms": 66.98270100000015,
+      "parsed_rows": 44850
+    },
+    "1000": {
+      "serial_round_scan_cpu_ms": 859.2538369999997,
+      "parsed_rows": 499500
+    },
+    "parse_quiz_10q": {
+      "cpu_ms_1000_loads": 93.62314500000002,
+      "bytes": 2072
+    },
+    "parse_quiz_100q": {
+      "cpu_ms_1000_loads": 919.5655399999998,
+      "bytes": 18632
+    }
+  },
+  "fd_log_observation": {
+    "command": "docker logs classquiz-bench-api-1, filtered before restoring baseline",
+    "excerpt": "OSError: [Errno 24] Too many open files",
+    "matched_lines_displayed": 8
+  },
+  "limitations": [
+    "CPU affinity limits concurrency, not hardware speed; local CPU is a Ryzen 9 9900X3D.",
+    "Synthetic ABCD quiz, no media, TLS, outer NPM or browser rendering.",
+    "All-stored includes think time and ~50ms polling granularity.",
+    "HTTP probes are sequential; stalls produce fewer samples.",
+    "Decoded application bytes, not compressed network traffic; final streams may be interrupted after observer completion.",
+    "Runtime experiments, not production-ready patches; compact experiment removes player results.",
+    "The exploratory baseline-1000 hit its client duration and is excluded; profiled run is excluded."
+  ]
+}

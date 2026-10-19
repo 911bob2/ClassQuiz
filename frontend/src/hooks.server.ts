@@ -2,9 +2,26 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleFetch } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import * as jose from 'jose';
+
+// Server-rendered loaders must use the internal API, including when the public
+// origin points at a host-only local port. Forward credentials only to our API.
+export const handleFetch: HandleFetch = async ({ event, request, fetch }) => {
+	const url = new URL(request.url);
+	if (
+		process.env.API_URL &&
+		url.origin === event.url.origin &&
+		url.pathname.startsWith('/api/')
+	) {
+		const headers = new Headers(request.headers);
+		headers.set('cookie', event.request.headers.get('cookie') || '');
+		request = new Request(new URL(url.pathname + url.search, process.env.API_URL), request);
+		request = new Request(request, { headers });
+	}
+	return fetch(request);
+};
 
 /** @type {import('@sveltejs/kit').Handle} */
 const authenticate: Handle = async ({ event, resolve }) => {

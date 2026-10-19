@@ -12,7 +12,7 @@ SPDX-License-Identifier: MPL-2.0
 	function sortObjectbyValue(obj) {
 		const ret = {};
 		Object.keys(obj)
-			.sort((a, b) => obj[b] - obj[a])
+			.sort((a, b) => obj[b] - obj[a] || (a < b ? -1 : a > b ? 1 : 0))
 			.forEach((s) => (ret[s] = obj[s]));
 		return ret;
 	}

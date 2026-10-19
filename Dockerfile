@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
+FROM rust:1.95-bookworm AS realtime-builder
+WORKDIR /build
+COPY tools/realtime-rust/ ./
+RUN cargo build --release --locked
+
 FROM python:3.13-slim
 
 COPY Pipfile* /app/
@@ -20,6 +25,7 @@ COPY alembic.ini /app/
 COPY migrations/ /app/migrations/
 COPY *start.sh /app/
 COPY gunicorn_conf.py /app/
+COPY --from=realtime-builder /build/target/release/classquiz-realtime /usr/local/bin/classquiz-realtime
 
 
 EXPOSE 80

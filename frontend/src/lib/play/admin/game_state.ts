@@ -4,6 +4,15 @@
 
 import type { Player, PlayerAnswer } from '$lib/admin.ts';
 import type { QuizData } from '$lib/quiz_types';
+export interface NativeHostSummary {
+	native_summary: true;
+	final: boolean;
+	page: number;
+	page_size: number;
+	player_count: number;
+	rows: Array<{ username: string; score: number; rank: number; answer?: string }>;
+	answer_counts: Record<string, number>;
+}
 
 /**
  * Interface that include all the game states for the admin page.
@@ -18,7 +27,7 @@ export interface IGameState {
 	question_results: any;
 	answer_count: number;
 	shown_question_now: number;
-	final_results: Array<null> | Array<Array<PlayerAnswer>>;
+	final_results: Array<null> | Array<Array<PlayerAnswer>> | NativeHostSummary;
 	game_started: boolean;
 	quiz_data: QuizData;
 	control_visible: boolean;

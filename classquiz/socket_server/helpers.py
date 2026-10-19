@@ -1,10 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Marlon W (Mawoka)
 #
 # SPDX-License-Identifier: MPL-2.0
-import aiohttp
-from classquiz.config import settings
 from classquiz.db.models import (
     PlayGame,
+    QuizQuestion,
     QuizQuestionType,
     TextQuizAnswer,
     ABCDQuizAnswer,
@@ -17,46 +16,19 @@ from .models import SubmitAnswerDataOrderType
 
 
 async def check_captcha(captcha_data: str) -> bool:
-    async with aiohttp.ClientSession() as session:
-        try:
-            if settings.hcaptcha_key is not None:
-                try:
-                    async with session.post(
-                        "https://hcaptcha.com/siteverify",
-                        data={
-                            "response": captcha_data,
-                            "secret": settings.hcaptcha_key,
-                        },
-                    ) as resp:
-                        resp_data = await resp.model_dump_json()
-                        if not resp_data["success"]:
-                            return
-                except KeyError:
-                    return False
-            elif settings.recaptcha_key is not None:
-                async with session.post(
-                    "https://www.google.com/recaptcha/api/siteverify",
-                    data={
-                        "secret": settings.recaptcha_key,
-                        "response": captcha_data,
-                    },
-                ) as resp:
-                    try:
-                        resp_data = await resp.model_dump_json()
-                        if not resp_data["success"]:
-                            return False
-                    except KeyError:
-                        return False
-        except TypeError:
-            pass
-            return False
-    return True
+    from classquiz.captcha import verify_captcha
+
+    return await verify_captcha(captcha_data) is None
 
 
 def check_answer(game_data: PlayGame, data: SubmitAnswerData) -> (bool, str):
     q_i = int(float(data.question_index))
-    q_type = game_data.questions[q_i].type
-    q_answers = game_data.questions[q_i].answers
+    return check_question_answer(game_data.questions[q_i], data)
+
+
+def check_question_answer(question: QuizQuestion, data: SubmitAnswerData) -> tuple[bool, str]:
+    q_type = question.type
+    q_answers = question.answers
     q_answer = data.answer
     if q_type == QuizQuestionType.ABCD:
         return (check_abcd_question(q_answer, q_answers), data.answer)

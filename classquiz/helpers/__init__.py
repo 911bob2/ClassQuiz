@@ -14,7 +14,7 @@ from openpyxl import load_workbook
 
 from classquiz.db.models import Quiz, User, QuizQuestion, ABCDQuizAnswer
 import xlsxwriter
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientTimeout, ClientError
 from io import BytesIO
 from PIL import Image
 from classquiz.config import meilisearch, settings, LOGGER
@@ -41,7 +41,7 @@ async def generate_spreadsheet(
     player_scores: dict[str, Any],
 ) -> BytesIO:
     storage = BytesIO()
-    workbook = xlsxwriter.Workbook(storage, {"in_memory": True})
+    workbook = xlsxwriter.Workbook(storage, {"in_memory": True, "strings_to_formulas": False, "strings_to_urls": False})
     player_worksheet = workbook.add_worksheet()
     player_worksheet.name = "Players"
     _ = player_worksheet.write(0, 0, "Username")
@@ -63,29 +63,36 @@ async def generate_spreadsheet(
     _ = worksheet.write(0, 3, "Correct answers")
     _ = worksheet.write(0, 4, "Correct answers")
     _ = worksheet.write(0, 5, "Wrong answers")
-    for i, _ in enumerate(quiz_results):
+    for key, answer_data in sorted(quiz_results.items(), key=lambda item: int(item[0])):
+        i = int(key)
         question = quiz.questions[i]
-        try:
-            answer_data = quiz_results[str(i)]
-        except KeyError:
+        if not answer_data:
             continue
         _ = worksheet.write(i + 1, 0, question["question"])
         _ = worksheet.write(i + 1, 1, question["time"])
 
-        try:
-            async with (
-                ClientSession() as session,
-                session.get(f"{settings.root_address}/api/v1/storage/download/{question['image']}") as response,
+        if question.get("image"):
+            try:
+                async with (
+                    ClientSession(timeout=ClientTimeout(total=10)) as session,
+                    session.get(f"{settings.root_address}/api/v1/storage/download/{question['image']}") as response,
+                ):
+                    content_type = response.headers.get("Content-Type")
+                    if content_type is not None and "image" in content_type:
+                        img_data = BytesIO(await response.read())
+                        _ = worksheet.insert_image(i + 1, 2, question["image"], {"image_data": img_data})
+                        image = Image.open(img_data)
+                        _ = worksheet.set_row(i + 1, image.height)
+                        _ = worksheet.set_column(2, 2, image.width)
+            except (
+                TypeError,
+                ValueError,
+                ClientError,
+                asyncio.TimeoutError,
+                OSError,
+                xlsxwriter.exceptions.XlsxWriterException,
             ):
-                content_type = response.headers.get("Content-Type")
-                if content_type is not None and "image" in content_type:
-                    img_data = BytesIO(await response.read())
-                    _ = worksheet.insert_image(i + 1, 2, question["image"], {"image_data": img_data})
-                    image = Image.open(img_data)
-                    _ = worksheet.set_row(i + 1, image.height)
-                    _ = worksheet.set_column(2, 2, image.width)
-        except TypeError:
-            pass
+                LOGGER.warning("An unavailable image was omitted from a spreadsheet export")
         answer_amount = len(answer_data)
         correct_answers = 0
         wrong_answers = 0

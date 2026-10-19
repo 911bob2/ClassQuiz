@@ -79,20 +79,24 @@ type questionMetrics struct {
 	first                    time.Time
 	received, sent, recorded []uint64
 	delivery                 histogram
+	resultReceived           []uint64
+	lastResult               time.Time
 	verified                 bool
 	source                   string
 	duplicates               int
 }
 type questionReport struct {
-	Index      int          `json:"question_index"`
-	Received   int          `json:"players_received"`
-	Sent       int          `json:"answers_sent"`
-	Recorded   *int         `json:"answers_recorded,omitempty"`
-	Missing    *int         `json:"answers_missing,omitempty"`
-	Unexpected *int         `json:"unexpected_bot_answers,omitempty"`
-	Duplicates int          `json:"duplicate_bot_answers"`
-	Source     string       `json:"verification_source"`
-	Delivery   latencyStats `json:"delivery_spread"`
+	Index          int          `json:"question_index"`
+	Received       int          `json:"players_received"`
+	Sent           int          `json:"answers_sent"`
+	Recorded       *int         `json:"answers_recorded,omitempty"`
+	Missing        *int         `json:"answers_missing,omitempty"`
+	Unexpected     *int         `json:"unexpected_bot_answers,omitempty"`
+	Duplicates     int          `json:"duplicate_bot_answers"`
+	Source         string       `json:"verification_source"`
+	Delivery       latencyStats `json:"delivery_spread"`
+	ResultReceipts int          `json:"result_receipts"`
+	LastResult     time.Time    `json:"last_result_at"`
 }
 type generatorSample struct {
 	At             time.Time `json:"at"`
@@ -133,6 +137,8 @@ type report struct {
 	Server             []json.RawMessage       `json:"server_samples,omitempty"`
 	MonitoringErrors   []string                `json:"monitoring_errors,omitempty"`
 	Notes              []string                `json:"notes"`
+	FinalReceipts      int                     `json:"final_result_receipts"`
+	LastFinal          time.Time               `json:"last_final_at"`
 }
 
 type metrics struct {
@@ -151,6 +157,8 @@ type metrics struct {
 	connected, active, peakConnected, peakActive          atomic.Int64
 	observer                                              atomic.Int64
 	finalizing                                            atomic.Bool
+	finalReceived                                         []uint64
+	lastFinal                                             time.Time
 }
 
 func newMetrics(users int) *metrics {
@@ -179,7 +187,7 @@ func bitCount(b []uint64) int {
 func (m *metrics) question(index int) *questionMetrics {
 	q := m.questions[index]
 	if q == nil {
-		q = &questionMetrics{index: index, received: make([]uint64, (m.users+63)/64), sent: make([]uint64, (m.users+63)/64), recorded: make([]uint64, (m.users+63)/64), source: "unverified"}
+		q = &questionMetrics{index: index, received: make([]uint64, (m.users+63)/64), sent: make([]uint64, (m.users+63)/64), recorded: make([]uint64, (m.users+63)/64), resultReceived: make([]uint64, (m.users+63)/64), source: "unverified"}
 		m.questions[index] = q
 	}
 	return q
@@ -210,6 +218,38 @@ func (m *metrics) duration(name string, d time.Duration) {
 		m.latency[name] = h
 	}
 	h.add(d)
+}
+
+func (m *metrics) resultReceipt(index, id int) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	q := m.question(index)
+	if !setBit(q.resultReceived, id) {
+		q.lastResult = time.Now()
+	}
+}
+
+func (m *metrics) personalResult(index, id int, answered bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	q := m.question(index)
+	q.verified = true
+	q.source = "personal_question_results"
+	if answered {
+		setBit(q.recorded, id)
+	}
+}
+
+func (m *metrics) finalReceipt(id int) bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.finalReceived == nil {
+		m.finalReceived = make([]uint64, (m.users+63)/64)
+	}
+	if !setBit(m.finalReceived, id) {
+		m.lastFinal = time.Now()
+	}
+	return bitCount(m.finalReceived) == m.users
 }
 func (m *metrics) error(phase, reason, sample string) {
 	m.mu.Lock()
@@ -341,6 +381,8 @@ func (m *metrics) snapshot(c config, reason string, dropped uint64) report {
 	for _, f := range m.failures {
 		r.Failures = append(r.Failures, *f)
 	}
+	r.FinalReceipts = bitCount(m.finalReceived)
+	r.LastFinal = m.lastFinal
 	sort.Slice(r.Failures, func(i, j int) bool {
 		return r.Failures[i].Phase+r.Failures[i].Reason < r.Failures[j].Phase+r.Failures[j].Reason
 	})
@@ -349,6 +391,8 @@ func (m *metrics) snapshot(c config, reason string, dropped uint64) report {
 	}
 	for index, q := range m.questions {
 		qr := questionReport{Index: index, Received: bitCount(q.received), Sent: bitCount(q.sent), Duplicates: q.duplicates, Source: q.source, Delivery: q.delivery.stats()}
+		qr.ResultReceipts = bitCount(q.resultReceived)
+		qr.LastResult = q.lastResult
 		if q.verified {
 			recorded := 0
 			unexpected := 0
@@ -395,6 +439,9 @@ func (m *metrics) sample(at time.Time, previousCPU *float64, previousAt *time.Ti
 func printReport(w io.Writer, r report) {
 	fmt.Fprintf(w, "\nStopped: %s | elapsed %s\n", r.Reason, r.Finished.Sub(r.Started).Round(time.Millisecond))
 	fmt.Fprintf(w, "Players: requested=%d attempted=%d joined=%d peak-active=%d peak-connected=%d rejoins=%d unexpected-disconnects=%d\n", r.Config.Users, r.Attempted, r.Joined, r.PeakActive, r.PeakConnected, r.Rejoins, r.Disconnects)
+	if r.FinalReceipts > 0 {
+		fmt.Fprintf(w, "Final results: received=%d/%d players\n", r.FinalReceipts, r.Config.Users)
+	}
 	for _, name := range []string{"connect", "join", "answer_scheduler_lag", "media"} {
 		if s, ok := r.Latency[name]; ok {
 			fmt.Fprintf(w, "%s: n=%d p50=%.2fms p95=%.2fms p99=%.2fms max=%.2fms\n", name, s.Count, s.P50MS, s.P95MS, s.P99MS, s.MaxMS)

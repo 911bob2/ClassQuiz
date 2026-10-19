@@ -9,6 +9,8 @@ deploy/*.log
 deploy/backups
 frontend/node_modules
 frontend/.svelte-kit
-tools
+tools/*
+!tools/realtime-rust/
+tools/realtime-rust/target
 stresstest.exe
 stresstest

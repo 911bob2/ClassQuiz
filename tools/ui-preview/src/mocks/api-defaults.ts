@@ -3,6 +3,7 @@ import type { FetchRoutes } from "../shims/fetch-mock";
 export const artwork = (id = "europe") =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540"><rect width="960" height="540" fill="${id === "space" ? "#202e48" : "#c6dfba"}"/><circle cx="740" cy="120" r="65" fill="#e9bd72"/><path d="M0 460 270 90 520 460Z" fill="#4e6e58"/><path d="m155 248 115-158 114 158-65-30-55 35-49-39Z" fill="#f7f5e9"/><path d="M350 540 650 180 960 540Z" fill="#7a947b"/><path d="M0 440Q210 340 460 480T960 420V540H0Z" fill="#92b6b6"/><text x="48" y="490" font-size="32" font-family="sans-serif" fill="#203c36">${id === "space" ? "Beyond the stars" : "A world to discover"}</text></svg>`;
 export const apiDefaults: FetchRoutes = {
+  "GET /api/v1/quiz/realtime/capabilities": { rust: true, configured: true },
   "GET /api/v1/users/me": user,
   "GET /api/v1/quiz/get/*": quiz,
   "GET /api/v1/quiz/list*": quizzes,

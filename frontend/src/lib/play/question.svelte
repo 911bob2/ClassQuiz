@@ -5,9 +5,12 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
+	import { roomEvents } from '$lib/room-socket';
+	const listen = roomEvents();
 	import type { Answer, OrderQuizAnswer, Question, RangeQuizAnswer } from '$lib/quiz_types';
 	import { QuizQuestionType } from '$lib/quiz_types';
-	import { socket } from '$lib/socket';
+	import { socket, sendAnswer } from '$lib/socket';
+	import { onDestroy } from 'svelte';
 	import Spinner from '../Spinner.svelte';
 	import { getLocalization } from '$lib/i18n';
 	import CircularTimer from '$lib/play/circular_progress.svelte';
@@ -22,16 +25,22 @@ SPDX-License-Identifier: MPL-2.0
 		question: Question;
 		game_mode: any;
 		question_index: string | number;
+		question_token?: string;
 		question_count?: number;
 		solution: any;
+		already_submitted?: boolean;
+		remaining_ms?: number;
 	}
 
 	let {
 		question = $bindable(),
 		game_mode = $bindable(),
 		question_index,
+		question_token,
 		question_count,
-		solution
+		solution,
+		already_submitted = false,
+		remaining_ms
 	}: Props = $props();
 
 	if (question.type === undefined) {
@@ -40,15 +49,25 @@ SPDX-License-Identifier: MPL-2.0
 		question.type = QuizQuestionType[question.type];
 	}
 
-	let timer_res = $state(question.time);
+	let timer_res = $state(
+		remaining_ms === undefined ? question.time : String(Math.ceil(remaining_ms / 1000))
+	);
 	let selected_answer: any = $state();
 	// Presentation only: true as soon as any answer was sent.
-	let submitted = $state(false);
+	let submitted = $state(already_submitted);
+	if (already_submitted) selected_answer = 'submitted';
+	$effect(() => {
+		if (already_submitted) {
+			submitted = true;
+			selected_answer ??= 'submitted';
+		}
+	});
+	let timer_interval: ReturnType<typeof setInterval>;
 
 	// Stop the timer if the question is answered
 	const timer = (time: string) => {
 		let seconds = Number(time);
-		let timer_interval = setInterval(() => {
+		timer_interval = setInterval(() => {
 			if (timer_res === '0') {
 				clearInterval(timer_interval);
 				return;
@@ -59,11 +78,18 @@ SPDX-License-Identifier: MPL-2.0
 			timer_res = seconds.toString();
 		}, 1000);
 	};
-	socket.on('everyone_answered', (_) => {
-		timer_res = '0';
+	const everyone_answered = (data) => {
+		if (data?.question_index === undefined || data.question_index === Number(question_index)) {
+			timer_res = '0';
+		}
+	};
+	listen('everyone_answered', everyone_answered);
+	onDestroy(() => {
+		clearInterval(timer_interval);
+		socket.off('everyone_answered', everyone_answered);
 	});
 
-	timer(question.time);
+	timer(timer_res);
 
 	$effect(() => {
 		if (solution !== undefined) {
@@ -74,8 +100,9 @@ SPDX-License-Identifier: MPL-2.0
 	const selectAnswer = (answer: string | number) => {
 		selected_answer = answer;
 		submitted = true;
-		socket.emit('submit_answer', {
+		sendAnswer({
 			question_index: question_index,
+			question_token,
 			answer: answer
 		});
 	};
@@ -87,8 +114,9 @@ SPDX-License-Identifier: MPL-2.0
 		for (let i = 0; i < data.length; i++) {
 			new_array.push({ answer: data[i].answer });
 		}
-		socket.emit('submit_answer', {
+		sendAnswer({
 			question_index: question_index,
+			question_token,
 			answer: 'a',
 			complex_answer: new_array
 		});

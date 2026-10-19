@@ -3,6 +3,11 @@
 // Scenarios push the real pages into a given state with `socket.fire(event, data)`.
 
 type Handler = (...args: any[]) => void;
+export async function connectRoom(pin: string) {
+  const response = await fetch(`/api/v1/quiz/play/check_captcha/${pin}`);
+  return response.json();
+}
+export function sendAnswer(data: unknown) { socket.emit('submit_answer', data); }
 
 export interface EmitRecord {
   event: string;

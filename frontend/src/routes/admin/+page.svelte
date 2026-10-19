@@ -5,17 +5,20 @@ SPDX-License-Identifier: MPL-2.0
 -->
 
 <script lang="ts">
-	import { socket } from '$lib/socket';
+	import { roomEvents } from '$lib/room-socket';
+	const listen = roomEvents();
+	import { socket, connectRoom } from '$lib/socket';
 	import { getLocalization } from '$lib/i18n';
 	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import SomeAdminScreen from '$lib/admin.svelte';
 	import GameNotStarted from '$lib/play/admin/game_not_started.svelte';
 	import { browser } from '$app/environment';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import FinalResults from '$lib/play/admin/final_results.svelte';
+	import NativeResults from '$lib/play/admin/native_results.svelte';
 	import { page } from '$app/state';
 	import { SocketGameControls } from '$lib/play/admin/socket_game_controls.ts';
-	import type { IGameState } from '$lib/play/admin/game_state.ts';
+	import type { IGameState, NativeHostSummary } from '$lib/play/admin/game_state.ts';
 	import { QuizQuestionType, type QuizData } from '$lib/quiz_types';
 	import type { Player, PlayerAnswer } from '$lib/admin';
 	import { tinykeys } from '$lib/tinykeys';
@@ -43,7 +46,7 @@ SPDX-License-Identifier: MPL-2.0
 		public question_results: any;
 		public answer_count: number;
 		public shown_question_now: number;
-		public final_results: Array<null> | Array<Array<PlayerAnswer>>;
+		public final_results: Array<null> | Array<Array<PlayerAnswer>> | NativeHostSummary;
 		public game_started: boolean;
 		public quiz_data: QuizData;
 		public control_visible: boolean;
@@ -110,52 +113,136 @@ SPDX-License-Identifier: MPL-2.0
 
 	const socket_game_controls: SocketGameControls = new SocketGameControls(socket);
 	let game_state: GameState = $state(new GameState(game_token));
+	let connecting = false;
+	let registeredSID = '';
+	let reconnecting = $state(false);
 
 	const connect = async () => {
-		socket.emit('register_as_admin', {
-			game_pin: game_pin,
-			game_id: game_token
-		});
-		const res = await fetch(`/api/v1/quiz/play/check_captcha/${game_pin}`);
-		const json = await res.json();
-		game_mode = json.game_mode;
+		if (connecting) return;
+		connecting = true;
+		try {
+			const metadata = await connectRoom(game_pin);
+			game_mode = metadata.game_mode;
+			if (registeredSID === socket.id) return;
+			registeredSID = socket.id;
+			const key = `quiz-host-client:${game_pin}`;
+			let client_id = sessionStorage.getItem(key);
+			if (!client_id) {
+				client_id = crypto.randomUUID();
+				sessionStorage.setItem(key, client_id);
+			}
+			socket.emit('register_as_admin', {
+				game_pin: game_pin,
+				game_id: game_token,
+				client_id
+			});
+		} catch (error) {
+			errorMessage = error.message;
+		} finally {
+			connecting = false;
+		}
 	};
+	const reconnectHost = () => {
+		if (success || auto_connect) connect();
+	};
+	listen('host_replaced', () => {
+		errorMessage = 'This host session moved to another tab. Refresh to take control again.';
+		success = false;
+	});
+	const hostDisconnected = () => {
+		if (game_state.quiz_data?.realtime_engine === 'rust') reconnecting = true;
+	};
+	listen('connect', reconnectHost);
+	listen('disconnect', hostDisconnected);
+	onDestroy(() => {
+		socket.off('connect', reconnectHost);
+		socket.off('disconnect', hostDisconnected);
+	});
 	onMount(() => {
 		if (auto_connect) {
 			connect();
 		}
-		tinykeys(window, {
+		return tinykeys(window, {
 			Enter: next_action,
 			Space: next_action
 		});
 	});
-	socket.on('session_id', (d) => {
+	listen('session_id', (d) => {
 		const session_id = d.session_id;
 	});
 
-	socket.on('registered_as_admin', (data) => {
+	listen('registered_as_admin', (data) => {
 		game_state.quiz_data = JSON.parse(data['game']);
 		console.log(game_state.quiz_data);
 		success = true;
+		reconnecting = false;
+		errorMessage = '';
 	});
-	socket.on('player_joined', (int_data) => {
-		game_state.players = [...game_state.players, int_data];
+	listen('error', () => {
+		errorMessage = 'The quiz request failed. Check the connection and retry.';
+		reconnecting = false;
 	});
-	socket.on('already_registered_as_admin', () => {
+	// The route owns durable view state. Child components may mount after several
+	// messages in one polling response; they must not be required to catch them.
+	listen('set_question_number', (data) => {
+		game_state.selected_question = data.question_index;
+		game_state.shown_question_now = data.question_index;
+		game_state.timer_res = game_state.quiz_data.questions[data.question_index].time;
+		game_state.question_results = null;
+		game_state.answer_count = 0;
+	});
+	listen('question_results', (data) => {
+		game_state.question_results = data;
+		game_state.timer_res = '0';
+	});
+	listen('final_results', (data) => {
+		game_state.final_results = data;
+		game_state.timer_res = '0';
+	});
+	listen('solutions', () => {
+		game_state.timer_res = '0';
+	});
+	listen('player_answer', (data) => {
+		if (data.question_index === game_state.shown_question_now)
+			game_state.answer_count = Math.max(game_state.answer_count, data.count);
+	});
+	listen('everyone_answered', (data) => {
+		if (
+			data?.question_index === undefined ||
+			data.question_index === game_state.shown_question_now
+		)
+			game_state.timer_res = '0';
+	});
+	listen('room_state', (data) => {
+		game_state.players = data.players || [];
+		game_state.game_started = data.started === true;
+		game_state.selected_question = data.question_index;
+		game_state.shown_question_now = data.question_index;
+		game_state.answer_count = data.answer_count;
+		game_state.timer_res =
+			data.question_index < 0 ? undefined : String(Math.ceil(data.remaining_ms / 1000));
+		game_state.question_results = null;
+		game_state.player_scores = data.player_scores || {};
+		reconnecting = false;
+	});
+	listen('player_joined', (int_data) => {
+		game_state.players.push(int_data);
+	});
+	listen('already_registered_as_admin', () => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		errorMessage = $t('admin_page.already_registered_as_admin');
 	});
 
-	socket.on('start_game', (_) => {
+	listen('start_game', (_) => {
 		game_state.game_started = true;
 	});
 
-	socket.on('control_visibility', (data) => {
+	listen('control_visibility', (data) => {
 		game_state.control_visible = data.visible;
 	});
 
-	/*	socket.on('question_results', (int_data) => {
+	/*	listen('question_results', (int_data) => {
         try {
             int_data = JSON.parse(int_data);
         } catch (e) {
@@ -164,7 +251,7 @@ SPDX-License-Identifier: MPL-2.0
         }
         question_results = int_data;
     });*/
-	socket.on('export_token', (int_data) => {
+	listen('export_token', (int_data) => {
 		warnToLeave = false;
 		export_token = int_data;
 
@@ -173,7 +260,7 @@ SPDX-License-Identifier: MPL-2.0
 		}, 200);
 	});
 
-	socket.on('results_saved_successfully', (_) => {
+	listen('results_saved_successfully', (_) => {
 		results_saved = true;
 	});
 
@@ -190,7 +277,16 @@ SPDX-License-Identifier: MPL-2.0
 		e.preventDefault();
 		socket.emit('get_export_token');
 	};
-	const save_quiz = () => {
+	const save_quiz = async () => {
+		if (game_state.quiz_data?.realtime_engine === 'rust') {
+			const response = await fetch(`/api/v1/quiz/realtime/${game_pin}/save`, {
+				method: 'POST',
+				headers: { 'X-Quiz-Host-Token': game_token }
+			});
+			if (response.ok) results_saved = true;
+			else errorMessage = (await response.json()).detail || 'Saving failed. Please retry.';
+			return;
+		}
 		socket.emit('save_quiz');
 	};
 
@@ -243,6 +339,10 @@ SPDX-License-Identifier: MPL-2.0
 <svelte:head>
 	<title>Telekom Quiz · Host</title>
 </svelte:head>
+{#if success && errorMessage}<p class="tq-panel tq-panel-body" role="alert">{errorMessage}</p>{/if}
+{#if reconnecting}<p class="tq-panel tq-panel-body" role="status">
+		Reconnecting to the quiz… Stored answers are retained. The timer keeps running.
+	</p>{/if}
 <div
 	class="host-root"
 	style="background-repeat: no-repeat;background-size: 100% 100%;background-image: {bg_image
@@ -267,57 +367,60 @@ SPDX-License-Identifier: MPL-2.0
 		<SomeAdminScreen {game_token} {bg_color} bind:game_state />
 	{/if}
 	{#if show_final_results}
-		<FinalResults bind:data={game_state.player_scores} {show_final_results}>
-			{#snippet actions()}
-				{#if game_state.control_visible}
-					{#if export_token === undefined}
-						<button
-							class="tq-button"
-							data-ui="host-request-export"
-							onclick={request_answer_export}
-						>
-							{$t('admin_page.request_export_results')}
-						</button>
-					{:else}
-						<a
-							class="tq-button"
-							data-ui="host-download-export"
-							target="_blank"
-							href="/api/v1/quiz/export_data/{export_token}?ts={new Date().getTime()}&game_pin={game_pin}"
-						>
-							{$t('admin_page.download_export_results')}
-						</a>
-					{/if}
+		{#snippet actions()}
+			{#if game_state.control_visible}
+				{#if export_token === undefined}
 					<button
-						class="tq-button tq-button-primary"
-						data-ui="host-save-results"
-						onclick={save_quiz}
-						disabled={results_saved}
+						class="tq-button"
+						data-ui="host-request-export"
+						onclick={request_answer_export}
 					>
-						{#if results_saved}
-							<svg
-								class="save-check"
-								aria-hidden="true"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M5 13l4 4L19 7"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-							{$t('telekom.results_saved', { defaultValue: 'Results saved' })}
-						{:else}
-							{$t('admin_page.save_results')}
-						{/if}
+						{$t('admin_page.request_export_results')}
 					</button>
+				{:else}
+					<a
+						class="tq-button"
+						data-ui="host-download-export"
+						target="_blank"
+						href="/api/v1/quiz/export_data/{export_token}?ts={new Date().getTime()}&game_pin={game_pin}"
+					>
+						{$t('admin_page.download_export_results')}
+					</a>
 				{/if}
-			{/snippet}
-		</FinalResults>
+				<button
+					class="tq-button tq-button-primary"
+					data-ui="host-save-results"
+					onclick={save_quiz}
+					disabled={results_saved}
+				>
+					{#if results_saved}
+						<svg
+							class="save-check"
+							aria-hidden="true"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M5 13l4 4L19 7"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+						{$t('telekom.results_saved', { defaultValue: 'Results saved' })}
+					{:else}
+						{$t('admin_page.save_results')}
+					{/if}
+				</button>
+			{/if}
+		{/snippet}
+		{#if 'native_summary' in game_state.final_results}
+			<NativeResults summary={game_state.final_results} {actions} />
+		{:else}
+			<FinalResults bind:data={game_state.player_scores} {show_final_results} {actions} />
+		{/if}
 	{/if}
 </div>
 <a

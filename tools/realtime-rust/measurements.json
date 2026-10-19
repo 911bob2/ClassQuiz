@@ -1,0 +1,2846 @@
+{
+  "date": "2026-10-15",
+  "server_cpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "generator_cpus": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "api_container_gib": 2,
+  "proxy_gib": 2,
+  "generator_gib": 4,
+  "binary_sha256": "4c94dd7a0339fccda518793608ae6caaa544edba7f80e101fdfadb329ce74047",
+  "rust_version": "1.95.0",
+  "socketioxide": "0.18.7",
+  "redis_client": "0.32.7",
+  "notes": [
+    "Short local synthetic tests, no VM deployment. Other workloads varied on this PC.",
+    "Rust has no WS compression and coalesces live host counts every 250ms. Python baselines differ in both runtime and architecture.",
+    "All-stored includes local per-player think time and broadcast delivery spread, polling resolution ~50ms.",
+    "one-worker and zero-think have independent fixed-rate probes; earlier HTTP probes share the host controller loop.",
+    "CPU percentages are relative to one core, runtime only; Redis and proxy also share the same four server CPUs.",
+    "First 10000 four-threads run had one join retry and is excluded from clean capacity evidence."
+  ],
+  "clean_answer_total": 1200000,
+  "runs": [
+    {
+      "label": "rust-10000-ready-handlers",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 10000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 60.14,
+      "stored_median_ms": 672.892,
+      "stored_p95_ms": 681.66,
+      "stored_max_ms": 681.66,
+      "all_question_results_p95_ms": 156.528,
+      "all_question_results_max_ms": 156.528,
+      "all_final_results_ms": 227.489,
+      "http_p95_ms": 45.253,
+      "http_max_ms": 101.361,
+      "api_peak_fds": 53,
+      "rx_mib": 64.987,
+      "generator_peak_cpu": 52.804,
+      "generator_peak_rss_mib": 346.895,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 100000,
+      "final_receipts": 10000,
+      "comfortable": true,
+      "python_cpu_percent_one_core": 4.747,
+      "python_peak_rss_mib": 195.367,
+      "rust_cpu_percent_one_core": 45.874,
+      "combined_runtime_cpu_percent_one_core": 50.621,
+      "rust_peak_rss_mib": 441.969,
+      "rust_peak_fds": 10022,
+      "rust": {
+        "accepted": 100000,
+        "commit_latency_ms": {
+          "count": 100000,
+          "max": 38.815,
+          "p50": 0.412,
+          "p95": 4.419,
+          "p99": 13.983
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 10000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-10000-ready-handlers",
+        "ramp": 60.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 3.403,
+      "rust_http_max_ms": 8.664,
+      "answer_http_p95_ms": 51.301,
+      "independent_http": {
+        "python": {
+          "p95_ms": null,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": null,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": null,
+      "comfortable_host_observed": true,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 7.441,
+          "all_stored_ms": 673.895,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 303.335,
+            "p95": 536.785,
+            "max": 619.354
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 15.829,
+          "all_stored_ms": 680.997,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 302.948,
+            "p95": 540.213,
+            "max": 626.007
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 4.008,
+          "all_stored_ms": 680.398,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 304.227,
+            "p95": 541.45,
+            "max": 633.438
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 11.746,
+          "all_stored_ms": 629.647,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 298.919,
+            "p95": 533.169,
+            "max": 620.542
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 26.621,
+          "all_stored_ms": 641.431,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 310.726,
+            "p95": 546.27,
+            "max": 633.548
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 5.561,
+          "all_stored_ms": 668.659,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 297.528,
+            "p95": 532.992,
+            "max": 631.33
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 19.229,
+          "all_stored_ms": 681.66,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 320.271,
+            "p95": 558.778,
+            "max": 630.892
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 8.127,
+          "all_stored_ms": 673.381,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 302.615,
+            "p95": 536.23,
+            "max": 616.815
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 9.446,
+          "all_stored_ms": 672.089,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 307.206,
+            "p95": 541.206,
+            "max": 623.582
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 5.838,
+          "all_stored_ms": 672.404,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 311.25,
+            "p95": 544.922,
+            "max": 636.639
+          }
+        }
+      ],
+      "description": "4 workers, 0\u2013500 ms",
+      "scheduler_lag": {
+        "count": 100000,
+        "mean_ms": 0.445,
+        "p50_ms": 0.404,
+        "p95_ms": 1.155,
+        "p99_ms": 1.538,
+        "min_ms": 0.001,
+        "max_ms": 26.077
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 10000,
+          "mean_ms": 67.142,
+          "p50_ms": 69.653,
+          "p95_ms": 122.118,
+          "p99_ms": 122.118,
+          "min_ms": 0,
+          "max_ms": 122.118
+        },
+        {
+          "index": 1,
+          "count": 10000,
+          "mean_ms": 62.448,
+          "p50_ms": 69.653,
+          "p95_ms": 112.177,
+          "p99_ms": 117.566,
+          "min_ms": 0,
+          "max_ms": 117.566
+        },
+        {
+          "index": 2,
+          "count": 10000,
+          "mean_ms": 75.234,
+          "p50_ms": 92.708,
+          "p95_ms": 133.179,
+          "p99_ms": 133.179,
+          "min_ms": 0,
+          "max_ms": 133.179
+        },
+        {
+          "index": 3,
+          "count": 10000,
+          "mean_ms": 65.04,
+          "p50_ms": 69.653,
+          "p95_ms": 123.395,
+          "p99_ms": 128.137,
+          "min_ms": 0,
+          "max_ms": 128.137
+        },
+        {
+          "index": 4,
+          "count": 10000,
+          "mean_ms": 66.362,
+          "p50_ms": 69.653,
+          "p95_ms": 123.395,
+          "p99_ms": 126.748,
+          "min_ms": 0,
+          "max_ms": 126.748
+        },
+        {
+          "index": 5,
+          "count": 10000,
+          "mean_ms": 64.62,
+          "p50_ms": 63.321,
+          "p95_ms": 133.389,
+          "p99_ms": 133.389,
+          "min_ms": 0,
+          "max_ms": 133.389
+        },
+        {
+          "index": 6,
+          "count": 10000,
+          "mean_ms": 77.957,
+          "p50_ms": 92.708,
+          "p95_ms": 126.407,
+          "p99_ms": 126.407,
+          "min_ms": 0,
+          "max_ms": 126.407
+        },
+        {
+          "index": 7,
+          "count": 10000,
+          "mean_ms": 66.961,
+          "p50_ms": 76.618,
+          "p95_ms": 123.395,
+          "p99_ms": 123.395,
+          "min_ms": 0,
+          "max_ms": 123.675
+        },
+        {
+          "index": 8,
+          "count": 10000,
+          "mean_ms": 71.426,
+          "p50_ms": 84.28,
+          "p95_ms": 123.291,
+          "p99_ms": 123.291,
+          "min_ms": 0,
+          "max_ms": 123.291
+        },
+        {
+          "index": 9,
+          "count": 10000,
+          "mean_ms": 78.021,
+          "p50_ms": 92.708,
+          "p95_ms": 123.395,
+          "p99_ms": 135.734,
+          "min_ms": 0,
+          "max_ms": 136.049
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 0.98,
+          "cpu_percent_one_core": 28.623,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.502,
+          "net_input_bytes": 5905574,
+          "net_output_bytes": 1219515
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 0.899,
+          "cpu_percent_one_core": 32.002,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.728,
+          "net_input_bytes": 5905266,
+          "net_output_bytes": 1219453
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 0.898,
+          "cpu_percent_one_core": 31.645,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.945,
+          "net_input_bytes": 5905359,
+          "net_output_bytes": 1219550
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 0.855,
+          "cpu_percent_one_core": 35.661,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.21,
+          "net_input_bytes": 5905109,
+          "net_output_bytes": 1219441
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 0.869,
+          "cpu_percent_one_core": 34.121,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.068,
+          "net_input_bytes": 5905653,
+          "net_output_bytes": 1219706
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 0.888,
+          "cpu_percent_one_core": 30.946,
+          "lua_calls": 10000,
+          "lua_mean_us": 11.854,
+          "net_input_bytes": 5904960,
+          "net_output_bytes": 1219075
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 0.899,
+          "cpu_percent_one_core": 31.246,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.403,
+          "net_input_bytes": 5905419,
+          "net_output_bytes": 1221798
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 0.89,
+          "cpu_percent_one_core": 33.854,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.616,
+          "net_input_bytes": 5905337,
+          "net_output_bytes": 1219434
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 0.888,
+          "cpu_percent_one_core": 34.409,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.581,
+          "net_input_bytes": 5905102,
+          "net_output_bytes": 1217072
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 0.889,
+          "cpu_percent_one_core": 33.755,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.703,
+          "net_input_bytes": 5905231,
+          "net_output_bytes": 1217363
+        }
+      ]
+    },
+    {
+      "label": "rust-10000-nodelay",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 10000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 120.116,
+      "stored_median_ms": 654.156,
+      "stored_p95_ms": 719.752,
+      "stored_max_ms": 719.752,
+      "all_question_results_p95_ms": 146.941,
+      "all_question_results_max_ms": 146.941,
+      "all_final_results_ms": 262.012,
+      "http_p95_ms": 45.202,
+      "http_max_ms": 143.366,
+      "api_peak_fds": 51,
+      "rx_mib": 64.529,
+      "generator_peak_cpu": 53.198,
+      "generator_peak_rss_mib": 356.0,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 100000,
+      "final_receipts": 10000,
+      "comfortable": true,
+      "python_cpu_percent_one_core": 1.881,
+      "python_peak_rss_mib": 194.168,
+      "rust_cpu_percent_one_core": 48.037,
+      "combined_runtime_cpu_percent_one_core": 49.918,
+      "rust_peak_rss_mib": 435.617,
+      "rust_peak_fds": 10022,
+      "rust": {
+        "accepted": 100000,
+        "commit_latency_ms": {
+          "count": 100000,
+          "max": 56.255,
+          "p50": 0.386,
+          "p95": 4.319,
+          "p99": 18.863
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 10000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-10000-nodelay",
+        "ramp": 120.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 3.318,
+      "rust_http_max_ms": 155.19,
+      "answer_http_p95_ms": 45.398,
+      "independent_http": {
+        "python": {
+          "p95_ms": null,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": null,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": null,
+      "comfortable_host_observed": true,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 57.594,
+          "all_stored_ms": 669.581,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 333.648,
+            "p95": 565.642,
+            "max": 636.934
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 28.308,
+          "all_stored_ms": 640.6,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 316.648,
+            "p95": 548.01,
+            "max": 623.066
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 48.115,
+          "all_stored_ms": 656.564,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 326.061,
+            "p95": 562.767,
+            "max": 635.383
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 54.85,
+          "all_stored_ms": 719.752,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 345.83,
+            "p95": 589.216,
+            "max": 673.473
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 45.64,
+          "all_stored_ms": 659.516,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 334.863,
+            "p95": 570.192,
+            "max": 644.707
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 35.14,
+          "all_stored_ms": 624.097,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 320.17,
+            "p95": 551.522,
+            "max": 622.163
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 55.089,
+          "all_stored_ms": 673.541,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 332.778,
+            "p95": 568.336,
+            "max": 628.213
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 75.127,
+          "all_stored_ms": 642.418,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 336.582,
+            "p95": 565.698,
+            "max": 637.44
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 54.983,
+          "all_stored_ms": 620.248,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 322.293,
+            "p95": 550.197,
+            "max": 614.656
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 42.157,
+          "all_stored_ms": 651.748,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 315.932,
+            "p95": 546.221,
+            "max": 624.81
+          }
+        }
+      ],
+      "description": "4 workers, 0\u2013500 ms, repeat",
+      "scheduler_lag": {
+        "count": 100000,
+        "mean_ms": 0.507,
+        "p50_ms": 0.404,
+        "p95_ms": 1.155,
+        "p99_ms": 2.047,
+        "min_ms": 0.001,
+        "max_ms": 46.937
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 10000,
+          "mean_ms": 71.745,
+          "p50_ms": 76.618,
+          "p95_ms": 123.395,
+          "p99_ms": 130.387,
+          "min_ms": 0,
+          "max_ms": 130.387
+        },
+        {
+          "index": 1,
+          "count": 10000,
+          "mean_ms": 66.928,
+          "p50_ms": 69.653,
+          "p95_ms": 123.395,
+          "p99_ms": 131.272,
+          "min_ms": 0,
+          "max_ms": 131.272
+        },
+        {
+          "index": 2,
+          "count": 10000,
+          "mean_ms": 65.143,
+          "p50_ms": 69.653,
+          "p95_ms": 123.395,
+          "p99_ms": 126.104,
+          "min_ms": 0,
+          "max_ms": 126.104
+        },
+        {
+          "index": 3,
+          "count": 10000,
+          "mean_ms": 75.487,
+          "p50_ms": 69.653,
+          "p95_ms": 163.987,
+          "p99_ms": 163.987,
+          "min_ms": 0,
+          "max_ms": 163.987
+        },
+        {
+          "index": 4,
+          "count": 10000,
+          "mean_ms": 66.848,
+          "p50_ms": 69.653,
+          "p95_ms": 133.716,
+          "p99_ms": 133.716,
+          "min_ms": 0,
+          "max_ms": 133.716
+        },
+        {
+          "index": 5,
+          "count": 10000,
+          "mean_ms": 65.223,
+          "p50_ms": 69.653,
+          "p95_ms": 121.447,
+          "p99_ms": 121.447,
+          "min_ms": 0,
+          "max_ms": 121.447
+        },
+        {
+          "index": 6,
+          "count": 10000,
+          "mean_ms": 79.924,
+          "p50_ms": 92.708,
+          "p95_ms": 128.512,
+          "p99_ms": 128.512,
+          "min_ms": 0,
+          "max_ms": 128.512
+        },
+        {
+          "index": 7,
+          "count": 10000,
+          "mean_ms": 67.284,
+          "p50_ms": 76.618,
+          "p95_ms": 123.395,
+          "p99_ms": 125.499,
+          "min_ms": 0,
+          "max_ms": 125.499
+        },
+        {
+          "index": 8,
+          "count": 10000,
+          "mean_ms": 68.674,
+          "p50_ms": 84.28,
+          "p95_ms": 112.177,
+          "p99_ms": 115.83,
+          "min_ms": 0,
+          "max_ms": 115.83
+        },
+        {
+          "index": 9,
+          "count": 10000,
+          "mean_ms": 64.398,
+          "p50_ms": 63.321,
+          "p95_ms": 123.395,
+          "p99_ms": 128.667,
+          "min_ms": 0,
+          "max_ms": 128.667
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 0.973,
+          "cpu_percent_one_core": 29.022,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.652,
+          "net_input_bytes": 5904262,
+          "net_output_bytes": 1220560
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 0.876,
+          "cpu_percent_one_core": 31.968,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.589,
+          "net_input_bytes": 5904442,
+          "net_output_bytes": 1218653
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 0.876,
+          "cpu_percent_one_core": 31.878,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.704,
+          "net_input_bytes": 5904277,
+          "net_output_bytes": 1216398
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 0.939,
+          "cpu_percent_one_core": 31.142,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.435,
+          "net_input_bytes": 5904610,
+          "net_output_bytes": 1221073
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 0.878,
+          "cpu_percent_one_core": 31.526,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.849,
+          "net_input_bytes": 5904787,
+          "net_output_bytes": 1218865
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 0.843,
+          "cpu_percent_one_core": 31.687,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.474,
+          "net_input_bytes": 5904394,
+          "net_output_bytes": 1214217
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 0.891,
+          "cpu_percent_one_core": 32.105,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.615,
+          "net_input_bytes": 5904357,
+          "net_output_bytes": 1218616
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 0.864,
+          "cpu_percent_one_core": 33.027,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.959,
+          "net_input_bytes": 5904172,
+          "net_output_bytes": 1218459
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 0.84,
+          "cpu_percent_one_core": 33.1,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.359,
+          "net_input_bytes": 5904598,
+          "net_output_bytes": 1218839
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 0.875,
+          "cpu_percent_one_core": 32.778,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.82,
+          "net_input_bytes": 5904043,
+          "net_output_bytes": 1218456
+        }
+      ]
+    },
+    {
+      "label": "rust-10000-one-worker",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 10000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 60.273,
+      "stored_median_ms": 795.554,
+      "stored_p95_ms": 803.182,
+      "stored_max_ms": 803.182,
+      "all_question_results_p95_ms": 278.859,
+      "all_question_results_max_ms": 278.859,
+      "all_final_results_ms": 357.274,
+      "http_p95_ms": 4.222,
+      "http_max_ms": 123.021,
+      "api_peak_fds": 52,
+      "rx_mib": 64.527,
+      "generator_peak_cpu": 51.597,
+      "generator_peak_rss_mib": 359.043,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 100000,
+      "final_receipts": 10000,
+      "comfortable": true,
+      "python_cpu_percent_one_core": 3.209,
+      "python_peak_rss_mib": 192.922,
+      "rust_cpu_percent_one_core": 43.544,
+      "combined_runtime_cpu_percent_one_core": 46.753,
+      "rust_peak_rss_mib": 463.348,
+      "rust_peak_fds": 10023,
+      "rust": {
+        "accepted": 100000,
+        "commit_latency_ms": {
+          "count": 100000,
+          "max": 49.471,
+          "p50": 0.464,
+          "p95": 4.695,
+          "p99": 28.527
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 10000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-10000-one-worker",
+        "ramp": 60.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "spread",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 1,
+          "redis_connections": 8,
+          "binary_sha256": "4c94dd7a0339fccda518793608ae6caaa544edba7f80e101fdfadb329ce74047"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 4.302,
+      "rust_http_max_ms": 217.767,
+      "answer_http_p95_ms": 4.387,
+      "independent_http": {
+        "python": {
+          "p95_ms": 4.716,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 3.88,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "comfortable_host_observed": true,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 128.039,
+          "all_stored_ms": 790.465,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 404.615,
+            "p95": 652.174,
+            "max": 764.705
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 32.946,
+          "all_stored_ms": 797.287,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 381.218,
+            "p95": 641.37,
+            "max": 759.303
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 28.116,
+          "all_stored_ms": 798.199,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 370.425,
+            "p95": 642.873,
+            "max": 752.948
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 29.799,
+          "all_stored_ms": 796.001,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 379.475,
+            "p95": 643.759,
+            "max": 758.017
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 27.22,
+          "all_stored_ms": 743.388,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 371.191,
+            "p95": 627.863,
+            "max": 730.823
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 28.712,
+          "all_stored_ms": 776.344,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 376.517,
+            "p95": 641.125,
+            "max": 756.943
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 30.882,
+          "all_stored_ms": 797.329,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 386.83,
+            "p95": 653.319,
+            "max": 769.333
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 30.431,
+          "all_stored_ms": 751.204,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 378.952,
+            "p95": 636.932,
+            "max": 744.0
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 35.765,
+          "all_stored_ms": 803.182,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 386.818,
+            "p95": 648.414,
+            "max": 767.306
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 28.947,
+          "all_stored_ms": 795.108,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 377.057,
+            "p95": 641.782,
+            "max": 764.787
+          }
+        }
+      ],
+      "description": "1 worker, 0\u2013500 ms",
+      "scheduler_lag": {
+        "count": 100000,
+        "mean_ms": 0.5,
+        "p50_ms": 0.276,
+        "p95_ms": 1.398,
+        "p99_ms": 3.298,
+        "min_ms": 0.001,
+        "max_ms": 46.432
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 10000,
+          "mean_ms": 63.07,
+          "p50_ms": 43.248,
+          "p95_ms": 180.663,
+          "p99_ms": 180.663,
+          "min_ms": 0,
+          "max_ms": 184.023
+        },
+        {
+          "index": 1,
+          "count": 10000,
+          "mean_ms": 122.641,
+          "p50_ms": 123.395,
+          "p95_ms": 258.036,
+          "p99_ms": 258.036,
+          "min_ms": 0,
+          "max_ms": 258.036
+        },
+        {
+          "index": 2,
+          "count": 10000,
+          "mean_ms": 118.414,
+          "p50_ms": 112.177,
+          "p95_ms": 240.462,
+          "p99_ms": 248.188,
+          "min_ms": 0,
+          "max_ms": 248.188
+        },
+        {
+          "index": 3,
+          "count": 10000,
+          "mean_ms": 117.81,
+          "p50_ms": 123.395,
+          "p95_ms": 240.462,
+          "p99_ms": 249.787,
+          "min_ms": 0,
+          "max_ms": 249.787
+        },
+        {
+          "index": 4,
+          "count": 10000,
+          "mean_ms": 109.895,
+          "p50_ms": 112.177,
+          "p95_ms": 218.602,
+          "p99_ms": 228.767,
+          "min_ms": 0,
+          "max_ms": 228.767
+        },
+        {
+          "index": 5,
+          "count": 10000,
+          "mean_ms": 117.612,
+          "p50_ms": 112.177,
+          "p95_ms": 240.462,
+          "p99_ms": 250.833,
+          "min_ms": 0,
+          "max_ms": 250.833
+        },
+        {
+          "index": 6,
+          "count": 10000,
+          "mean_ms": 123.574,
+          "p50_ms": 123.395,
+          "p95_ms": 264.509,
+          "p99_ms": 264.509,
+          "min_ms": 0,
+          "max_ms": 266.056
+        },
+        {
+          "index": 7,
+          "count": 10000,
+          "mean_ms": 114.224,
+          "p50_ms": 112.177,
+          "p95_ms": 240.462,
+          "p99_ms": 240.462,
+          "min_ms": 0,
+          "max_ms": 241.098
+        },
+        {
+          "index": 8,
+          "count": 10000,
+          "mean_ms": 115.896,
+          "p50_ms": 112.177,
+          "p95_ms": 240.462,
+          "p99_ms": 250.235,
+          "min_ms": 0,
+          "max_ms": 250.235
+        },
+        {
+          "index": 9,
+          "count": 10000,
+          "mean_ms": 119.096,
+          "p50_ms": 112.177,
+          "p95_ms": 257.885,
+          "p99_ms": 257.885,
+          "min_ms": 0,
+          "max_ms": 257.885
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 1.102,
+          "cpu_percent_one_core": 25.665,
+          "lua_calls": 10000,
+          "lua_mean_us": 12.842,
+          "net_input_bytes": 5905362,
+          "net_output_bytes": 1247350
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 1.019,
+          "cpu_percent_one_core": 29.108,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.397,
+          "net_input_bytes": 5904685,
+          "net_output_bytes": 1244713
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 1.02,
+          "cpu_percent_one_core": 28.631,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.441,
+          "net_input_bytes": 5904689,
+          "net_output_bytes": 1244753
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 1.025,
+          "cpu_percent_one_core": 29.322,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.532,
+          "net_input_bytes": 5904587,
+          "net_output_bytes": 1244635
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 0.981,
+          "cpu_percent_one_core": 29.522,
+          "lua_calls": 10000,
+          "lua_mean_us": 13.106,
+          "net_input_bytes": 5904713,
+          "net_output_bytes": 1242452
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 0.997,
+          "cpu_percent_one_core": 30.089,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.655,
+          "net_input_bytes": 5904802,
+          "net_output_bytes": 1242531
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 1.022,
+          "cpu_percent_one_core": 30.499,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.931,
+          "net_input_bytes": 5904825,
+          "net_output_bytes": 1244779
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 0.973,
+          "cpu_percent_one_core": 30.983,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.689,
+          "net_input_bytes": 5904390,
+          "net_output_bytes": 1242252
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 1.035,
+          "cpu_percent_one_core": 30.861,
+          "lua_calls": 10000,
+          "lua_mean_us": 15.17,
+          "net_input_bytes": 5905008,
+          "net_output_bytes": 1247107
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 1.014,
+          "cpu_percent_one_core": 30.917,
+          "lua_calls": 10000,
+          "lua_mean_us": 14.863,
+          "net_input_bytes": 5904693,
+          "net_output_bytes": 1244764
+        }
+      ]
+    },
+    {
+      "label": "rust-30000-four-threads",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 30000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 120.078,
+      "stored_median_ms": 1067.016,
+      "stored_p95_ms": 1321.468,
+      "stored_max_ms": 1321.468,
+      "all_question_results_p95_ms": 484.296,
+      "all_question_results_max_ms": 484.296,
+      "all_final_results_ms": 886.057,
+      "http_p95_ms": 198.548,
+      "http_max_ms": 414.403,
+      "api_peak_fds": 78,
+      "rx_mib": 195.327,
+      "generator_peak_cpu": 120.585,
+      "generator_peak_rss_mib": 1053.352,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 300000,
+      "final_receipts": 30000,
+      "comfortable": false,
+      "python_cpu_percent_one_core": 18.335,
+      "python_peak_rss_mib": 203.633,
+      "rust_cpu_percent_one_core": 104.027,
+      "combined_runtime_cpu_percent_one_core": 122.362,
+      "rust_peak_rss_mib": 1305.613,
+      "rust_peak_fds": 30023,
+      "rust": {
+        "accepted": 300000,
+        "commit_latency_ms": {
+          "count": 300000,
+          "max": 408.575,
+          "p50": 84.543,
+          "p95": 194.303,
+          "p99": 227.839
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 30000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 30000,
+        "questions": 10,
+        "label": "rust-30000-four-threads",
+        "ramp": 120.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 14.603,
+      "rust_http_max_ms": 334.861,
+      "answer_http_p95_ms": 267.303,
+      "independent_http": {
+        "python": {
+          "p95_ms": null,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": null,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": null,
+      "comfortable_host_observed": false,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 248.816,
+          "all_stored_ms": 1321.468,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 690.576,
+            "p95": 932.473,
+            "max": 1242.626
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 124.215,
+          "all_stored_ms": 1035.18,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 640.09,
+            "p95": 835.799,
+            "max": 1019.872
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 110.268,
+          "all_stored_ms": 1016.16,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 505.769,
+            "p95": 784.514,
+            "max": 977.212
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 134.972,
+          "all_stored_ms": 1060.08,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 500.308,
+            "p95": 792.564,
+            "max": 1012.124
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 168.383,
+          "all_stored_ms": 1227.863,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 567.642,
+            "p95": 884.579,
+            "max": 1179.718
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 117.284,
+          "all_stored_ms": 1036.54,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 536.498,
+            "p95": 804.859,
+            "max": 1027.777
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 132.67,
+          "all_stored_ms": 1075.236,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 543.918,
+            "p95": 785.703,
+            "max": 1033.889
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 104.502,
+          "all_stored_ms": 1073.953,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 558.459,
+            "p95": 830.92,
+            "max": 1037.302
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 134.495,
+          "all_stored_ms": 1311.628,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 679.232,
+            "p95": 947.152,
+            "max": 1285.125
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 125.199,
+          "all_stored_ms": 1035.678,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 477.275,
+            "p95": 786.316,
+            "max": 972.04
+          }
+        }
+      ],
+      "description": "4 workers, 0\u2013500 ms",
+      "scheduler_lag": {
+        "count": 300000,
+        "mean_ms": 1.108,
+        "p50_ms": 0.027,
+        "p95_ms": 1.398,
+        "p99_ms": 24.412,
+        "min_ms": 0.001,
+        "max_ms": 149.618
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 30000,
+          "mean_ms": 289.103,
+          "p50_ms": 320.056,
+          "p95_ms": 515.454,
+          "p99_ms": 566.999,
+          "min_ms": 0,
+          "max_ms": 703.55
+        },
+        {
+          "index": 1,
+          "count": 30000,
+          "mean_ms": 237.937,
+          "p50_ms": 240.462,
+          "p95_ms": 515.454,
+          "p99_ms": 515.454,
+          "min_ms": 0,
+          "max_ms": 527.256
+        },
+        {
+          "index": 2,
+          "count": 30000,
+          "mean_ms": 225.379,
+          "p50_ms": 218.602,
+          "p95_ms": 425.995,
+          "p99_ms": 468.594,
+          "min_ms": 0,
+          "max_ms": 504.947
+        },
+        {
+          "index": 3,
+          "count": 30000,
+          "mean_ms": 225.834,
+          "p50_ms": 218.602,
+          "p95_ms": 468.594,
+          "p99_ms": 513.609,
+          "min_ms": 0,
+          "max_ms": 513.609
+        },
+        {
+          "index": 4,
+          "count": 30000,
+          "mean_ms": 287.49,
+          "p50_ms": 290.96,
+          "p95_ms": 566.999,
+          "p99_ms": 686.069,
+          "min_ms": 0,
+          "max_ms": 689.273
+        },
+        {
+          "index": 5,
+          "count": 30000,
+          "mean_ms": 228.361,
+          "p50_ms": 240.462,
+          "p95_ms": 468.594,
+          "p99_ms": 515.454,
+          "min_ms": 0,
+          "max_ms": 521.988
+        },
+        {
+          "index": 6,
+          "count": 30000,
+          "mean_ms": 221.824,
+          "p50_ms": 218.602,
+          "p95_ms": 468.594,
+          "p99_ms": 515.454,
+          "min_ms": 0,
+          "max_ms": 544.459
+        },
+        {
+          "index": 7,
+          "count": 30000,
+          "mean_ms": 250.958,
+          "p50_ms": 290.96,
+          "p95_ms": 515.454,
+          "p99_ms": 548.188,
+          "min_ms": 0,
+          "max_ms": 548.188
+        },
+        {
+          "index": 8,
+          "count": 30000,
+          "mean_ms": 296.642,
+          "p50_ms": 290.96,
+          "p95_ms": 623.699,
+          "p99_ms": 754.676,
+          "min_ms": 0,
+          "max_ms": 793.874
+        },
+        {
+          "index": 9,
+          "count": 30000,
+          "mean_ms": 209.783,
+          "p50_ms": 218.602,
+          "p95_ms": 468.594,
+          "p99_ms": 468.594,
+          "min_ms": 0,
+          "max_ms": 500.065
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 1.709,
+          "cpu_percent_one_core": 34.721,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.72,
+          "net_input_bytes": 17716723,
+          "net_output_bytes": 3630311
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 1.359,
+          "cpu_percent_one_core": 47.953,
+          "lua_calls": 30000,
+          "lua_mean_us": 15.408,
+          "net_input_bytes": 17715421,
+          "net_output_bytes": 3618572
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 1.295,
+          "cpu_percent_one_core": 45.785,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.553,
+          "net_input_bytes": 17715884,
+          "net_output_bytes": 3623347
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 1.343,
+          "cpu_percent_one_core": 40.428,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.565,
+          "net_input_bytes": 17717103,
+          "net_output_bytes": 3628743
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 1.487,
+          "cpu_percent_one_core": 40.85,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.376,
+          "net_input_bytes": 17717344,
+          "net_output_bytes": 3628818
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 1.319,
+          "cpu_percent_one_core": 43.389,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.879,
+          "net_input_bytes": 17716941,
+          "net_output_bytes": 3628386
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 1.35,
+          "cpu_percent_one_core": 43.51,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.648,
+          "net_input_bytes": 17716569,
+          "net_output_bytes": 3623998
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 1.362,
+          "cpu_percent_one_core": 40.333,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.98,
+          "net_input_bytes": 17716714,
+          "net_output_bytes": 3626146
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 1.589,
+          "cpu_percent_one_core": 35.786,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.112,
+          "net_input_bytes": 17717265,
+          "net_output_bytes": 3628609
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 1.292,
+          "cpu_percent_one_core": 41.657,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.107,
+          "net_input_bytes": 17716990,
+          "net_output_bytes": 3626461
+        }
+      ]
+    },
+    {
+      "label": "rust-30000-nodelay",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 30000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 120.102,
+      "stored_median_ms": 1092.779,
+      "stored_p95_ms": 1174.251,
+      "stored_max_ms": 1174.251,
+      "all_question_results_p95_ms": 526.031,
+      "all_question_results_max_ms": 526.031,
+      "all_final_results_ms": 911.871,
+      "http_p95_ms": 202.491,
+      "http_max_ms": 584.15,
+      "api_peak_fds": 56,
+      "rx_mib": 193.915,
+      "generator_peak_cpu": 123.608,
+      "generator_peak_rss_mib": 1041.508,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 300000,
+      "final_receipts": 30000,
+      "comfortable": false,
+      "python_cpu_percent_one_core": 2.569,
+      "python_peak_rss_mib": 195.652,
+      "rust_cpu_percent_one_core": 109.583,
+      "combined_runtime_cpu_percent_one_core": 112.151,
+      "rust_peak_rss_mib": 1329.102,
+      "rust_peak_fds": 30021,
+      "rust": {
+        "accepted": 300000,
+        "commit_latency_ms": {
+          "count": 300000,
+          "max": 383.743,
+          "p50": 91.647,
+          "p95": 184.063,
+          "p99": 220.031
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 30000,
+        "pid": 15,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 30000,
+        "questions": 10,
+        "label": "rust-30000-nodelay",
+        "ramp": 120.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 9.616,
+      "rust_http_max_ms": 221.116,
+      "answer_http_p95_ms": 218.148,
+      "independent_http": {
+        "python": {
+          "p95_ms": null,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": null,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": null,
+      "comfortable_host_observed": false,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 251.389,
+          "all_stored_ms": 1174.251,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 567.424,
+            "p95": 875.071,
+            "max": 1126.248
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 315.542,
+          "all_stored_ms": 997.262,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 582.248,
+            "p95": 818.103,
+            "max": 985.503
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 244.688,
+          "all_stored_ms": 1117.131,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 554.417,
+            "p95": 842.245,
+            "max": 1108.322
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 216.365,
+          "all_stored_ms": 1054.935,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 568.43,
+            "p95": 897.409,
+            "max": 1051.862
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 252.513,
+          "all_stored_ms": 1086.705,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 559.815,
+            "p95": 836.058,
+            "max": 1054.825
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 357.107,
+          "all_stored_ms": 1077.696,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 598.857,
+            "p95": 868.752,
+            "max": 1043.519
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 293.167,
+          "all_stored_ms": 1063.654,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 555.498,
+            "p95": 825.406,
+            "max": 1052.055
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 335.441,
+          "all_stored_ms": 1098.853,
+          "host_answer_notifications": 6,
+          "scoring_elapsed_ms": {
+            "median": 611.705,
+            "p95": 859.889,
+            "max": 1049.251
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 305.765,
+          "all_stored_ms": 1129.622,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 595.928,
+            "p95": 906.891,
+            "max": 1072.539
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 254.607,
+          "all_stored_ms": 1123.819,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 574.538,
+            "p95": 869.782,
+            "max": 1122.504
+          }
+        }
+      ],
+      "description": "4 workers, 0\u2013500 ms, repeat",
+      "scheduler_lag": {
+        "count": 300000,
+        "mean_ms": 1.084,
+        "p50_ms": 0.03,
+        "p95_ms": 1.861,
+        "p99_ms": 24.412,
+        "min_ms": 0.001,
+        "max_ms": 124.483
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 30000,
+          "mean_ms": 279.724,
+          "p50_ms": 320.056,
+          "p95_ms": 515.454,
+          "p99_ms": 623.699,
+          "min_ms": 0,
+          "max_ms": 635.828
+        },
+        {
+          "index": 1,
+          "count": 30000,
+          "mean_ms": 250.497,
+          "p50_ms": 264.509,
+          "p95_ms": 468.594,
+          "p99_ms": 496.275,
+          "min_ms": 0,
+          "max_ms": 496.275
+        },
+        {
+          "index": 2,
+          "count": 30000,
+          "mean_ms": 234.916,
+          "p50_ms": 218.602,
+          "p95_ms": 515.454,
+          "p99_ms": 614.4,
+          "min_ms": 0,
+          "max_ms": 614.4
+        },
+        {
+          "index": 3,
+          "count": 30000,
+          "mean_ms": 253.488,
+          "p50_ms": 240.462,
+          "p95_ms": 551.494,
+          "p99_ms": 551.494,
+          "min_ms": 0,
+          "max_ms": 551.494
+        },
+        {
+          "index": 4,
+          "count": 30000,
+          "mean_ms": 245.243,
+          "p50_ms": 240.462,
+          "p95_ms": 515.454,
+          "p99_ms": 563.1,
+          "min_ms": 0,
+          "max_ms": 563.1
+        },
+        {
+          "index": 5,
+          "count": 30000,
+          "mean_ms": 265.522,
+          "p50_ms": 264.509,
+          "p95_ms": 515.454,
+          "p99_ms": 552.027,
+          "min_ms": 0,
+          "max_ms": 552.027
+        },
+        {
+          "index": 6,
+          "count": 30000,
+          "mean_ms": 235.566,
+          "p50_ms": 240.462,
+          "p95_ms": 515.454,
+          "p99_ms": 561.798,
+          "min_ms": 0,
+          "max_ms": 561.798
+        },
+        {
+          "index": 7,
+          "count": 30000,
+          "mean_ms": 265.513,
+          "p50_ms": 290.96,
+          "p95_ms": 515.454,
+          "p99_ms": 549.252,
+          "min_ms": 0,
+          "max_ms": 549.252
+        },
+        {
+          "index": 8,
+          "count": 30000,
+          "mean_ms": 273.639,
+          "p50_ms": 264.509,
+          "p95_ms": 515.454,
+          "p99_ms": 566.999,
+          "min_ms": 0,
+          "max_ms": 592.468
+        },
+        {
+          "index": 9,
+          "count": 30000,
+          "mean_ms": 255.97,
+          "p50_ms": 264.509,
+          "p95_ms": 566.999,
+          "p99_ms": 623.699,
+          "min_ms": 0,
+          "max_ms": 628.749
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 1.592,
+          "cpu_percent_one_core": 36.044,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.233,
+          "net_input_bytes": 17714545,
+          "net_output_bytes": 3628266
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 1.255,
+          "cpu_percent_one_core": 45.666,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.58,
+          "net_input_bytes": 17714214,
+          "net_output_bytes": 3619430
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 1.387,
+          "cpu_percent_one_core": 44.316,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.609,
+          "net_input_bytes": 17714718,
+          "net_output_bytes": 3626643
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 1.353,
+          "cpu_percent_one_core": 47.256,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.313,
+          "net_input_bytes": 17715238,
+          "net_output_bytes": 3624784
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 1.417,
+          "cpu_percent_one_core": 42.024,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.447,
+          "net_input_bytes": 17715241,
+          "net_output_bytes": 3629031
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 1.355,
+          "cpu_percent_one_core": 44.046,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.82,
+          "net_input_bytes": 17713913,
+          "net_output_bytes": 3623412
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 1.337,
+          "cpu_percent_one_core": 42.854,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.443,
+          "net_input_bytes": 17713892,
+          "net_output_bytes": 3623723
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 1.379,
+          "cpu_percent_one_core": 50.802,
+          "lua_calls": 30000,
+          "lua_mean_us": 15.731,
+          "net_input_bytes": 17713910,
+          "net_output_bytes": 3623311
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 1.498,
+          "cpu_percent_one_core": 38.729,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.626,
+          "net_input_bytes": 17714555,
+          "net_output_bytes": 3626096
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 1.403,
+          "cpu_percent_one_core": 41.343,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.518,
+          "net_input_bytes": 17714463,
+          "net_output_bytes": 3624005
+        }
+      ]
+    },
+    {
+      "label": "rust-30000-zero-think",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 30000,
+      "rounds": 10,
+      "integrity": true,
+      "join_seconds": 120.176,
+      "stored_median_ms": 931.3,
+      "stored_p95_ms": 1137.367,
+      "stored_max_ms": 1137.367,
+      "all_question_results_p95_ms": 583.458,
+      "all_question_results_max_ms": 583.458,
+      "all_final_results_ms": 744.989,
+      "http_p95_ms": 169.508,
+      "http_max_ms": 485.162,
+      "api_peak_fds": 53,
+      "rx_mib": 193.856,
+      "generator_peak_cpu": 119.607,
+      "generator_peak_rss_mib": 1040.129,
+      "disconnects": 0,
+      "failures": null,
+      "answer_total": 300000,
+      "final_receipts": 30000,
+      "comfortable": false,
+      "python_cpu_percent_one_core": 3.076,
+      "python_peak_rss_mib": 196.066,
+      "rust_cpu_percent_one_core": 108.116,
+      "combined_runtime_cpu_percent_one_core": 111.192,
+      "rust_peak_rss_mib": 1352.309,
+      "rust_peak_fds": 30025,
+      "rust": {
+        "accepted": 300000,
+        "commit_latency_ms": {
+          "count": 300000,
+          "max": 877.055,
+          "p50": 264.703,
+          "p95": 464.639,
+          "p99": 529.919
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 30000,
+        "pid": 14,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 30000,
+        "questions": 10,
+        "label": "rust-30000-zero-think",
+        "ramp": 120.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "burst",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 14,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8,
+          "binary_sha256": "4c94dd7a0339fccda518793608ae6caaa544edba7f80e101fdfadb329ce74047"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 12.486,
+      "rust_http_max_ms": 317.858,
+      "answer_http_p95_ms": 261.976,
+      "independent_http": {
+        "python": {
+          "p95_ms": 259.469,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 18.221,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "comfortable_host_observed": false,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 622.895,
+          "all_stored_ms": 1137.367,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 502.197,
+            "p95": 819.127,
+            "max": 854.804
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 364.348,
+          "all_stored_ms": 977.143,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 430.521,
+            "p95": 678.623,
+            "max": 714.726
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 375.905,
+          "all_stored_ms": 947.656,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 406.753,
+            "p95": 637.885,
+            "max": 673.994
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 432.511,
+          "all_stored_ms": 884.866,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 427.015,
+            "p95": 632.068,
+            "max": 651.792
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 429.664,
+          "all_stored_ms": 920.444,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 434.684,
+            "p95": 616.939,
+            "max": 627.443
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 505.491,
+          "all_stored_ms": 909.761,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 562.436,
+            "p95": 755.056,
+            "max": 784.248
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 460.234,
+          "all_stored_ms": 905.357,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 407.127,
+            "p95": 622.942,
+            "max": 639.17
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 394.033,
+          "all_stored_ms": 942.157,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 424.905,
+            "p95": 644.094,
+            "max": 652.686
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 334.659,
+          "all_stored_ms": 977.324,
+          "host_answer_notifications": 5,
+          "scoring_elapsed_ms": {
+            "median": 454.195,
+            "p95": 624.064,
+            "max": 650.514
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 482.142,
+          "all_stored_ms": 819.947,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 536.428,
+            "p95": 733.026,
+            "max": 755.492
+          }
+        }
+      ],
+      "description": "4 workers, zero think time",
+      "scheduler_lag": {
+        "count": 300000,
+        "mean_ms": 0.007,
+        "p50_ms": 0.002,
+        "p95_ms": 0.009,
+        "p99_ms": 0.036,
+        "min_ms": 0.001,
+        "max_ms": 20.979
+      },
+      "delivery_spread": [
+        {
+          "index": 0,
+          "count": 30000,
+          "mean_ms": 385.894,
+          "p50_ms": 387.268,
+          "p95_ms": 754.676,
+          "p99_ms": 754.676,
+          "min_ms": 0,
+          "max_ms": 776.263
+        },
+        {
+          "index": 1,
+          "count": 30000,
+          "mean_ms": 316.14,
+          "p50_ms": 352.062,
+          "p95_ms": 623.699,
+          "p99_ms": 678.163,
+          "min_ms": 0,
+          "max_ms": 678.163
+        },
+        {
+          "index": 2,
+          "count": 30000,
+          "mean_ms": 278.613,
+          "p50_ms": 290.96,
+          "p95_ms": 566.999,
+          "p99_ms": 595.658,
+          "min_ms": 0,
+          "max_ms": 595.658
+        },
+        {
+          "index": 3,
+          "count": 30000,
+          "mean_ms": 274.983,
+          "p50_ms": 264.509,
+          "p95_ms": 566.999,
+          "p99_ms": 606.59,
+          "min_ms": 0,
+          "max_ms": 606.59
+        },
+        {
+          "index": 4,
+          "count": 30000,
+          "mean_ms": 288.352,
+          "p50_ms": 320.056,
+          "p95_ms": 566.999,
+          "p99_ms": 595.022,
+          "min_ms": 0,
+          "max_ms": 595.022
+        },
+        {
+          "index": 5,
+          "count": 30000,
+          "mean_ms": 321.278,
+          "p50_ms": 320.056,
+          "p95_ms": 623.699,
+          "p99_ms": 623.699,
+          "min_ms": 0,
+          "max_ms": 714.888
+        },
+        {
+          "index": 6,
+          "count": 30000,
+          "mean_ms": 287.675,
+          "p50_ms": 290.96,
+          "p95_ms": 566.999,
+          "p99_ms": 596.825,
+          "min_ms": 0,
+          "max_ms": 596.825
+        },
+        {
+          "index": 7,
+          "count": 30000,
+          "mean_ms": 297.101,
+          "p50_ms": 320.056,
+          "p95_ms": 600.832,
+          "p99_ms": 600.832,
+          "min_ms": 0,
+          "max_ms": 600.832
+        },
+        {
+          "index": 8,
+          "count": 30000,
+          "mean_ms": 300.076,
+          "p50_ms": 290.96,
+          "p95_ms": 566.999,
+          "p99_ms": 580.975,
+          "min_ms": 0,
+          "max_ms": 580.975
+        },
+        {
+          "index": 9,
+          "count": 30000,
+          "mean_ms": 322.243,
+          "p50_ms": 352.062,
+          "p95_ms": 623.699,
+          "p99_ms": 662.071,
+          "min_ms": 0,
+          "max_ms": 662.071
+        }
+      ],
+      "redis_phases": [
+        {
+          "phase": "answer_0",
+          "elapsed_s": 1.452,
+          "cpu_percent_one_core": 35.058,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.091,
+          "net_input_bytes": 17714789,
+          "net_output_bytes": 3654484
+        },
+        {
+          "phase": "answer_1",
+          "elapsed_s": 1.239,
+          "cpu_percent_one_core": 42.507,
+          "lua_calls": 30000,
+          "lua_mean_us": 13.06,
+          "net_input_bytes": 17711520,
+          "net_output_bytes": 3649405
+        },
+        {
+          "phase": "answer_2",
+          "elapsed_s": 1.228,
+          "cpu_percent_one_core": 42.484,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.869,
+          "net_input_bytes": 17711747,
+          "net_output_bytes": 3647441
+        },
+        {
+          "phase": "answer_3",
+          "elapsed_s": 1.157,
+          "cpu_percent_one_core": 40.686,
+          "lua_calls": 30000,
+          "lua_mean_us": 11.879,
+          "net_input_bytes": 17710697,
+          "net_output_bytes": 3639840
+        },
+        {
+          "phase": "answer_4",
+          "elapsed_s": 1.183,
+          "cpu_percent_one_core": 38.684,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.572,
+          "net_input_bytes": 17711565,
+          "net_output_bytes": 3645202
+        },
+        {
+          "phase": "answer_5",
+          "elapsed_s": 1.181,
+          "cpu_percent_one_core": 49.789,
+          "lua_calls": 30000,
+          "lua_mean_us": 14.904,
+          "net_input_bytes": 17713197,
+          "net_output_bytes": 3642338
+        },
+        {
+          "phase": "answer_6",
+          "elapsed_s": 1.168,
+          "cpu_percent_one_core": 40.408,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.104,
+          "net_input_bytes": 17710868,
+          "net_output_bytes": 3644331
+        },
+        {
+          "phase": "answer_7",
+          "elapsed_s": 1.222,
+          "cpu_percent_one_core": 39.796,
+          "lua_calls": 30000,
+          "lua_mean_us": 11.786,
+          "net_input_bytes": 17712776,
+          "net_output_bytes": 3650516
+        },
+        {
+          "phase": "answer_8",
+          "elapsed_s": 1.247,
+          "cpu_percent_one_core": 36.43,
+          "lua_calls": 30000,
+          "lua_mean_us": 11.075,
+          "net_input_bytes": 17711373,
+          "net_output_bytes": 3648890
+        },
+        {
+          "phase": "answer_9",
+          "elapsed_s": 1.074,
+          "cpu_percent_one_core": 46.463,
+          "lua_calls": 30000,
+          "lua_mean_us": 12.155,
+          "net_input_bytes": 17711209,
+          "net_output_bytes": 3638454
+        }
+      ]
+    }
+  ],
+  "diagnostics": [
+    {
+      "label": "rust-10000-four-threads",
+      "answer_validation": "active-question",
+      "quiz_questions": 10,
+      "users": 10000,
+      "rounds": 10,
+      "integrity": false,
+      "join_seconds": 60.044,
+      "stored_median_ms": 647.595,
+      "stored_p95_ms": 672.49,
+      "stored_max_ms": 672.49,
+      "all_question_results_p95_ms": 137.197,
+      "all_question_results_max_ms": 137.197,
+      "all_final_results_ms": 218.175,
+      "http_p95_ms": 43.457,
+      "http_max_ms": 96.373,
+      "api_peak_fds": 42,
+      "rx_mib": 64.987,
+      "generator_peak_cpu": 52.403,
+      "generator_peak_rss_mib": 367.02,
+      "disconnects": 0,
+      "failures": [
+        {
+          "phase": "join",
+          "reason": "join confirmation timed out",
+          "count": 1,
+          "samples": [
+            "join: join confirmation timed out"
+          ]
+        }
+      ],
+      "answer_total": 100000,
+      "final_receipts": 10000,
+      "comfortable": false,
+      "python_cpu_percent_one_core": 4.361,
+      "python_peak_rss_mib": 195.25,
+      "rust_cpu_percent_one_core": 45.098,
+      "combined_runtime_cpu_percent_one_core": 49.459,
+      "rust_peak_rss_mib": 433.996,
+      "rust_peak_fds": 10021,
+      "rust": {
+        "accepted": 100000,
+        "commit_latency_ms": {
+          "count": 100000,
+          "max": 72.191,
+          "p50": 0.369,
+          "p95": 4.359,
+          "p99": 24.447
+        },
+        "compression": false,
+        "connected": 1,
+        "emit_errors": 0,
+        "engine": "rust-socketioxide",
+        "errors": 0,
+        "heartbeat_interval_s": 25,
+        "heartbeat_timeout_s": 20,
+        "joined": 10000,
+        "pid": 18,
+        "rejected": 0
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-10000-four-threads",
+        "ramp": 60.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 10.0,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "round_pause": 1,
+        "mixed": false
+      },
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 18,
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "error": null,
+      "rust_http_p95_ms": 2.831,
+      "rust_http_max_ms": 9.118,
+      "answer_http_p95_ms": 57.861,
+      "independent_http": {
+        "python": {
+          "p95_ms": null,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": null,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": null,
+      "comfortable_host_observed": false,
+      "rounds_detail": [
+        {
+          "index": 0,
+          "host_question_ms": 44.908,
+          "all_stored_ms": 672.49,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 304.836,
+            "p95": 540.036,
+            "max": 634.233
+          }
+        },
+        {
+          "index": 1,
+          "host_question_ms": 17.123,
+          "all_stored_ms": 630.312,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 299.0,
+            "p95": 533.643,
+            "max": 620.878
+          }
+        },
+        {
+          "index": 2,
+          "host_question_ms": 29.463,
+          "all_stored_ms": 643.378,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 300.136,
+            "p95": 539.67,
+            "max": 635.371
+          }
+        },
+        {
+          "index": 3,
+          "host_question_ms": 37.579,
+          "all_stored_ms": 647.976,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 295.252,
+            "p95": 526.861,
+            "max": 613.066
+          }
+        },
+        {
+          "index": 4,
+          "host_question_ms": 34.8,
+          "all_stored_ms": 647.214,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 305.871,
+            "p95": 539.498,
+            "max": 629.388
+          }
+        },
+        {
+          "index": 5,
+          "host_question_ms": 39.015,
+          "all_stored_ms": 649.264,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 304.264,
+            "p95": 538.838,
+            "max": 639.203
+          }
+        },
+        {
+          "index": 6,
+          "host_question_ms": 48.928,
+          "all_stored_ms": 665.481,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 307.085,
+            "p95": 539.52,
+            "max": 617.807
+          }
+        },
+        {
+          "index": 7,
+          "host_question_ms": 30.593,
+          "all_stored_ms": 638.592,
+          "host_answer_notifications": 4,
+          "scoring_elapsed_ms": {
+            "median": 305.862,
+            "p95": 539.011,
+            "max": 620.131
+          }
+        },
+        {
+          "index": 8,
+          "host_question_ms": 45.028,
+          "all_stored_ms": 655.427,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 304.282,
+            "p95": 538.937,
+            "max": 621.388
+          }
+        },
+        {
+          "index": 9,
+          "host_question_ms": 23.68,
+          "all_stored_ms": 634.888,
+          "host_answer_notifications": 3,
+          "scoring_elapsed_ms": {
+            "median": 285.43,
+            "p95": 520.052,
+            "max": 619.422
+          }
+        }
+      ]
+    }
+  ]
+}

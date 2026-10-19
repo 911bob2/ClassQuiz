@@ -44,7 +44,7 @@ SPDX-License-Identifier: MPL-2.0
 		Object.keys(data).sort((a, b) => {
 			const scoreA = parseFloat(data[a]) || 0;
 			const scoreB = parseFloat(data[b]) || 0;
-			return scoreB - scoreA;
+			return scoreB - scoreA || (a < b ? -1 : a > b ? 1 : 0);
 		})
 	);
 
@@ -107,8 +107,8 @@ SPDX-License-Identifier: MPL-2.0
 					</tr>
 				</thead>
 				<tbody>
-					{#each player_names as player, i (player)}
-						<tr animate:flip class:hidden={i > 3}>
+					{#each player_names.slice(0, 4) as player, i (player)}
+						<tr animate:flip>
 							<td class="results-rank">{i + 1}</td>
 							<td>{player}</td>
 							<td class="results-number">{data[player]}</td>

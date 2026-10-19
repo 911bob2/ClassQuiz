@@ -69,7 +69,11 @@ type wire struct {
 }
 
 func engineURL(c config, transport, sid string) string {
-	u, _ := url.Parse(c.endpoint("/socket.io/"))
+	path := c.socketPath
+	if path == "" {
+		path = "/socket.io/"
+	}
+	u, _ := url.Parse(c.endpoint(path))
 	q := u.Query()
 	q.Set("EIO", "4")
 	q.Set("transport", transport)

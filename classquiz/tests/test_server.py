@@ -342,7 +342,7 @@ class TestQuiz:
 
 class TestPlayQuiz:
     @pytest.mark.asyncio
-    async def test_start_quiz(self, test_client: TestClient):  # noqa : F811
+    async def test_start_quiz(self, test_client: TestClient, monkeypatch):  # noqa : F811
         resp = test_client.post(
             "/api/v1/quiz/start/fb5adc91-629e-416e-8b98-ae400e36417c?game_mode=kahoot", cookies=ValueStorage.cookies
         )
@@ -352,9 +352,18 @@ class TestPlayQuiz:
             cookies=ValueStorage.cookies,
         )
         assert resp.status_code == 400
+        with monkeypatch.context() as patch:
+            patch.setattr("classquiz.captcha.public_policy", lambda: None)
+            resp = test_client.post(
+                f"/api/v1/quiz/start/{ValueStorage.quiz_id}?game_mode=kahoot&captcha_enabled=True",
+                cookies=ValueStorage.cookies,
+            )
+            assert resp.status_code == 422
         resp = test_client.post(
-            f"/api/v1/quiz/start/{ValueStorage.quiz_id}?game_mode=kahoot", cookies=ValueStorage.cookies
+            f"/api/v1/quiz/start/{ValueStorage.quiz_id}?game_mode=kahoot&captcha_enabled=False",
+            cookies=ValueStorage.cookies,
         )
+        assert resp.status_code == 200
         ValueStorage.game_pin = resp.json()["game_pin"]
         ValueStorage.game_id = resp.json()["game_id"]
 
@@ -362,7 +371,8 @@ class TestPlayQuiz:
     async def test_check_captcha_enabled(self, test_client: TestClient):  # noqa : F811
         res = test_client.get(f"/api/v1/quiz/play/check_captcha/{ValueStorage.game_pin}")
         assert res.status_code == 200
-        assert res.json()["enabled"] is True
+        assert res.json()["enabled"] is False
+        assert res.json()["captcha_policy"] is None
 
         res = test_client.get("/api/v1/quiz/play/check_captcha/dsadsadas")
         assert res.status_code == 404

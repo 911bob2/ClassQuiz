@@ -6,7 +6,6 @@ SPDX-License-Identifier: MPL-2.0
 
 <script lang="ts">
 	// import { alertModal } from '$lib/stores';
-	import { captcha_enabled } from '$lib/config';
 	import { fade } from 'svelte/transition';
 	import Spinner from '$lib/Spinner.svelte';
 	import { onMount } from 'svelte';
@@ -20,8 +19,33 @@ SPDX-License-Identifier: MPL-2.0
 	let custom_field = $state('');
 	let cqcs_enabled = $state(false);
 	let randomized_answers = $state(false);
+	let large_audience = $state(false);
+	let rust_experimental = $state(false);
+	let rust_available = $state(false);
+	let start_error = $state('');
+	let python_captcha = $state(false);
+	let rust_captcha = $state(false);
+	const captcha_available = $derived(rust_experimental ? rust_captcha : python_captcha);
+	$effect(() => {
+		if (!captcha_available) captcha_selected = false;
+	});
+	$effect(() => {
+		if (rust_experimental) {
+			large_audience = true;
+			cqcs_enabled = false;
+			selected_game_mode = 'kahoot';
+		}
+	});
 
 	onMount(() => {
+		fetch('/api/v1/quiz/realtime/capabilities')
+			.then((r) => r.json())
+			.then((d) => {
+				rust_available = d.rust === true;
+				python_captcha = !!d.captcha;
+				rust_captcha = !!d.rust_captcha;
+			})
+			.catch(() => {});
 		const ls_data = localStorage.getItem('custom_field');
 		custom_field = ls_data ? ls_data : '';
 	});
@@ -29,40 +53,44 @@ SPDX-License-Identifier: MPL-2.0
 	const start_game = async (id: string) => {
 		let res;
 		loading = true;
-		localStorage.setItem('custom_field', custom_field);
-		const cqcs_enabled_parsed = cqcs_enabled ? 'True' : 'False';
-		const randomized_answers_parsed = randomized_answers ? 'True' : 'False';
-		if (captcha_enabled && captcha_selected) {
-			res = await fetch(
-				`/api/v1/quiz/start/${id}?captcha_enabled=True&game_mode=${selected_game_mode}&custom_field=${custom_field}&cqcs_enabled=${cqcs_enabled_parsed}`,
-				{
-					method: 'POST'
-				}
-			);
-		} else {
-			res = await fetch(
-				`/api/v1/quiz/start/${id}?captcha_enabled=False&game_mode=${selected_game_mode}&custom_field=${custom_field}&cqcs_enabled=${cqcs_enabled_parsed}&randomize_answers=${randomized_answers_parsed}`,
-				{
-					method: 'POST'
-				}
-			);
-		}
-		if (res.status !== 200) {
-			/*			alertModal.set({
-				open: true,
-				title: 'Start failed',
-				body: `Failed to start game, ${await res.text()}`
-			});*/
-			/*alertModal.subscribe((_) => {
-				window.location.assign('/account/login?returnTo=/dashboard');
-			});*/
-			alert('Starting game failed');
-			window.location.assign('/account/login?returnTo=/dashboard');
-		} else {
-			const data = await res.json();
-			window.location.assign(
-				`/admin?token=${data.game_id}&pin=${data.game_pin}&connect=1&cqc_code=${data.cqc_code}`
-			);
+		start_error = '';
+		try {
+			localStorage.setItem('custom_field', custom_field);
+			const cqcs_enabled_parsed = cqcs_enabled ? 'True' : 'False';
+			const randomized_answers_parsed = randomized_answers ? 'True' : 'False';
+			if (captcha_available && captcha_selected) {
+				res = await fetch(
+					`/api/v1/quiz/start/${id}?captcha_enabled=True&game_mode=${selected_game_mode}&custom_field=${encodeURIComponent(custom_field)}&cqcs_enabled=${cqcs_enabled_parsed}&randomize_answers=${randomized_answers_parsed}&large_audience=${large_audience}&rust_experimental=${rust_experimental}`,
+					{
+						method: 'POST'
+					}
+				);
+			} else {
+				res = await fetch(
+					`/api/v1/quiz/start/${id}?captcha_enabled=False&game_mode=${selected_game_mode}&custom_field=${encodeURIComponent(custom_field)}&cqcs_enabled=${cqcs_enabled_parsed}&randomize_answers=${randomized_answers_parsed}&large_audience=${large_audience}&rust_experimental=${rust_experimental}`,
+					{
+						method: 'POST'
+					}
+				);
+			}
+			if (res.status !== 200) {
+				loading = false;
+				const failure = await res.json().catch(() => ({}));
+				start_error =
+					typeof failure.detail === 'string'
+						? failure.detail
+						: 'Starting game failed. Please retry.';
+				return;
+			} else {
+				const data = await res.json();
+				window.location.assign(
+					`/admin?token=${data.game_id}&pin=${data.game_pin}&connect=1&cqc_code=${data.cqc_code}`
+				);
+			}
+		} catch {
+			start_error = 'Connection failed. Please retry.';
+		} finally {
+			loading = false;
 		}
 	};
 
@@ -136,7 +164,12 @@ SPDX-License-Identifier: MPL-2.0
 				class="tq-panel mode-option"
 				class:mode-selected={selected_game_mode === 'normal'}
 			>
-				<input type="radio" bind:group={selected_game_mode} value="normal" />
+				<input
+					type="radio"
+					bind:group={selected_game_mode}
+					value="normal"
+					disabled={rust_experimental}
+				/>
 				<span>
 					<strong>{$t('start_game.old_school_mode')}</strong>
 					<span class="tq-muted mode-description">
@@ -164,16 +197,20 @@ SPDX-License-Identifier: MPL-2.0
 			<label class="option-row">
 				<input
 					type="checkbox"
-					disabled={!captcha_enabled}
+					disabled={!captcha_available}
+					data-ui="captcha-toggle"
 					bind:checked={captcha_selected}
 				/>
 				<span>Captcha</span>
 			</label>
+			{#if !captcha_available}<p class="tq-muted text-sm option-note">
+					Captcha is not configured for this engine.
+				</p>{/if}
 			{#if captcha_selected}
 				<p class="tq-muted text-sm option-note">{$t('start_game.captcha_message')}</p>
 			{/if}
 			<label class="option-row">
-				<input type="checkbox" bind:checked={cqcs_enabled} />
+				<input type="checkbox" bind:checked={cqcs_enabled} disabled={rust_experimental} />
 				<span>{$t('telekom.controllers', { defaultValue: 'Controllers' })}</span>
 				<a class="tq-link text-sm" href="/controller" target="_blank" rel="noreferrer">
 					{$t('telekom.learn_more', { defaultValue: 'Learn more' })}
@@ -184,7 +221,52 @@ SPDX-License-Identifier: MPL-2.0
 				<span>{$t('telekom.randomize_answers', { defaultValue: 'Randomize answers' })}</span
 				>
 			</label>
+			<label class="option-row">
+				<input
+					type="checkbox"
+					bind:checked={large_audience}
+					disabled={rust_experimental}
+					data-ui="large-audience-toggle"
+					aria-describedby="large-audience-help"
+				/>
+				<span
+					>{$t('telekom.large_audience', {
+						defaultValue: 'Huge publicum optimization (300+ players)'
+					})}</span
+				>
+			</label>
+			<p class="tq-muted text-sm option-note" id="large-audience-help">
+				{$t('telekom.large_audience_help', {
+					defaultValue:
+						'Players see their own score and rank, plus the top 10 at the end. The host keeps full results and exports.'
+				})}
+			</p>
+			<div class="rust-option tq-panel tq-panel-body">
+				<label class="option-row">
+					<input
+						type="checkbox"
+						bind:checked={rust_experimental}
+						disabled={!rust_available}
+						data-ui="rust-engine-toggle"
+						aria-describedby="rust-engine-help"
+					/>
+					<span>Experimental Rust engine (10,000+ players)</span>
+				</label>
+				<p class="tq-muted text-sm" id="rust-engine-help">
+					{rust_available
+						? 'For very large audiences. Includes personal scores and top 10 results. Requires normal mode and controllers off. Supports captcha when configured.'
+						: 'The Rust engine is unavailable on this server. You can use the Python modes above.'}
+					<a
+						class="tq-link"
+						data-ui="rust-learn-more"
+						href="/docs/large-audiences"
+						target="_blank"
+						rel="noreferrer">Learn more</a
+					>
+				</p>
+			</div>
 		</fieldset>
+		{#if start_error}<p class="tq-muted" role="alert">{start_error}</p>{/if}
 
 		<div class="tq-toolbar dialog-actions">
 			<button

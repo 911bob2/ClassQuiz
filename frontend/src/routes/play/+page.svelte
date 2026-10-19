@@ -6,7 +6,10 @@ SPDX-License-Identifier: MPL-2.0
 
 <!--suppress ALL -->
 <script lang="ts">
-	import { socket } from '$lib/socket';
+	import { roomEvents } from '$lib/room-socket';
+	const listen = roomEvents();
+	import { socket, connectRoom } from '$lib/socket';
+	import { onMount, onDestroy } from 'svelte';
 	import JoinGame from '$lib/play/join.svelte';
 	import type { Question as QuestionType } from '$lib/quiz_types';
 	import ShowTitle from '$lib/play/title.svelte';
@@ -14,6 +17,7 @@ SPDX-License-Identifier: MPL-2.0
 	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import ShowEndScreen from '$lib/play/admin/final_results.svelte';
 	import KahootResults from '$lib/play/results_kahoot.svelte';
+	import LargeAudienceResults from '$lib/play/large_audience_results.svelte';
 	import { getLocalization } from '$lib/i18n';
 	import Cookies from 'js-cookie';
 	import { backgroundText } from '$lib/play/background';
@@ -43,6 +47,14 @@ SPDX-License-Identifier: MPL-2.0
 
 	// Variables init
 	let question_index = $state('');
+	let question_token: string | undefined = $state();
+	let already_submitted = $state(false);
+	let remaining_ms: number | undefined = $state();
+	let reconnecting = $state(false);
+	let connection_error = $state('');
+	let restoring = false;
+	let personal_result: any = $state();
+	let personal_final: any = $state();
 	let unique = $state({});
 	navbarVisible.visible = false;
 	let answer_results: any = $state();
@@ -72,42 +84,89 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	};
 
-	socket.on('time_sync', (data) => {
+	listen('time_sync', (data) => {
 		socket.emit('echo_time_sync', data);
 	});
 
-	socket.on('connect', async () => {
-		console.log('Connected!');
+	const restorePlayer = async () => {
+		if (restoring) return;
 		const cookie_data = Cookies.get('joined_game');
 		if (!cookie_data) {
 			return;
 		}
-		const data = JSON.parse(cookie_data);
-		socket.emit('rejoin_game', {
-			old_sid: data.sid,
-			username: data.username,
-			game_pin: data.game_pin
-		});
-		const res = await fetch(`/api/v1/quiz/play/check_captcha/${game_pin}`);
-		const json = await res.json();
-		game_mode = json.game_mode;
+		restoring = true;
+		try {
+			const data = JSON.parse(cookie_data);
+			game_pin = data.game_pin;
+			username = data.username;
+			const metadata = await connectRoom(game_pin);
+			game_mode = metadata.game_mode;
+			socket.emit(data.pending ? 'join_game' : 'rejoin_game', {
+				old_sid: data.sid,
+				username: data.username,
+				game_pin: data.game_pin,
+				resume_token: data.resume_token
+			});
+			connection_error = '';
+		} catch (error) {
+			connection_error = error.message;
+		} finally {
+			restoring = false;
+		}
+	};
+	listen('connect', restorePlayer);
+	const disconnected = () => {
+		if (gameData?.realtime_engine === 'rust') reconnecting = true;
+	};
+	listen('disconnect', disconnected);
+	onMount(() => {
+		if (socket.connected) restorePlayer();
+	});
+	onDestroy(() => {
+		socket.off('connect', restorePlayer);
+		socket.off('disconnect', disconnected);
+	});
+	const rememberPlayer = (data) => {
+		const old = JSON.parse(Cookies.get('joined_game') || '{}');
+		Cookies.set(
+			'joined_game',
+			JSON.stringify({
+				sid: socket.id,
+				username,
+				game_pin,
+				resume_token: data.resume_token || old.resume_token
+			}),
+			{ expires: 1, sameSite: 'lax' }
+		);
+		reconnecting = false;
+		connection_error = '';
+	};
+	listen('error', () => {
+		connection_error = 'The quiz request failed. Check the connection and retry.';
+	});
+	listen('room_full', () => {
+		connection_error = 'This room has reached its player limit.';
+		Cookies.remove('joined_game');
+	});
+	listen('game_already_started', () => {
+		connection_error = 'This quiz has already started.';
+		Cookies.remove('joined_game');
 	});
 
 	// Socket-events
-	socket.on('joined_game', (data) => {
+	listen('joined_game', (data) => {
 		gameData = data;
-		Cookies.set('joined_game', JSON.stringify({ sid: socket.id, username, game_pin }), {
-			expires: 3600
-		});
+		rememberPlayer(data);
 	});
-	socket.on('rejoined_game', (data) => {
+	listen('rejoined_game', (data) => {
 		gameData = data;
+		rememberPlayer(data);
 		if (data.started) {
 			gameMeta.started = true;
 		}
 	});
 
-	socket.on('game_not_found', () => {
+	listen('game_not_found', () => {
 		const cookie_data = Cookies.get('joined_game');
 		if (cookie_data) {
 			Cookies.remove('joined_game');
@@ -116,28 +175,62 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	});
 
-	socket.on('set_question_number', (data) => {
+	listen('set_question_number', (data) => {
 		solution = undefined;
 		restart();
 		question = data.question;
 		question_index = data.question_index;
+		question_token = data.question_token;
+		already_submitted = false;
+		remaining_ms = undefined;
+		personal_result = undefined;
 		answer_results = undefined;
 	});
+	listen('room_state', (data) => {
+		gameMeta.started = data.started === true;
+		if (data.question_index >= 0 && data.question) {
+			question_index = data.question_index;
+			question_token = data.question_token;
+			question = data.question;
+			already_submitted = data.answered;
+			remaining_ms = data.remaining_ms;
+			solution = data.solution;
+			personal_result = undefined;
+			answer_results = undefined;
+			restart();
+		}
+		reconnecting = false;
+	});
+	listen('answer_committed', (data) => {
+		if (data.question_index === Number(question_index)) already_submitted = true;
+	});
 
-	socket.on('start_game', () => {
+	listen('start_game', () => {
 		gameMeta.started = true;
 	});
 
-	socket.on('question_results', (data) => {
+	listen('question_results', (data) => {
 		restart();
 		answer_results = data;
 	});
+	listen('personal_question_results', (data) => {
+		if (data.version === 1 && data.question_index === Number(question_index)) {
+			personal_result = data;
+		}
+	});
+	listen('personal_final_results', (data) => {
+		if (data.version === 1) {
+			personal_final = data;
+			preventReload = false;
+			Cookies.remove('joined_game');
+		}
+	});
 
-	socket.on('username_already_exists', () => {
+	listen('username_already_exists', () => {
 		window.alert('Username already exists!');
 	});
 
-	socket.on('kick', () => {
+	listen('kick', () => {
 		window.alert('You got kicked');
 		preventReload = false;
 		game_pin = '';
@@ -145,12 +238,12 @@ SPDX-License-Identifier: MPL-2.0
 		Cookies.set('kicked', 'value', { expires: 1 });
 		window.location.reload();
 	});
-	socket.on('final_results', (data) => {
+	listen('final_results', (data) => {
 		final_results = data;
 		Cookies.remove('joined_game');
 	});
 
-	socket.on('solutions', (data) => {
+	listen('solutions', (data) => {
 		solution = data;
 	});
 
@@ -173,8 +266,16 @@ SPDX-License-Identifier: MPL-2.0
 	style="background: {bg_color ? bg_color : 'transparent'}"
 	style:color={text_color}
 >
+	{#if reconnecting || connection_error}
+		<p class="tq-panel tq-panel-body" role="status">
+			{connection_error ||
+				'Reconnecting… Your stored answers are safe; the question timer keeps running.'}
+		</p>
+	{/if}
 	{#if !gameMeta.started && gameData === undefined}
 		<JoinGame bind:game_pin bind:game_mode bind:username />
+	{:else if personal_final}
+		<LargeAudienceResults result={personal_final} final={true} />
 	{:else if JSON.stringify(final_results) !== JSON.stringify([null])}
 		<ShowEndScreen bind:data={scores} show_final_results={true} {username} />
 	{:else if gameData !== undefined && question_index === ''}
@@ -184,9 +285,20 @@ SPDX-License-Identifier: MPL-2.0
 			cover_image={gameData.cover_image}
 			{username}
 		/>
+	{:else if personal_result}
+		<LargeAudienceResults result={personal_result} />
 	{:else if gameMeta.started && gameData !== undefined && question_index !== '' && answer_results === undefined}
 		{#key unique}
-			<Question bind:game_mode bind:question {question_index} {question_count} {solution} />
+			<Question
+				bind:game_mode
+				bind:question
+				{question_index}
+				{question_token}
+				{question_count}
+				{solution}
+				{already_submitted}
+				{remaining_ms}
+			/>
 		{/key}
 	{:else if gameMeta.started && answer_results !== undefined}
 		{#if answer_results === null}

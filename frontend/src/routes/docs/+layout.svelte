@@ -22,6 +22,7 @@ SPDX-License-Identifier: MPL-2.0
 			links: [
 				{ href: '/docs/quiz/question-types', label: 'Question types' },
 				{ href: '/docs/features', label: 'Features' },
+				{ href: '/docs/large-audiences', label: 'Large audiences & Rust' },
 				{ href: '/docs/import-from-kahoot', label: 'Import from Kahoot' },
 				{ href: '/docs/classquizcontroller', label: 'ClassQuizController' }
 			]

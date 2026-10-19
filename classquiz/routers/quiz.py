@@ -7,13 +7,16 @@ import json
 import random
 import re
 import uuid
+import math
+import asyncio
+from types import SimpleNamespace
 from datetime import datetime
 from random import randint
 
 import ormar.exceptions
 
 from classquiz.helpers import generate_spreadsheet, handle_import_from_excel
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Header
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import ValidationError, BaseModel
 
@@ -82,8 +85,19 @@ async def start_quiz(
     custom_field: str | None = None,
     cqcs_enabled: bool = False,
     randomize_answers: bool = False,
+    large_audience: bool = False,
+    rust_experimental: bool = False,
     user: User = Depends(get_current_user),
 ):
+    if rust_experimental:
+        from classquiz.realtime import rust_capabilities
+
+        if cqcs_enabled or game_mode != "kahoot":
+            raise HTTPException(422, "Rust requires normal mode and controllers off")
+        capabilities = await rust_capabilities()
+        if not capabilities.get("rust"):
+            raise HTTPException(503, "Rust engine is unavailable; choose Python or retry shortly")
+        large_audience = True
     try:
         quiz_id = uuid.UUID(quiz_id)
     except ValueError:
@@ -93,6 +107,22 @@ async def start_quiz(
         quiz = await Quiz.objects.get_or_none(id=quiz_id, public=True)
         if quiz is None:
             return JSONResponse(status_code=404, content={"detail": "quiz not found"})
+    from classquiz.captcha import public_policy
+
+    captcha_policy = (
+        (capabilities.get("rust_captcha") if rust_experimental else public_policy()) if captcha_enabled else None
+    )
+    if captcha_enabled and captcha_policy is None:
+        raise HTTPException(422, "Captcha is not configured for this engine")
+    if rust_experimental:
+        try:
+            timers_valid = all(
+                math.isfinite(float(q["time"])) and 1 <= float(q["time"]) <= 3600 for q in quiz.questions
+            )
+        except (TypeError, ValueError, KeyError):
+            timers_valid = False
+        if not timers_valid:
+            raise HTTPException(422, "Rust question timers must be between 1 and 3600 seconds")
     quiz.plays += 1
     await quiz.update()
     game_pin = randint(100000, 999999)
@@ -119,18 +149,25 @@ async def start_quiz(
         title=quiz.title,
         description=quiz.description,
         captcha_enabled=captcha_enabled,
+        captcha_policy=captcha_policy,
+        captcha_lab=capabilities.get("captcha_lab", False) if rust_experimental else False,
         cover_image=quiz.cover_image,
         game_mode=game_mode,
         user_id=user.id,
         background_color=quiz.background_color,
         custom_field=custom_field,
         background_image=quiz.background_image,
+        large_audience=large_audience,
+        realtime_engine="rust" if rust_experimental else "python",
     )
     code = None
     if cqcs_enabled:
         code = generate_code(6)
         await redis.set(f"game:cqc:code:{code}", game_pin, ex=3600)
-    await redis.set(f"game:{str(game.game_pin)}", game.model_dump_json(), ex=18000)
+    async with redis.pipeline(transaction=True) as pipe:
+        pipe.set(f"game:{game.game_pin}", game.model_dump_json(), ex=18000)
+        pipe.set(f"game:{game.game_pin}:generation", str(game.game_id), ex=18000)
+        await pipe.execute()
     await redis.set(f"game_pin:{user.id}:{quiz_id}", game_pin, ex=18000)
 
     await redis.set(
@@ -145,6 +182,18 @@ class CheckIfCaptchaEnabledResponse(BaseModel):
     enabled: bool
     game_mode: str | None = None
     custom_field: str | None = None
+    realtime_engine: str = "python"
+    socket_path: str = "/socket.io"
+    captcha_policy: dict | None = None
+    captcha_lab: bool = False
+
+
+@router.get("/realtime/capabilities")
+async def realtime_capabilities():
+    from classquiz.realtime import rust_capabilities
+    from classquiz.captcha import public_policy
+
+    return {**(await rust_capabilities()), "configured": bool(settings.rust_realtime_url), "captcha": public_policy()}
 
 
 @router.get("/play/check_captcha/{game_pin}", response_model=CheckIfCaptchaEnabledResponse)
@@ -153,10 +202,15 @@ async def check_if_captcha_enabled(game_pin: str):
     if game is None:
         return JSONResponse(status_code=404, content={"detail": "game not found"})
     game = PlayGame.model_validate_json(game)
-    if game.captcha_enabled:
-        return CheckIfCaptchaEnabledResponse(enabled=True, game_mode=game.game_mode, custom_field=game.custom_field)
-    else:
-        return CheckIfCaptchaEnabledResponse(enabled=False, game_mode=game.game_mode, custom_field=game.custom_field)
+    return CheckIfCaptchaEnabledResponse(
+        enabled=game.captcha_enabled,
+        game_mode=game.game_mode,
+        custom_field=game.custom_field,
+        realtime_engine=game.realtime_engine,
+        socket_path="/socket.io-rust" if game.realtime_engine == "rust" else "/socket.io",
+        captcha_policy=game.captcha_policy,
+        captcha_lab=game.captcha_lab,
+    )
 
 
 @router.get("/join/{game_pin}", deprecated=True)
@@ -164,8 +218,22 @@ async def get_game_id(game_pin: str):
     redis_res = await redis.get(f"game:{game_pin}")
     if redis_res is None:
         raise HTTPException(status_code=404, detail="game not found")
-    else:
-        return json.loads(redis_res)["game_id"]
+    raise HTTPException(410, "Host tokens are no longer available through player admission")
+
+
+@router.post("/realtime/{game_pin}/save")
+async def save_native_results(game_pin: str, x_quiz_host_token: str | None = Header(default=None)):
+    from classquiz.realtime import native_host, host_action
+    from classquiz.db.models import GameResults
+    from classquiz.socket_server.export_helpers import save_quiz_to_storage
+
+    game = await native_host(game_pin, x_quiz_host_token)
+    if game.realtime_phase != "final":
+        raise HTTPException(409, "Finish the game before saving results")
+    async with host_action(game_pin):
+        if not await GameResults.objects.get_or_none(id=game.game_id):
+            await save_quiz_to_storage(game_pin)
+    return {"saved": True}
 
 
 @router.get("/list")
@@ -223,21 +291,45 @@ async def delete_quiz(quiz_id: str, user: User = Depends(get_current_user)):
 
 @router.get("/export_data/{export_token}", response_class=StreamingResponse)
 async def export_quiz_answers(export_token: str, game_pin: str):
+    bound_pin = await redis.get(f"export_token:{export_token}:room")
+    if bound_pin is not None and bound_pin != game_pin:
+        raise HTTPException(403, "Export token belongs to a different room")
     data = await redis.get(f"export_token:{export_token}")
     if data is None:
         raise HTTPException(status_code=404, detail="export token not found")
     data = json.loads(data)
-    data2 = await redis.get(f"game:{game_pin}")
-    game_data = PlayGame.model_validate_json(data2)
-    quiz = await Quiz.objects.get_or_none(id=game_data.quiz_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="quiz not found")
-
-    player_fields = await redis.hgetall(f"game:{game_pin}:players:custom_fields")
-    score_data = await redis.hgetall(f"game_session:{game_pin}:player_scores")
-    spreadsheet = await generate_spreadsheet(
-        quiz=quiz, quiz_results=data, player_fields=player_fields, player_scores=score_data
-    )
+    snapshot = await redis.get(f"export_token:{export_token}:snapshot")
+    if snapshot is not None:
+        frozen = json.loads(snapshot)
+        quiz = SimpleNamespace(title=frozen["game"]["title"], questions=frozen["game"]["questions"])
+        fields = frozen.get("fields") or []
+        scores = frozen.get("scores") or []
+        player_fields = dict(zip(fields[::2], fields[1::2]))
+        score_data = dict(zip(scores[::2], scores[1::2]))
+        for player in frozen.get("players") or []:
+            score_data.setdefault(json.loads(player)["username"], 0)
+        # XLSX assembly is CPU heavy. Keep the API loop responsive while Rust
+        # serves sockets independently; the helper's media I/O gets its own loop.
+        spreadsheet = await asyncio.to_thread(
+            lambda: asyncio.run(
+                generate_spreadsheet(
+                    quiz=quiz, quiz_results=data, player_fields=player_fields, player_scores=score_data
+                )
+            )
+        )
+    else:
+        data2 = await redis.get(f"game:{game_pin}")
+        if not data2:
+            raise HTTPException(404, "Room expired")
+        game_data = PlayGame.model_validate_json(data2)
+        quiz = await Quiz.objects.get_or_none(id=game_data.quiz_id)
+        if quiz is None:
+            raise HTTPException(status_code=404, detail="quiz not found")
+        player_fields = await redis.hgetall(f"game:{game_pin}:players:custom_fields")
+        score_data = await redis.hgetall(f"game_session:{game_pin}:player_scores")
+        spreadsheet = await generate_spreadsheet(
+            quiz=quiz, quiz_results=data, player_fields=player_fields, player_scores=score_data
+        )
 
     def iter_file():
         yield from spreadsheet

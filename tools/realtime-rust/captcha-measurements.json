@@ -1,0 +1,402 @@
+{
+  "scope": "Local lab only. Real engine, Redis and socket clients; 200ms simulated provider for load. No public-provider load traffic.",
+  "capacity": [
+    {
+      "users": 10000,
+      "rounds": 10,
+      "integrity": true,
+      "comfortable": true,
+      "stored_p95_ms": 687.555495999959,
+      "all_question_results_p95_ms": 130.9514045715332,
+      "all_final_results_ms": 206.65812492370605,
+      "rust_peak_rss_mib": 448.40234375,
+      "rust_cpu_percent_one_core": 54.90339671994868,
+      "python_cpu_percent_one_core": 2.39772073872557,
+      "independent_http": {
+        "python": {
+          "p95_ms": 38.386274999993475,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 1.4732859999639913,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 15,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8,
+          "binary_sha256": "6b88c41175bc0db2ed975534f6bd88ca3427dc035b2de76f7510fb32eae099ed"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "settings": {
+        "users": 10000,
+        "questions": 10,
+        "label": "rust-captcha-10000",
+        "ramp": 60.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 2,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "spread",
+        "round_pause": 1,
+        "mixed": false,
+        "rust": true,
+        "captcha": true
+      },
+      "started_utc": "2026-10-15T19:40:41.314245+00:00",
+      "captcha": {
+        "inflight": 0,
+        "lab_build": true,
+        "max_concurrent": 128,
+        "outcomes": {
+          "accepted": 10000
+        },
+        "peak_inflight": 43,
+        "provider_ms": {
+          "count": 10000,
+          "max": 226,
+          "p50": 200,
+          "p95": 201,
+          "p99": 201
+        },
+        "queue_ms": {
+          "count": 10000,
+          "max": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "starts_per_second": 200.0
+      },
+      "provider": {
+        "requests": 10000,
+        "active": 0,
+        "peak_active": 43,
+        "connections": 43,
+        "forms_valid": true,
+        "config": {
+          "delay_ms": 200,
+          "mode": "token"
+        },
+        "time": 1792093324.390756
+      }
+    },
+    {
+      "users": 30000,
+      "rounds": 10,
+      "integrity": true,
+      "comfortable": false,
+      "stored_p95_ms": 1397.375658999863,
+      "all_question_results_p95_ms": 413.9888286590576,
+      "all_final_results_ms": 595.897912979126,
+      "rust_peak_rss_mib": 1346.21875,
+      "rust_cpu_percent_one_core": 112.76857852946739,
+      "python_cpu_percent_one_core": 2.706368505783527,
+      "independent_http": {
+        "python": {
+          "p95_ms": 274.223075000009,
+          "errors": 0
+        },
+        "rust": {
+          "p95_ms": 13.585729999931573,
+          "errors": 0
+        }
+      },
+      "independent_probe_skipped": 0,
+      "environment": {
+        "patches": [
+          "baseline"
+        ],
+        "profile_phase": "",
+        "scale_experiment": "",
+        "event_loop": "asyncio.unix_events",
+        "gc_thresholds": [
+          2000,
+          10,
+          10
+        ],
+        "answer_validation": "active-question",
+        "pid": 10,
+        "rust_pid": 16,
+        "rust_config": {
+          "threads": 4,
+          "redis_connections": 8,
+          "binary_sha256": "6b88c41175bc0db2ed975534f6bd88ca3427dc035b2de76f7510fb32eae099ed"
+        },
+        "cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "nofile": [
+          65536,
+          65536
+        ]
+      },
+      "settings": {
+        "users": 30000,
+        "questions": 10,
+        "label": "rust-captcha-30000",
+        "ramp": 180.0,
+        "profile": false,
+        "profile_phase": "",
+        "compact": false,
+        "transport": "auto",
+        "idle": 2,
+        "large_audience": true,
+        "quiz_questions": 10,
+        "answer_max": "500ms",
+        "answer_mode": "spread",
+        "round_pause": 1,
+        "mixed": false,
+        "rust": true,
+        "captcha": true
+      },
+      "started_utc": "2026-10-15T19:43:12.751809+00:00",
+      "captcha": {
+        "inflight": 0,
+        "lab_build": true,
+        "max_concurrent": 128,
+        "outcomes": {
+          "accepted": 30000
+        },
+        "peak_inflight": 42,
+        "provider_ms": {
+          "count": 30000,
+          "max": 227,
+          "p50": 200,
+          "p95": 201,
+          "p99": 201
+        },
+        "queue_ms": {
+          "count": 30000,
+          "max": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "starts_per_second": 200.0
+      },
+      "provider": {
+        "requests": 30000,
+        "active": 0,
+        "peak_active": 42,
+        "connections": 42,
+        "forms_valid": true,
+        "config": {
+          "delay_ms": 200,
+          "mode": "token"
+        },
+        "time": 1792093603.963617
+      }
+    }
+  ],
+  "contracts": [
+    {
+      "provider": "hcaptcha",
+      "passed": [
+        "rust: missing, false, expired, quota, malformed, oversized, HTTP failure and timeout fail closed; valid proof joins",
+        "token replay into a second identity is rejected before contacting provider",
+        "simultaneous reuse allows exactly one provider call and one admitted identity",
+        "authenticated resume skips provider; leaked socket ID alone cannot resume",
+        "answers and scoring do not invoke captcha",
+        "python: missing, false, expired, quota, malformed, oversized, HTTP failure and timeout fail closed; valid proof joins",
+        "room control remains responsive during verification; final join checks started state; bound retry receipt is consumed atomically",
+        "generation replacement during provider call invalidates the proof"
+      ],
+      "provider_metrics": {
+        "requests": 19,
+        "active": 0,
+        "peak_active": 2,
+        "connections": 4,
+        "forms_valid": true,
+        "config": {
+          "delay_ms": 200,
+          "mode": "token"
+        },
+        "time": 1792142186.8552532
+      }
+    },
+    {
+      "provider": "recaptcha_v3",
+      "passed": [
+        "rust: missing, false, expired, quota, malformed, oversized, HTTP failure and timeout fail closed; valid proof joins",
+        "token replay into a second identity is rejected before contacting provider",
+        "simultaneous reuse allows exactly one provider call and one admitted identity",
+        "authenticated resume skips provider; leaked socket ID alone cannot resume",
+        "answers and scoring do not invoke captcha",
+        "python: missing, false, expired, quota, malformed, oversized, HTTP failure and timeout fail closed; valid proof joins",
+        "room control remains responsive during verification; final join checks started state; bound retry receipt is consumed atomically",
+        "generation replacement during provider call invalidates the proof"
+      ],
+      "provider_metrics": {
+        "requests": 25,
+        "active": 0,
+        "peak_active": 2,
+        "connections": 4,
+        "forms_valid": true,
+        "config": {
+          "delay_ms": 200,
+          "mode": "token"
+        },
+        "time": 1792142308.9293475
+      }
+    }
+  ],
+  "browser": [
+    {
+      "provider": "hcaptcha",
+      "passed": [
+        "Rust host option exposes configured captcha and creates a protected room",
+        "SDK load failure and rejected token show retryable inline errors; valid retry joins without reload",
+        "page refresh resumes without captcha; answer and personal results still work"
+      ]
+    },
+    {
+      "provider": "recaptcha_v3",
+      "passed": [
+        "Rust host option exposes configured captcha and creates a protected room",
+        "SDK load failure and rejected token show retryable inline errors; valid retry joins without reload",
+        "page refresh resumes without captcha; answer and personal results still work"
+      ]
+    }
+  ],
+  "overload": {
+    "users": 1000,
+    "rejection_codes": {
+      "captcha_unavailable": 128,
+      "captcha_busy": 872
+    },
+    "outage_provider": {
+      "requests": 128,
+      "active": 0,
+      "peak_active": 128,
+      "connections": 128,
+      "forms_valid": true,
+      "config": {
+        "delay_ms": 200,
+        "mode": "slow"
+      },
+      "time": 1792093661.7909768
+    },
+    "health_p95_ms": 0.3693210001074476,
+    "health_max_ms": 46.167938000053255,
+    "recovered": 1000,
+    "recovery_seconds": 10.198104774000058,
+    "recovery_provider": {
+      "requests": 1000,
+      "active": 0,
+      "peak_active": 21,
+      "connections": 21,
+      "forms_valid": true,
+      "config": {
+        "delay_ms": 200,
+        "mode": "token"
+      },
+      "time": 1792093671.9881296
+    }
+  },
+  "crash_recovery": {
+    "users": 1000,
+    "provider_requests": 1000,
+    "native_ready_seconds": 13.877,
+    "all_identities_rejoined_seconds": 21.313,
+    "answers_verified": 1000,
+    "final_receipts": 1000,
+    "rejoins": 1000,
+    "expected_transport_disconnects": 1000,
+    "expected_attempt_failures": [
+      {
+        "phase": "read",
+        "reason": "network/protocol error",
+        "count": 1000,
+        "samples": [
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF",
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF",
+          "read: websocket: close 1006 (abnormal closure): unexpected EOF"
+        ]
+      },
+      {
+        "phase": "transport",
+        "reason": "HTTP 502",
+        "count": 3920,
+        "samples": [
+          "transport: polling GET HTTP 502",
+          "transport: polling GET HTTP 502",
+          "transport: polling GET HTTP 502"
+        ]
+      }
+    ],
+    "note": "Deliberate SIGKILL in lobby; transient connection failures are expected. Every identity and result must recover."
+  },
+  "live_hcaptcha": {
+    "passed": [
+      "real HTTPS siteverify rejects invalid token",
+      "published dummy token admitted through native verifier",
+      "dummy replay rejected locally"
+    ],
+    "captcha": {
+      "inflight": 0,
+      "lab_build": true,
+      "max_concurrent": 128,
+      "outcomes": {
+        "accepted": 1,
+        "expired": 1,
+        "rejected": 1
+      },
+      "peak_inflight": 1,
+      "provider_ms": {
+        "count": 2,
+        "max": 47,
+        "p50": 19,
+        "p95": 47,
+        "p99": 47
+      },
+      "queue_ms": {
+        "count": 3,
+        "max": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0
+      },
+      "starts_per_second": 200.0
+    }
+  },
+  "unverified": [
+    "live Google v3 scoring",
+    "human challenges and solve time",
+    "public-provider burst capacity",
+    "production keys and domain settings"
+  ]
+}

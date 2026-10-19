@@ -18,6 +18,10 @@ then start the quiz. Reveal results after each question, and reveal final
 results before ending the run to verify that the submitted answers were stored.
 Ctrl+C stops the test and prints the report. Final results also stop it.
 
+For isolated native-verifier development, `--lab-captcha` generates synthetic
+tokens only when the server marks the room as a captcha lab. It cannot join a
+real protected lobby. See the [captcha lab and measurements](../realtime-rust/CAPTCHA.md).
+
 Add media traffic, or make every player answer immediately:
 
 ```powershell
@@ -50,6 +54,7 @@ chmod +x stresstest
 | `--transport auto\|websocket\|polling` | `auto` | Polling followed by upgrade, direct WebSocket, or polling only. |
 | `--timeout` | `20s` | Metadata/media, transport setup, writes and join-confirmation timeout. |
 | `--duration` | unlimited | Optional time limit including ramp-up; e.g. `5m`. |
+| `--wait-all-results` | off | Wait until every requested player fully receives finals; the lab enables this for capacity comparisons. |
 | `--verbosity` | `1` | `0`: final summary; `1`: progress every 5 seconds; `2`: each connection/failure; `3`: events/media requests; `4`: packet samples. |
 | `--monitor-ssh` | off | SSH config alias, such as `my-vm`, for optional VM monitoring. |
 | `--output` | off | Final JSON report path, also written on Ctrl+C. |

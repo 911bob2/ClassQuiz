@@ -43,6 +43,13 @@ class Settings(BaseSettings):
     db_url: PostgresDsn | str = "postgresql://postgres:mysecretpassword@localhost:5432/classquiz"
     hcaptcha_key: str | None = None
     recaptcha_key: str | None = None
+    hcaptcha_site_key: str | None = None
+    recaptcha_site_key: str | None = None
+    captcha_provider: str | None = None
+    captcha_site_key: str | None = None
+    captcha_secret_key: str | None = None
+    captcha_allowed_hostnames: str | None = None
+    captcha_recaptcha_min_score: float = 0.5
     mail_address: str
     mail_password: str
     mail_username: str
@@ -64,6 +71,7 @@ class Settings(BaseSettings):
     pixabay_api_key: str | None = None
     mods: list[str] = []
     registration_disabled: bool = False
+    rust_realtime_url: str | None = None
 
     # storage_backend
     storage_backend: str  # either "local" or "s3"

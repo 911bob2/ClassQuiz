@@ -154,6 +154,40 @@ cd /opt/classquiz
 docker compose --env-file deploy/.env -f deploy/compose.yaml exec -T api python - < deploy/smoke.py
 ```
 
+### Experimental Rust rooms
+
+The backend image includes the Rust binary. The separate `realtime` service runs
+its Python supervisor; API workers discover it through `RUST_REALTIME_URL`.
+The gateway sends `/socket.io-rust/` to this service and keeps `/socket.io/` on
+Python. The host setting is available only when the native service is healthy.
+The guide at `/docs/large-audiences` explains feature restrictions and measured
+capacity. Existing Python rooms do not switch engines.
+
+Captcha is configured at runtime for both engines. Set `CAPTCHA_PROVIDER`
+(`hcaptcha`, the default, or `recaptcha_v3`), `CAPTCHA_SITE_KEY` and
+`CAPTCHA_SECRET_KEY` in `deploy/.env`; set `CAPTCHA_ALLOWED_HOSTNAMES` to the
+public hostname for v3. Recreate `api`, `worker` and `realtime` after changes.
+The secret is never passed to the frontend. Missing configuration disables the
+host checkbox and protected-room creation fails closed. Rust verifies directly
+with a shared native HTTP client; ordinary Python rooms use the repaired Python
+verifier. See [native captcha setup and test limits](../tools/realtime-rust/CAPTCHA.md).
+
+Run one native owner per Redis database. A Redis lease prevents overlapping
+owners; after a crash, replacement may wait up to 15 seconds before acquiring it.
+Rooms, identities and accepted answers recover from Redis, while question clocks
+continue running. Clients reconnect automatically. Preserve the Redis volume:
+this recovery does not replace Redis persistence or backups. The supplied AOF
+configuration can lose roughly the last second of writes on a storage/VM crash.
+
+Monitor `docker compose --env-file deploy/.env -f deploy/compose.yaml logs realtime`
+and its container health. `/health` and `/metrics` are internal native endpoints;
+do not publish port 81 directly. Before an upgrade, let native quizzes finish,
+then rebuild the backend and recreate `api`, `worker` and `realtime` together.
+Updating the frontend/proxy configuration is also required when enabling this
+integration for the first time. No rolling upgrade or active-active failover is
+provided. Adjust `RUST_REALTIME_THREADS` and the documented native resource caps
+only after measuring the target machine.
+
 To access the local diagnostic gateway from your computer:
 
 ```powershell
