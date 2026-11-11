@@ -76,11 +76,14 @@ async def update_share(
 
 @router.get("/{uuid}")
 async def get_share(uuid: UUID) -> QuizTivity:
-    share = await QuizTivityShare.objects.select_related("quiztivity").get_or_none(id=uuid)
+    share = await QuizTivityShare.objects.get_or_none(id=uuid)
     if share is None:
         raise HTTPException(status_code=404, detail="Share not found")
-    if share.expire_at is None:
-        return share.quiztivity
-    if share.expire_at < datetime.now():
+    if share.expire_at is not None and share.expire_at < datetime.now():
         raise HTTPException(status_code=410, detail="Already expired")
-    return share.quiztivity
+    # Loaded on its own: ormar >= 0.26 leaves JSON columns of select_related
+    # models as raw strings, so `pages` would reach the client as a string.
+    quiztivity = await QuizTivity.objects.get_or_none(id=share.quiztivity.id)
+    if quiztivity is None:
+        raise HTTPException(status_code=404, detail="Share not found")
+    return quiztivity
