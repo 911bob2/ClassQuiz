@@ -15,7 +15,7 @@ services:
       - api
     environment:
       REDIS_URL: redis://redis:6379/0?decode_responses=True
-      API_URL: http://api:80
+      API_URL: http://api:8000
   api:
     image: ghcr.io/mawoka-myblock/classquiz-backend:master
     restart: &restart always
