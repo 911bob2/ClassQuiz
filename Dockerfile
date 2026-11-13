@@ -48,6 +48,10 @@ RUN apt-get update \
         libpq5 \
         zlib1g \
     && rm -rf /var/lib/apt/lists/*
+# The image ships the standard library without bytecode, and the app runs as
+# nonroot, which can't write __pycache__ there: every new Python process (the
+# health checks run one every few seconds) recompiled it. Precompile once.
+RUN python -c "import compileall, sysconfig; compileall.compile_dir(sysconfig.get_path('stdlib'), quiet=1, workers=0)"
 WORKDIR /app
 
 
