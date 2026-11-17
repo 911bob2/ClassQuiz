@@ -65,7 +65,8 @@ SPDX-License-Identifier: MPL-2.0
 			};
 		}
 		// BalloonEditor.builtinPlugins = [Strikethrough]
-		Editor.create(html_el, {
+		Editor.create({
+			root: { element: html_el },
 			licenseKey: 'GPL',
 			// plugins: [Strikethrough],
 			config: {
