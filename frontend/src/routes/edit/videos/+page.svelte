@@ -102,7 +102,8 @@ SPDX-License-Identifier: MPL-2.0
 				'-crf',
 				'20',
 				'-vf',
-				'scale=1080:-2',
+				// At most 1080 pixels wide, and never enlarged.
+				"scale=w='min(1080,iw)':h=-2",
 				output_name
 			]);
 			if (exit_code !== 0) {
