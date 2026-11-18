@@ -7,6 +7,9 @@ SPDX-License-Identifier: MPL-2.0
 <script lang="ts">
 	import { FFmpeg } from '@ffmpeg/ffmpeg';
 	import { fetchFile } from '@ffmpeg/util';
+	// Served by this site. Without these, the library fetches its core from a CDN.
+	import core_url from '@ffmpeg/core?url';
+	import wasm_url from '@ffmpeg/core/wasm?url';
 
 	import { navbarVisible } from '$lib/stores.svelte.ts';
 	import { getLocalization } from '$lib/i18n';
@@ -50,18 +53,30 @@ SPDX-License-Identifier: MPL-2.0
 	let file_size_in_mi: undefined | number = $state(undefined);
 	let original_file_size_in_mi: undefined | number = undefined;
 	let file_data: undefined | Blob = undefined;
+	let error_message: undefined | string = $state(undefined);
+
+	// Fixed names inside ffmpeg's own file system, so a file called "out.mp4" can't clash.
+	const input_name = 'input.mp4';
+	const output_name = 'output.mp4';
 
 	const compress_video = async () => {
 		if (status !== Status.Idle) {
 			return;
 		}
-		status = Status.Compressing;
-		const ffmpeg = new FFmpeg();
 		const file = file_input.files?.[0];
 		if (!file) {
-			status = Status.Idle;
+			error_message = $t('telekom.video_choose_file', {
+				defaultValue: 'Choose a video first.'
+			});
 			return;
 		}
+		error_message = undefined;
+		status = Status.Compressing;
+		stats.progress = 0;
+		stats.time_elapsed = 0;
+		stats.speed = 0;
+		last_time_elapsed = 0;
+		const ffmpeg = new FFmpeg();
 		original_file_size_in_mi = file.size / 1_048_576;
 		ffmpeg.on('log', ({ message }) => {
 			const speed_match = message.match(speed_extraction_regex);
@@ -76,29 +91,44 @@ SPDX-License-Identifier: MPL-2.0
 			last_time_elapsed = stats.time_elapsed;
 			stats.progress = p.progress ?? 0;
 		});
-		await ffmpeg.load({
-			// log: true,
-		});
-		await ffmpeg.writeFile(file.name, await fetchFile(file));
-		await ffmpeg.exec([
-			'-i',
-			file.name,
-			'-vcodec',
-			'libx264',
-			'-crf',
-			'20',
-			'-vf',
-			'scale=1080:-2',
-			'out.mp4'
-		]);
-		const data = await ffmpeg.readFile('out.mp4');
-		file_size_in_mi = data.length / 1_048_576;
-		file_data = new Blob([data]);
-		status = Status.CompressDone;
-		stats.progress = 1;
+		try {
+			await ffmpeg.load({ coreURL: core_url, wasmURL: wasm_url });
+			await ffmpeg.writeFile(input_name, await fetchFile(file));
+			const exit_code = await ffmpeg.exec([
+				'-i',
+				input_name,
+				'-vcodec',
+				'libx264',
+				'-crf',
+				'20',
+				'-vf',
+				'scale=1080:-2',
+				output_name
+			]);
+			if (exit_code !== 0) {
+				throw new Error(`ffmpeg exited with code ${exit_code}`);
+			}
+			const data = await ffmpeg.readFile(output_name);
+			file_size_in_mi = data.length / 1_048_576;
+			file_data = new Blob([data]);
+			status = Status.CompressDone;
+			stats.progress = 1;
+		} catch (e) {
+			console.error('Video compression failed', e);
+			status = Status.Idle;
+			error_message = $t('telekom.video_compression_failed', {
+				defaultValue: 'The video could not be compressed. Try another file.'
+			});
+		} finally {
+			ffmpeg.terminate();
+		}
 	};
 
 	const upload_video = async () => {
+		if (status !== Status.CompressDone || !file_data) {
+			return;
+		}
+		error_message = undefined;
 		status = Status.Uploading;
 		upload_stats.upload_started = new Date();
 		/*        const progressTrackingStream = new TransformStream({
@@ -123,7 +153,7 @@ SPDX-License-Identifier: MPL-2.0
                 });
                 const json = await response.json()*/
 		const xhr = new XMLHttpRequest();
-		const success = await new Promise((resolve) => {
+		const response: { status: number; body: string } = await new Promise((resolve) => {
 			xhr.upload.addEventListener('progress', (event) => {
 				if (event.lengthComputable) {
 					upload_stats.progress = event.loaded / event.total;
@@ -131,19 +161,40 @@ SPDX-License-Identifier: MPL-2.0
 				}
 			});
 			xhr.addEventListener('loadend', () => {
-				resolve({
-					success: xhr.readyState === 4 && xhr.status === 200,
-					body: xhr.responseText
-				});
+				resolve({ status: xhr.status, body: xhr.responseText });
 			});
 			xhr.open('POST', '/api/v1/storage/raw', true);
 			xhr.setRequestHeader('Content-Type', 'video/mp4');
 			xhr.send(file_data);
 		});
-		console.log('success:', success);
-		const json = JSON.parse(success.body);
-		localStorage.setItem('video_upload_id', json.id);
-		console.log(json, 'done');
+		let video_id: undefined | string = undefined;
+		if (response.status === 200) {
+			try {
+				video_id = JSON.parse(response.body).id;
+			} catch {
+				video_id = undefined;
+			}
+		}
+		if (!video_id) {
+			// Without an id there is nothing to attach; stay here so the user can try again.
+			status = Status.CompressDone;
+			if (response.status === 409) {
+				error_message = $t('telekom.video_storage_full', {
+					defaultValue:
+						'Your storage is full. Delete files you no longer need and try again.'
+				});
+			} else if (response.status === 413) {
+				error_message = $t('telekom.video_too_large', {
+					defaultValue: 'The compressed video is too large to upload.'
+				});
+			} else {
+				error_message = $t('telekom.video_upload_failed', {
+					defaultValue: 'The upload failed. Try again.'
+				});
+			}
+			return;
+		}
+		localStorage.setItem('video_upload_id', video_id);
 		status = Status.Done;
 		window.close();
 	};
@@ -162,6 +213,12 @@ SPDX-License-Identifier: MPL-2.0
 			<span class="tq-label">{$t('words.video')}</span>
 			<input type="file" bind:this={file_input} accept="video/mp4" />
 		</label>
+
+		{#if error_message}
+			<p class="tq-alert tq-alert-error" role="alert" data-ui="video-error">
+				{error_message}
+			</p>
+		{/if}
 
 		{#if status === Status.Compressing || status === Status.CompressDone}
 			<div role="status" class="video-status">
