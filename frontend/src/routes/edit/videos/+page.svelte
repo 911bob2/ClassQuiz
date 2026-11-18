@@ -58,6 +58,22 @@ SPDX-License-Identifier: MPL-2.0
 	const input_name = 'input.mp4';
 	const output_name = 'output.mp4';
 
+	const storage_full_message = () =>
+		$t('telekom.video_storage_full', {
+			defaultValue: 'Your storage is full. Delete files you no longer need and try again.'
+		});
+
+	// The server refuses an upload when the storage is full, but it answers before the whole
+	// file has arrived, and with a big file the browser often can't read that answer.
+	const storage_is_full = async (): Promise<boolean> => {
+		try {
+			const response = await fetch('/api/v1/storage/limit');
+			return response.ok && (await response.json()).limit_reached === true;
+		} catch {
+			return false;
+		}
+	};
+
 	const compress_video = async () => {
 		if (status !== Status.Idle) {
 			return;
@@ -71,6 +87,12 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		error_message = undefined;
 		status = Status.Compressing;
+		// Compressing can take minutes, so don't start if the upload would be refused anyway.
+		if (await storage_is_full()) {
+			status = Status.Idle;
+			error_message = storage_full_message();
+			return;
+		}
 		stats.progress = 0;
 		stats.time_elapsed = 0;
 		stats.speed = 0;
@@ -177,21 +199,18 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		if (!video_id) {
 			// Without an id there is nothing to attach; stay here so the user can try again.
-			status = Status.CompressDone;
-			if (response.status === 409) {
-				error_message = $t('telekom.video_storage_full', {
-					defaultValue:
-						'Your storage is full. Delete files you no longer need and try again.'
-				});
-			} else if (response.status === 413) {
+			if (response.status === 413) {
 				error_message = $t('telekom.video_too_large', {
 					defaultValue: 'The compressed video is too large to upload.'
 				});
+			} else if (response.status === 409 || (await storage_is_full())) {
+				error_message = storage_full_message();
 			} else {
 				error_message = $t('telekom.video_upload_failed', {
 					defaultValue: 'The upload failed. Try again.'
 				});
 			}
+			status = Status.CompressDone;
 			return;
 		}
 		localStorage.setItem('video_upload_id', video_id);
