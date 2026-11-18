@@ -74,6 +74,18 @@ SPDX-License-Identifier: MPL-2.0
 		}
 	};
 
+	// Another file needs its own compression. Without this, "Upload" would still send the
+	// previous one.
+	const file_changed = () => {
+		error_message = undefined;
+		if (status === Status.CompressDone) {
+			file_data = undefined;
+			file_size_in_mi = undefined;
+			stats = { progress: 0, time_elapsed: 0, speed: 0 };
+			status = Status.Idle;
+		}
+	};
+
 	const compress_video = async () => {
 		if (status !== Status.Idle) {
 			return;
@@ -123,8 +135,8 @@ SPDX-License-Identifier: MPL-2.0
 				'-crf',
 				'20',
 				'-vf',
-				// At most 1080 pixels wide, and never enlarged.
-				"scale=w='min(1080,iw)':h=-2",
+				// At most 1080 pixels wide, never enlarged. x264 needs an even width.
+				"scale=w='trunc(min(1080,iw)/2)*2':h=-2",
 				output_name
 			]);
 			if (exit_code !== 0) {
@@ -152,6 +164,8 @@ SPDX-License-Identifier: MPL-2.0
 		}
 		error_message = undefined;
 		status = Status.Uploading;
+		upload_stats.progress = 0;
+		upload_stats.time_elapsed = 0;
 		upload_stats.upload_started = new Date();
 		/*        const progressTrackingStream = new TransformStream({
             transform(chunk, controller) {
@@ -230,7 +244,13 @@ SPDX-License-Identifier: MPL-2.0
 	<section class="tq-panel tq-panel-body tq-stack">
 		<label class="video-file">
 			<span class="tq-label">{$t('words.video')}</span>
-			<input type="file" bind:this={file_input} accept="video/mp4" />
+			<input
+				type="file"
+				bind:this={file_input}
+				accept="video/mp4"
+				onchange={file_changed}
+				disabled={status === Status.Compressing || status === Status.Uploading}
+			/>
 		</label>
 
 		{#if error_message}
