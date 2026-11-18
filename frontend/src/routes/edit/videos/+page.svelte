@@ -32,7 +32,6 @@ SPDX-License-Identifier: MPL-2.0
 		});
 
 	const speed_extraction_regex = /speed=(\d+\.\d+)x(?![\s\S]*speed=\d+\.\d+x)/;
-	let last_time_elapsed = 0;
 
 	// eslint-disable-next-line no-unused-vars
 	enum Status {
@@ -75,21 +74,21 @@ SPDX-License-Identifier: MPL-2.0
 		stats.progress = 0;
 		stats.time_elapsed = 0;
 		stats.speed = 0;
-		last_time_elapsed = 0;
+		const compression_started = Date.now();
 		const ffmpeg = new FFmpeg();
 		original_file_size_in_mi = file.size / 1_048_576;
 		ffmpeg.on('log', ({ message }) => {
+			// Most log lines carry no speed; keep the last one that did.
 			const speed_match = message.match(speed_extraction_regex);
-			stats.speed = speed_match ? parseFloat(speed_match[1]) : 0;
+			if (speed_match) {
+				stats.speed = parseFloat(speed_match[1]);
+			}
 		});
 		ffmpeg.on('progress', (p) => {
-			if (stats.progress >= 1) {
-				stats.time_elapsed = last_time_elapsed;
-				return;
-			}
-			stats.time_elapsed = p.time ?? 0;
-			last_time_elapsed = stats.time_elapsed;
-			stats.progress = p.progress ?? 0;
+			// ffmpeg.wasm: only accurate if input and output have the same length,
+			// so keep it between 0 and 1.
+			stats.progress = Math.min(Math.max(p.progress ?? 0, 0), 1);
+			stats.time_elapsed = (Date.now() - compression_started) / 1000;
 		});
 		try {
 			await ffmpeg.load({ coreURL: core_url, wasmURL: wasm_url });
@@ -240,7 +239,7 @@ SPDX-License-Identifier: MPL-2.0
 							<tr>
 								<td>{stats.speed}×</td>
 								<td>{Math.round(stats.progress * 100)}%</td>
-								<td>{(stats.time_elapsed / 1_000_000).toFixed(2)}s</td>
+								<td>{stats.time_elapsed.toFixed(2)}s</td>
 							</tr>
 						</tbody>
 					</table>
